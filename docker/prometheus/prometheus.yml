@@ -1,0 +1,21 @@
+# Prometheus 抓取配置
+# 启动 backend 后,/actuator/prometheus 暴露指标
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: legislation-dev
+
+scrape_configs:
+  - job_name: 'legislation-backend'
+    metrics_path: /api/actuator/prometheus
+    scheme: http
+    static_configs:
+      - targets: ['backend:8083']
+        labels:
+          service: legislation-backend
+          env: dev
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

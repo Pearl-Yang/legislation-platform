@@ -1,0 +1,132 @@
+# 立法版 - 一键启动(Docker Compose)
+#
+# 启动全部组件:MySQL + Neo4j + 后端
+# 前端 / 小程序是 Node 工程,需各自 cd 启动;见 README
+#
+# 使用:
+#   cp .env.example .env  &&  编辑 .env
+#   docker compose up -d
+#   docker compose logs -f backend
+#
+# 数据持久化在 ./docker-data/{mysql,neo4j}
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: legislation-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root123}
+      MYSQL_DATABASE:      ${DB_NAME:-legal_legislation}
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - ./docker-data/mysql:/var/lib/mysql
+      - ../legislation-edition/backend/sql/legislation_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${DB_PASSWORD:-root123}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  neo4j:
+    image: neo4j:5.15-community
+    container_name: legislation-neo4j
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-legislation@2026}
+      NEO4J_PLUGINS: '[]'
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+      NEO4J_dbms_security_procedures_allowlist: apoc.*
+    ports:
+      - "7474:7474"   # HTTP Browser
+      - "7687:7687"   # Bolt
+    volumes:
+      - ./docker-data/neo4j:/data
+      - ./neo4j/init:/var/lib/neo4j/import
+      - ./neo4j/conf:/var/lib/neo4j/conf
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u ${NEO4J_USER:-neo4j} -p ${NEO4J_PASSWORD:-legislation@2026} 'RETURN 1' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  backend:
+    build:
+      context: ../legislation-edition/backend
+      dockerfile: ../../docker/backend.Dockerfile
+    container_name: legislation-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      neo4j:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-legal_legislation}
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-root123}
+      NEO4J_ENABLED: ${NEO4J_ENABLED:-false}
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: ${NEO4J_USER:-neo4j}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-legislation@2026}
+      JWT_SECRET: ${JWT_SECRET:-legislationIntelligencePlatformSecretKey2026PaddedForHmac256}
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
+      AI_DRAFT_ENABLED: ${AI_DRAFT_ENABLED:-false}
+    ports:
+      - "8083:8083"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8083/actuator/health | grep -q UP || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+
+  # =============================================================================
+  # Prometheus: 抓取 backend /actuator/prometheus
+  # =============================================================================
+  prometheus:
+    image: prom/prometheus:v2.50.1
+    container_name: legislation-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.template=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./docker-data/prometheus:/prometheus
+    depends_on:
+      - backend
+
+  # =============================================================================
+  # Grafana: 内置 Prometheus 数据源 + 立法平台看板
+  # =============================================================================
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: legislation-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_INSTALL_PLUGINS: grafana-piechart-panel,grafana-clock-panel
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./docker-data/grafana:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus

@@ -1,0 +1,275 @@
+@import './variables.scss';
+
+html, body, #app {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Inter', sans-serif;
+  background: $bg-page;
+  color: $text-primary;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { text-decoration: none; color: $primary-color; transition: color .15s ease; }
+a:hover { color: $primary-light; }
+* { box-sizing: border-box; }
+
+// ===========================
+// 通用工具类
+// ===========================
+.flex { display: flex; }
+.flex-1 { flex: 1; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-col { display: flex; flex-direction: column; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.gap-16 { gap: 16px; }
+.gap-24 { gap: 24px; }
+
+.mt-8  { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.mb-8  { margin-bottom: 8px; }
+.mb-12 { margin-bottom: 12px; }
+.mb-16 { margin-bottom: 16px; }
+.mb-24 { margin-bottom: 24px; }
+
+.text-secondary { color: $text-secondary; }
+.text-tertiary  { color: $text-tertiary; }
+.text-primary-color { color: $primary-color; }
+.text-success { color: $status-success; }
+.text-warning { color: $status-warning; }
+.text-danger  { color: $status-danger; }
+.fw-bold { font-weight: 600; }
+.fz-12 { font-size: 12px; }
+.fz-14 { font-size: 14px; }
+.fz-16 { font-size: 16px; }
+.fz-18 { font-size: 18px; }
+.fz-20 { font-size: 20px; }
+.fz-24 { font-size: 24px; }
+
+// ===========================
+// 页面通用容器
+// ===========================
+.page-container {
+  padding: 20px 24px;
+
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+
+    .title {
+      font-size: 20px;
+      font-weight: 600;
+      color: $text-primary;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      &::before {
+        content: '';
+        display: inline-block;
+        width: 4px;
+        height: 18px;
+        background: linear-gradient(180deg, $primary-light, $primary-color);
+        border-radius: 2px;
+      }
+    }
+    .subtitle {
+      color: $text-secondary;
+      font-size: 13px;
+      margin-left: 4px;
+    }
+  }
+}
+
+// ===========================
+// 卡片 / 统计卡（扁平柔和）
+// ===========================
+.stat-card {
+  background: $bg-card;
+  border-radius: $radius-md;
+  padding: 20px;
+  box-shadow: $shadow-card;
+  border: 1px solid $border-lighter;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: box-shadow .2s ease, transform .2s ease;
+
+  &:hover { box-shadow: $shadow-elevated; }
+
+  .icon-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .stat-content {
+    min-width: 0;
+    .stat-label { color: $text-secondary; font-size: 13px; }
+    .stat-value { font-size: 24px; font-weight: 600; color: $text-primary; margin-top: 2px; letter-spacing: -0.01em; }
+    .stat-extra { font-size: 12px; color: $text-secondary; margin-top: 4px; }
+  }
+
+  // 柔和的"色块+同色文字"而非老气渐变
+  &.stat-blue   .icon-wrap { background: $primary-lighter; color: $primary-color; }
+  &.stat-orange .icon-wrap { background: rgba(245, 158, 11, 0.12); color: $accent-amber; }
+  &.stat-green  .icon-wrap { background: rgba(16, 185, 129, 0.12); color: $accent-emerald; }
+  &.stat-red    .icon-wrap { background: rgba(244, 63, 94, 0.12); color: $accent-rose; }
+  &.stat-purple .icon-wrap { background: rgba(139, 92, 246, 0.12); color: $accent-violet; }
+  &.stat-cyan   .icon-wrap { background: rgba(6, 182, 212, 0.12); color: $accent-cyan; }
+  &.stat-fuchsia .icon-wrap { background: rgba(217, 70, 239, 0.12); color: $accent-fuchsia; }
+}
+
+// ===========================
+// Element Plus 主题色覆盖
+// ===========================
+.el-button--primary {
+  --el-button-bg-color: #{$primary-color};
+  --el-button-border-color: #{$primary-color};
+  --el-button-hover-bg-color: #{$primary-light};
+  --el-button-hover-border-color: #{$primary-light};
+  --el-button-active-bg-color: #{$primary-dark};
+  --el-button-active-border-color: #{$primary-dark};
+  --el-button-disabled-bg-color: #c7d2fe;
+  --el-button-disabled-border-color: #c7d2fe;
+  font-weight: 500;
+  border-radius: $radius-sm;
+}
+.el-button {
+  border-radius: $radius-sm;
+}
+
+.el-tabs__item.is-active { color: $primary-color !important; }
+.el-tabs__active-bar { background-color: $primary-color !important; }
+.el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
+  background: $bg-card; color: $primary-color !important; border-bottom-color: $bg-card;
+}
+
+.el-tag.el-tag--primary {
+  --el-tag-bg-color: #{$primary-lighter};
+  --el-tag-border-color: #c7d2fe;
+  --el-tag-text-color: #{$primary-color};
+}
+.el-tag { border-radius: 6px; }
+
+.el-card {
+  border-radius: $radius-md;
+  border: 1px solid $border-lighter;
+  box-shadow: $shadow-card;
+  transition: box-shadow .2s ease;
+}
+.el-card.is-hover-shadow:hover { box-shadow: $shadow-elevated !important; }
+
+.el-table {
+  --el-table-header-bg-color: #{$bg-canvas};
+  --el-table-header-text-color: #{$text-secondary};
+  --el-table-border-color: #{$border-lighter};
+  --el-table-row-hover-bg-color: #{$primary-tint};
+  --el-table-header-text-color: #{$text-regular};
+  font-size: 14px;
+}
+.el-table th.el-table__cell {
+  font-weight: 600;
+  background: $bg-canvas;
+  color: $text-regular;
+}
+
+.el-pagination { justify-content: flex-end; margin-top: 16px; }
+
+.el-drawer { border-radius: 0; }
+.el-drawer__header { padding: 16px 20px; margin-bottom: 0; border-bottom: 1px solid $border-lighter; font-weight: 600; }
+
+.el-menu {
+  border-right: none !important;
+  --el-menu-bg-color: transparent;
+  --el-menu-text-color: #cbd5e1;
+  --el-menu-hover-bg-color: rgba(255, 255, 255, 0.06);
+}
+.el-menu-item.is-active { color: #fff !important; background: $primary-tint !important; }
+
+// ===========================
+// 滚动条（更细更柔和）
+// ===========================
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.25);
+  border-radius: 4px;
+  &:hover { background: rgba(100, 116, 139, 0.45); }
+}
+::-webkit-scrollbar-track { background: transparent; }
+
+// ===========================
+// 审查严重度标签
+// ===========================
+.sev-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  &.red    { background: $sev-red; }
+  &.yellow { background: $sev-yellow; }
+  &.blue   { background: $sev-blue; }
+  &.grey   { background: $sev-grey; }
+}
+
+// 流程时间轴小圆点
+.stage-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  &.done        { background: $status-success; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18); }
+  &.in-progress { background: $primary-color; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.18); }
+  &.pending     { background: #cbd5e1; }
+  &.returned    { background: $status-danger; box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.18); }
+  &.skipped     { background: $status-info; }
+}
+
+// 立法类型徽标
+.type-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: 0.02em;
+  &.admin { background: $type-admin; }
+  &.dept  { background: $type-dept; }
+  &.local { background: $type-local; }
+}
+
+// 链接式"小药丸"
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: $primary-lighter;
+  color: $primary-color;
+  &.green  { background: rgba(16, 185, 129, 0.12); color: $accent-emerald; }
+  &.amber  { background: rgba(245, 158, 11, 0.12); color: $accent-amber; }
+  &.rose   { background: rgba(244, 63, 94, 0.12);  color: $accent-rose; }
+  &.cyan   { background: rgba(6, 182, 212, 0.12);  color: $accent-cyan; }
+  &.violet { background: rgba(139, 92, 246, 0.12); color: $accent-violet; }
+  &.slate  { background: $bg-canvas; color: $text-secondary; }
+}

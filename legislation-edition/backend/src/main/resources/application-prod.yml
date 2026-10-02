@@ -1,0 +1,49 @@
+# ============================================================
+#  生产环境 profile（部署到外置 Tomcat 时使用）
+#  使用方法：把本文件放到 Tomcat 的 conf/ 目录下，
+#  或者放到 war 同级的 config/ 目录，Spring Boot 会自动加载。
+#  优先级：外部配置文件 > war 内的 application.yml
+# ============================================================
+
+spring:
+  application:
+    name: legislation-edition-backend
+
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      # ★ 改成团队实际的 MySQL 地址
+      url: jdbc:mysql://localhost:3306/legal_legislation?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+      # ★ 改成团队实际的数据库账号
+      username: root
+      # ★ 改成团队实际的数据库密码（生产环境强烈建议改成强密码）
+      password: 123456
+      initial-size: 5
+      min-idle: 5
+      max-active: 50
+      max-wait: 60000
+      validation-query: SELECT 1
+      test-while-idle: true
+
+jwt:
+  # ★ 改成团队自定义的 JWT 密钥（建议 32 位以上随机字符串）
+  secret: legislationIntelligencePlatformSecretKey2026
+  expiration: 86400000
+
+logging:
+  level:
+    com.legal: INFO
+    org.springframework.security: WARN
+  file:
+    # 日志输出到 Tomcat 的 logs 目录下，方便排错
+    name: ${catalina.home:-./logs}/legislation-backend.log
+
+# AI 模型接入（按需启用）
+ai:
+  draft-generation:
+    enabled: false
+  review:
+    enabled: false
+  evaluation:
+    enabled: false

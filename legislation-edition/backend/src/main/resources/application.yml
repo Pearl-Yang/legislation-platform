@@ -1,0 +1,141 @@
+server:
+  port: 8083
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: legislation-edition-backend
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.legal.legislation.entity
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: auto
+
+# ===================== OpenAPI / Knife4j 配置 =====================
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    persist-authorization: true
+    disable-swagger-default-url: true
+  default-flat-param-object: true
+  packages-to-scan: com.legal.legislation.controller
+  paths-to-match: /**
+  group-configs:
+    - group: 01-立法项目
+      packages-to-scan: com.legal.legislation.controller
+      paths-to-match: /legislative-project/**, /stage-template/**
+    - group: 02-草案生成
+      packages-to-scan: com.legal.legislation.controller
+      paths-to-match: /draft/**
+    - group: 03-智慧审查
+      packages-to-scan: com.legal.legislation.controller
+      paths-to-match: /review/**
+    - group: 04-智能清理
+      packages-to-scan: com.legal.legislation.controller
+      paths-to-match: /cleanup/**, /regulation/**
+    - group: 05-实施评估
+      packages-to-scan: com.legal.legislation.controller
+      paths-to-match: /evaluation/**
+    - group: 06-意见征集
+      packages-to-scan: com.legal.legislation.controller
+      paths-to-match: /consultation/**
+    - group: 07-立法资料库
+      packages-to-scan: com.legal.legislation.controller
+      paths-to-match: /library/**
+    - group: 08-立法信息展示
+      packages-to-scan: com.legal.legislation.controller
+      paths-to-match: /info/**
+    - group: 公共-认证
+      packages-to-scan: com.legal.legislation.controller
+      paths-to-match: /auth/**
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+    enable-version: true
+    enable-swagger-models: true
+    swagger-model-name: 实体模型
+    enable-document-manage: true
+    enable-host-extend: true
+    enable-search: true
+    enable-footer: true
+    footer-content: "智立法 · 立法版研发内部文档,仅供团队成员使用,请勿对外发布"
+
+# ===================== 缓存(可切换 Redis) =====================
+legislation:
+  cache:
+    type: ${CACHE_TYPE:memory}     # memory(默认) | redis
+  cors:
+    allowed-origins: "*"
+  qwen:
+    mode: ${QWEN_MODE:offline}     # online(走 dashscope) | offline(本地规则)
+    apiKey: ${QWEN_API_KEY:}
+    baseUrl: ${QWEN_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode}
+    model: ${QWEN_MODEL:qwen-plus}
+
+# ===================== Actuator / Prometheus =====================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus, threaddump, heapdump
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+    prometheus:
+      access: read_only
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+        descriptions: true
+        step: PT1M
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      percentiles:
+        http.server.requests: 0.5, 0.75, 0.9, 0.95, 0.99
+  info:
+    env:
+      enabled: true
+    app:
+      name: 智立法
+      description: 行政立法智能辅助平台
+      version: 3.0.0
+
+info:
+  app:
+    name: 智立法
+    encoding: UTF-8
+    java:
+      source: 17
+      target: 17

@@ -1,0 +1,59 @@
+{
+  "uid": "legislation-overview",
+  "title": "智立法 · 平台总览",
+  "tags": ["legislation", "overview"],
+  "timezone": "browser",
+  "schemaVersion": 30,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "立法项目创建累计",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "targets": [{ "expr": "increase(legislation_project_total_total[1h])", "legendFormat": "本小时新增" }]
+    },
+    {
+      "type": "stat",
+      "title": "草案 AI 生成次数",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "targets": [{ "expr": "increase(legislation_draft_generated_total_total[1h])" }]
+    },
+    {
+      "type": "stat",
+      "title": "审查执行次数",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "targets": [{ "expr": "increase(legislation_review_total_total[1h])" }]
+    },
+    {
+      "type": "stat",
+      "title": "评估任务数",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "targets": [{ "expr": "increase(legislation_evaluation_total_total[1h])" }]
+    },
+    {
+      "type": "graph",
+      "title": "Qwen LLM 调用耗时 P95",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [{ "expr": "histogram_quantile(0.95, rate(legislation_qwen_latency_seconds_bucket[5m]))" }]
+    },
+    {
+      "type": "graph",
+      "title": "HTTP 接口 P95 延迟",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [{ "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket[5m]))" }]
+    },
+    {
+      "type": "bargauge",
+      "title": "爬虫抓取分布(按状态)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "targets": [{ "expr": "sum by (status) (rate(legislation_crawler_fetch_total_total[5m]))" }]
+    },
+    {
+      "type": "bargauge",
+      "title": "清理决策分布",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "targets": [{ "expr": "sum by (action) (rate(legislation_cleanup_decision_total_total[5m]))" }]
+    }
+  ]
+}

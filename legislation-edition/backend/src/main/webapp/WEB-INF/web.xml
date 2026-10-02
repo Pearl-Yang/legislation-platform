@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                             https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+
+    <display-name>智立法 - 行政立法智能辅助平台</display-name>
+    <description>面向行政法规/部门规章/地方政府规章的立法全生命周期智能辅助平台</description>
+
+    <!-- 关键：告诉 Tomcat 用 Spring Boot 的 Servlet 启动器来加载应用 -->
+    <absolute-ordering/>
+
+    <!--
+      不需要显式声明 listener 和 servlet-mapping，
+      Spring Boot 的 spring-web-6.x 会通过
+      META-INF/services/jakarta.servlet.ServletContainerInitializer
+      自动注册 SpringBootServletInitializer。
+      Tomcat 10.x 启动时会自动调用它。
+    -->
+
+    <!-- 字符编码 -->
+    <jsp-config>
+        <default-encoding>UTF-8</default-encoding>
+    </jsp-config>
+
+    <!-- session 超时（分钟） -->
+    <session-config>
+        <session-timeout>60</session-timeout>
+    </session-config>
+
+    <!-- 欢迎页（不重要，本项目是 API 服务） -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+</web-app>

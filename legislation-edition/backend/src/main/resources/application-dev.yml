@@ -1,0 +1,44 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:legal_legislation}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      username: ${DB_USER:root}
+      password: ${DB_PASSWORD:root123}
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+
+# Neo4j 知识图谱(可选,未启动时图谱接口走空实现)
+neo4j:
+  enabled: ${NEO4J_ENABLED:false}
+  uri: ${NEO4J_URI:bolt://localhost:7687}
+  username: ${NEO4J_USER:neo4j}
+  password: ${NEO4J_PASSWORD:legislation@2026}
+
+jwt:
+  secret: ${JWT_SECRET:legislationIntelligencePlatformSecretKey2026PaddedForHmac256}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+ai:
+  draft-generation:
+    enabled: ${AI_DRAFT_ENABLED:false}
+    provider: aliyun
+    api-key: ${DASHSCOPE_API_KEY:}
+    model: ${AI_MODEL:qwen-long}
+    top-ksimilarity: 5
+  review:
+    enabled: ${AI_REVIEW_ENABLED:false}
+  evaluation:
+    enabled: ${AI_EVAL_ENABLED:false}
+
+logging:
+  level:
+    com.legal: DEBUG
+    org.springframework.security: INFO

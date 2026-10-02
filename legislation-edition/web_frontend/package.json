@@ -1,0 +1,32 @@
+{
+  "name": "legislation-edition-web",
+  "version": "1.0.0",
+  "description": "智立法 - 行政立法智能辅助平台 Web 端",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js --fix",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "vue": "^3.4.0",
+    "vue-router": "^4.2.5",
+    "pinia": "^2.1.7",
+    "element-plus": "^2.4.4",
+    "@element-plus/icons-vue": "^2.3.1",
+    "axios": "^1.6.0",
+    "echarts": "^5.4.3",
+    "vue-echarts": "^6.6.5",
+    "dayjs": "^1.11.10"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.1.6",
+    "sass": "^1.69.5",
+    "vitest": "^1.6.0",
+    "@vue/test-utils": "^2.4.5",
+    "happy-dom": "^14.12.0"
+  }
+}

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  智立法 - Logback 配置
+  - 控制台:人类可读(开发体验佳)
+  - JSON 文件:logstash / filebeat 可直接采集;预留 ELK 接入
+  - 切换日志格式:
+      spring.profiles.active=prod 时输出 JSON 到 logs/app.json.log
+      其他 profile 走控制台 + 普通文件
+-->
+<configuration>
+
+    <springProperty scope="context" name="appName"        source="spring.application.name"         defaultValue="legislation"/>
+    <springProperty scope="context" name="activeProfile"  source="spring.profiles.active"         defaultValue="dev"/>
+
+    <property name="LOG_DIR"          value="${LOG_DIR:-logs}"/>
+    <property name="PATTERN_PLAIN"    value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"/>
+    <property name="PATTERN_JSON" value="{&quot;time&quot;:%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX},&quot;level&quot;:%level,&quot;thread&quot;:&quot;%thread&quot;,&quot;logger&quot;:&quot;%logger&quot;,&quot;message&quot;:%msg,&quot;app&quot;:&quot;${appName}&quot;,&quot;profile&quot;:&quot;${activeProfile}&quot;}%n"/>
+
+    <!-- 控制台输出(plain) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${PATTERN_PLAIN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 普通文本日志文件 -->
+    <appender name="FILE_PLAIN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${PATTERN_PLAIN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- JSON 日志(ELK / Loki / filebeat 直接采集) -->
+    <appender name="FILE_JSON" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/app.json.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/app.json.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${PATTERN_JSON}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- prod 环境同时输出 JSON + 控制台(简化容器化部署) -->
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="FILE_JSON"/>
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- 其他 profile(默认本地) -->
+    <springProfile name="!prod">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE_PLAIN"/>
+        </root>
+    </springProfile>
+
+    <!-- 项目核心 logger:DEBUG 级别 -->
+    <logger name="com.legal.legislation" level="DEBUG"/>
+    <!-- 噪音抑制 -->
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="com.baomidou.mybatisplus" level="WARN"/>
+    <logger name="org.flywaydb" level="INFO"/>
+    <logger name="io.lettuce" level="WARN"/>
+
+</configuration>

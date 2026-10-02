@@ -1,0 +1,15 @@
+{
+  "name": "legislation-edition-mini",
+  "version": "1.0.0",
+  "private": true,
+  "description": "智立法 - 行政立法智能辅助平台微信小程序",
+  "scripts": {
+    "dev": "uni -p mp-weixin",
+    "build": "uni build -p mp-weixin"
+  },
+  "devDependencies": {
+    "@dcloudio/uni-app-vite": "3.0.0-4020920250117001",
+    "vite": "^5.0.0",
+    "sass": "^1.64.0"
+  }
+}

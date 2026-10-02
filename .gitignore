@@ -1,0 +1,57 @@
+# ====== 通用 ======
+.DS_Store
+*.log
+*.iml
+.idea/
+.vscode/
+.env
+.env.local
+.env.*.local
+
+# ====== Java / Spring Boot ======
+target/
+build/
+*.class
+*.jar
+*.war
+hs_err_pid*
+replay_pid*
+
+# ====== Node / Vue / Vite ======
+node_modules/
+dist/
+dist-ssr/
+*.local
+.cache/
+.parcel-cache/
+
+# ====== 小程序 (uni-app) ======
+unpackage/
+dist/build/
+
+# ====== Python (crawler) ======
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.env.venv
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.scrapy/
+*.egg-info/
+build/
+*.egg
+
+# 爬虫输出
+crawler/output/*
+!crawler/output/.gitkeep
+crawler/report/*
+!crawler/report/.gitkeep

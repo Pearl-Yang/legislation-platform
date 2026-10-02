@@ -1,0 +1,62 @@
+// ===========================
+// 智立法 · 行政立法智能辅助平台 — 全局 SCSS 变量
+// 设计基调：科技感靛蓝 · Linear/Vercel/Notion 同款现代扁平
+// ===========================
+
+// ---- 主色（科技感靛蓝） ----
+$primary-color:         #4f46e5;   // 主品牌色（Indigo 600）
+$primary-light:        #6366f1;   // 悬停（Indigo 500）
+$primary-lighter:      #eef2ff;   // 浅底（Indigo 50）
+$primary-dark:         #3730a3;   // 深色 / 标题（Indigo 800）
+$primary-tint:         rgba(79, 70, 229, 0.08); // hover/选中底色
+
+// ---- 辅色（更现代、更协调） ----
+$accent-violet:        #8b5cf6;   // Violet 500
+$accent-cyan:          #06b6d4;   // Cyan 500
+$accent-emerald:       #10b981;   // Emerald 500
+$accent-amber:         #f59e0b;   // Amber 500
+$accent-rose:          #f43f5e;   // Rose 500
+$accent-fuchsia:       #d946ef;   // Fuchsia 500
+
+// ---- 中性文字（Slate 体系） ----
+$text-primary:         #0f172a;   // Slate 900 · 标题
+$text-regular:         #334155;   // Slate 700 · 正文
+$text-secondary:       #64748b;   // Slate 500 · 辅助
+$text-tertiary:        #94a3b8;   // Slate 400
+$text-placeholder:     #cbd5e1;   // Slate 300
+
+// ---- 背景 / 边框 ----
+$bg-page:              #f8fafc;   // Slate 50 · 页面底
+$bg-canvas:            #f1f5f9;   // Slate 100 · 区块
+$bg-card:              #ffffff;
+$bg-sidebar:           #0f172a;   // Slate 900
+$bg-sidebar-hover:     #1e293b;   // Slate 800
+$bg-header:            rgba(255, 255, 255, 0.85);
+$border-light:         #e2e8f0;   // Slate 200
+$border-lighter:       #f1f5f9;   // Slate 100
+
+// ---- 间距 / 圆角 / 阴影（更柔和、更现代） ----
+$radius-sm:   6px;
+$radius-md:  10px;
+$radius-lg:  14px;
+$radius-xl:  20px;
+$shadow-card:     0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+$shadow-elevated: 0 4px 12px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.04);
+$shadow-pop:      0 16px 32px -8px rgba(15, 23, 42, 0.18), 0 4px 8px rgba(15, 23, 42, 0.06);
+
+// ---- 审查严重度（红/黄/蓝/灰，统一走现代色） ----
+$sev-red:     $accent-rose;
+$sev-yellow:  $accent-amber;
+$sev-blue:    $accent-cyan;
+$sev-grey:    $text-tertiary;
+
+// ---- 立法类型（与主色协调） ----
+$type-admin:  $primary-color;   // 行政法规
+$type-dept:   $accent-violet;   // 部门规章
+$type-local:  $accent-emerald;  // 地方政府规章
+
+// ---- 状态 ----
+$status-success: $accent-emerald;
+$status-warning: $accent-amber;
+$status-danger:  $accent-rose;
+$status-info:    $accent-cyan;

@@ -1,0 +1,50 @@
+# 爬虫系统依赖包
+# Python 3.9+
+
+# 核心爬虫
+requests==2.31.0
+httpx==0.25.2
+
+# HTML解析
+beautifulsoup4==4.12.2
+lxml==4.9.3
+parsel==1.9.1
+
+# 异步支持
+aiohttp==3.9.1
+asyncio==3.4.3
+
+# 数据库连接
+pymysql==1.1.0
+sqlalchemy==2.0.23
+alembic==1.12.1
+
+# 数据导出
+openpyxl==3.1.2
+pandas==2.1.4
+xlsxwriter==3.1.9
+
+# Word文档生成
+python-docx==1.0.2
+docxtpl==0.17.4
+
+# 配置管理
+python-dotenv==1.0.0
+pyyaml==6.0.1
+
+# 任务调度
+schedule==1.2.1
+apscheduler==3.10.4
+
+# 日志
+loguru==0.7.2
+
+# 数据验证
+pydantic==2.5.2
+pydantic-settings==2.1.0
+
+# 工具库
+tqdm==4.66.1
+retrying==1.3.4
+fake-useragent==1.4.0
+urllib3==2.1.0
