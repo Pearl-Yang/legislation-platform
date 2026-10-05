@@ -13,9 +13,10 @@ import com.legal.legislation.notify.NotifyMessage;
 import com.legal.legislation.notify.NotifyService;
 import com.legal.legislation.service.EvaluationService;
 import com.legal.legislation.service.Task;
+import com.legal.legislation.task.AsyncTaskEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,8 +50,14 @@ public class EvaluationServiceImpl implements EvaluationService {
     private final EvaluationIndicatorMapper  indicatorMapper;
     private final RegulationMapper           regulationMapper;
     private final NotifyService              notifyService;
+    private final ApplicationEventPublisher  eventPublisher;
 
     private final Random rng = new Random();
+
+    @Override
+    public void setEventPublisher(ApplicationEventPublisher publisher) {
+        // 接口定义,目前直接通过构造注入,本方法仅做兜底(测试场景使用)
+    }
 
     @Override
     public Task<List<EvaluationTask>> listTasks(String status, Long regulationId) {
@@ -73,12 +80,14 @@ public class EvaluationServiceImpl implements EvaluationService {
         task.setStatus(EvaluationTask.STATUS_PENDING);
         task.setCreatedAt(LocalDateTime.now());
         taskMapper.insert(task);
-        runEvaluationAsync(task.getId());
+        // 发布异步任务事件:业务事务提交后由 AsyncTaskRunner 在新线程跑指标计算
+        eventPublisher.publishEvent(new AsyncTaskEvent(this, AsyncTaskEvent.Kind.EVALUATION_RUN, task.getId()));
         return Task.ok(task);
     }
 
-    @Async
-    void runEvaluationAsync(Long taskId) {
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void runTask(Long taskId) {
         try {
             EvaluationTask task = taskMapper.selectById(taskId);
             if (task == null) return;

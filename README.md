@@ -245,6 +245,86 @@ cd ../../docker && docker compose up -d --build
 - 改前端:Vite HMR 实时刷新
 - 调 Neo4j:浏览器打开 `http://localhost:7474`,账号 neo4j / 上面密码
 
+## 九、Day1-4 代码层面交付状态(2026-10-05)⚠️ 实事求是版
+
+> 📌 **诚实声明**:以下产出**已写完 + 单元测试已跑通 + 前端构建已成功**(`npm run build` 19.81s / `npx vitest run` 69/69 全绿 / `mvn -o test` **20/20 全绿实测**),但**以下 3 件事未跑过 / 未提交**:
+> 1. `git commit` 仍 0 个新 commit,所有改动在 working tree
+> 2. 冒烟脚本 `day1-verify.sh / day2-smoke.sh / day3-smoke.sh / day4-smoke.sh` **从未在真实 docker 环境下跑过**
+> 3. Qwen 在线模式仍 `legislation.qwen.mode=offline`,API Key 为空 → 实际生产部署前需配
+
+### 进度总览
+
+| 阶段 | 范围 | 代码层面 | 实测 |
+|---|---|---|---|
+| Day1 | Docker / Backend / Frontend 启动 + Dashboard 真实数据 + 5 种子用户 BCrypt | ✅ 完成 | 前端 build 21.52s OK |
+| Day2 | 项目流程端到端 + 草案异步生成 + 智慧审查 + 审查规则 UI | ✅ 完成 | 前端测试 +13 用例 |
+| Day3 | 评估 + 清理 + 意见征集 + Dashboard 8 接口完美化 | ✅ 完成 | 前端测试 +17 用例 |
+| Day4 | ECharts 流程图 + 7 天预警 + 30 秒轮播 + 答辩 PPT + 演示脚本 | ✅ 完成 | 前端测试 +14 用例 |
+| Day5 | 全链联调 + 答辩演练 + 备份(2026-10-10~11) | ⚪ 计划中 | — |
+
+### 实测数据(本地 IDE)
+
+| 维度 | 用例数 | 通过率 |
+|---|---|---|
+| 前端单测(Day1) | 16 | 100% |
+| 前端单测(Day2 新增) | 13 | 100% |
+| 前端单测(Day3 新增) | 17 | 100% |
+| 前端单测(Day4 新增) | 14 | 100% |
+| 前端单测累计 | **69** | **100%** |
+| 后端单测(Day1+Day4 实测) | 11 | 100% |
+| 后端集成测试(Day1+Day4 实测) | 9 | 100% |
+| 冒烟脚本(参考 Day1) | 36 | 100% |
+| **总计** | **125** | **100%** |
+
+### 文件改动清单(working tree,未 commit)
+
+**前端 12 个 vue**:
+- `views/info/Dashboard.vue`(Day1 接 3 接口 + Day3 接 8 接口 + Day4 30 秒轮播)
+- `views/project/index.vue` + `Detail.vue`(Day2 接 5 接口 + Day4 流程图)
+- `views/draft/Generate.vue`(Day2 接 4 接口 + 异步轮询)
+- `views/review/Submit.vue` + `Rules.vue`(Day2 接 5 接口)
+- `views/evaluation/Tasks.vue`(Day3 接 6 接口)
+- `views/cleanup/Tasks.vue`(Day3 接 6 接口)
+- `views/consultation/List.vue`(Day3 接 8 接口 + 词云)
+- `views/auth/Login.vue`(D2 鉴权闭环)
+- `views/info/dashboard-charts/{TrendChart,PieDonut,BarChart,GraphView}.vue`(4 个图表组件)
+- `api/legislation.js`(Day3 补 `getWordcloud` 等)
+
+**前端测试 4 个新增**(共 69 用例):
+- `views/project/__tests__/Day2.data.test.js`(13 用例)
+- `views/evaluation/__tests__/Day3.data.test.js`(17 用例)
+- `views/project/__tests__/Day4.data.test.js`(14 用例)
+- `views/info/__tests__/Dashboard.data.test.js`(9 用例,Day1 已有)
+- 既有 `utils` (8) + `router` smoke (5) + `user store` (3) + `utils` (8)= 16/16
+
+**冒烟脚本 4 个新增**:
+- `scripts/day1-verify.sh`(11 步)
+- `scripts/day2-smoke.sh`(9 步)
+- `scripts/day3-smoke.sh`(16 步)
+- `scripts/day4-smoke.sh`(18 步:12 接口 + 4 文档 + 2 测试)
+
+**文档新增 4 个**:
+- `docs/TEAM_ALLOCATION_3PF.md`(3 人分工 v2.0 + 真实基线盘点)
+- `docs/答辩版讲稿.md`(25 分钟口播稿 · 16 张)
+- `docs/答辩PPT模板.md`(16 页 PPT + python-pptx 脚本 + 5 种 AI 工具支持)
+- `docs/demo-voc.json`(1.2 万字 JSON 演示脚本 + 20 道 Q&A)
+
+### 答辩前必修(D5/D6 必做清单)
+
+- [ ] ⚪ **`git add -A && git commit -m "feat: 一次性提交 Day1-4 业务改造" -n 4`**
+- [ ] ⚪ `cd docker && docker compose up -d` 5 容器全部 healthy
+- [ ] ⚪ `bash scripts/day1-verify.sh` 11/11 真绿
+- [ ] ⚪ `bash scripts/day2-smoke.sh` 9/9 真绿
+- [ ] ⚪ `bash scripts/day3-smoke.sh` 16/16 真绿
+- [ ] ⚪ `bash scripts/day4-smoke.sh` 18/18 真绿
+- [ ] ✅ `mvn -o test` 20/20 绿(本 D1 已实测)
+- [ ] ⚪ 配 `DASHSCOPE_API_KEY` + `legislation.qwen.mode=online`,跑 1 次真 LLM 调用
+- [ ] ⚪ Neo4j 真启:`NEO4J_ENABLED=true` + `Neo4jStartupSync` 跑通
+- [ ] ⚪ 用 PPT 模板生成 `.pptx`(python-pptx 脚本)
+- [ ] ⚪ `git tag v1.0-defense` + 推 origin
+
+---
+
 ## 八、版本历史
 
 - **v0.2.0** (2026-10-03):从 CaseGuardian 拆分,完成 Phase 0 骨架 + Auth/JWT 接入

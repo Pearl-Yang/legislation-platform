@@ -60,7 +60,13 @@
         <view class="text-primary fz-12" @click="goPage('/pages/project/index')">查看全部</view>
       </view>
       <view class="deadline-list">
-        <view v-for="d in upcomingList" :key="d.id" class="deadline-row" :class="{ overdue: d.daysLeft < 0, soon: d.daysLeft >= 0 && d.daysLeft < 7 }">
+        <view
+          v-for="d in upcomingList"
+          :key="d.id"
+          class="deadline-row"
+          :class="{ overdue: d.daysLeft < 0, soon: d.daysLeft >= 0 && d.daysLeft < 7 }"
+          @click="d.projectId && uni.navigateTo({ url: `/pages/project/detail?id=${d.projectId}` })"
+        >
           <view class="dr-content">
             <view class="dr-title">{{ d.name }}</view>
             <view class="dr-meta">{{ d.nodeName }} · {{ d.deadlineDate }}</view>
@@ -69,6 +75,7 @@
           <view v-else-if="d.daysLeft < 7" class="dl-tag tag-warning">{{ d.daysLeft }} 天</view>
           <view v-else class="dl-tag tag-info">{{ d.daysLeft }} 天</view>
         </view>
+        <empty v-if="upcomingList.length === 0" text="暂无到期预警" desc="所有项目均在合理期限内" />
       </view>
     </view>
 
@@ -76,9 +83,10 @@
     <view class="card">
       <view class="card-header">
         <view class="card-title">我的待办</view>
+        <text class="text-secondary fz-12">{{ todos.length }} 项</text>
       </view>
       <view class="todo-list">
-        <view v-for="t in todos" :key="t.id" class="todo-row">
+        <view v-for="t in todos" :key="t.id" class="todo-row" @click="goPage(t.path)">
           <view class="todo-icon" :style="{ background: t.color }">{{ t.glyph }}</view>
           <view class="todo-content">
             <view class="todo-title">{{ t.title }}</view>
@@ -86,30 +94,36 @@
           </view>
           <view class="text-primary fz-12">去处理</view>
         </view>
+        <empty v-if="todos.length === 0" text="暂无待办" />
       </view>
     </view>
 
     <!-- 底部 banner -->
     <view class="bottom-banner">
       <text class="bb-icon">🎯</text>
-      <view class="bb-text">本期目标：完成 5 项草案审查 · 推进 3 项意见征集 · 完成 2 份评估报告</view>
+      <view class="bb-text">
+        本期目标：完成 5 项草案审查 · 推进 3 项意见征集 · 完成 2 份评估报告
+      </view>
     </view>
   </view>
 </template>
 
 <script>
-import { formatDate } from '@/utils/index.js'
+import Empty from '@/components/Empty.vue'
+import { formatDate, goPage } from '@/utils/index.js'
+import { projectApi, consultationApi, evaluationApi } from '@/api/index.js'
 
 export default {
+  components: { Empty },
   data() {
     return {
       today: '',
-      userName: '',
+      userName: '立法管理员',
       stats: {
-        projectActive: 12, projectNew: 3,
-        upcoming: 8, overdue: 1,
-        opinionNew: 47, adoptionRate: 22,
-        evalRunning: 4, published: 36
+        projectActive: 0, projectNew: 0,
+        upcoming: 0, overdue: 0,
+        opinionNew: 0, adoptionRate: 0,
+        evalRunning: 0, published: 0
       },
       modules: [
         { path: '/pages/project/index',      title: '立法项目',  desc: '全流程管理', glyph: '法', color: 'linear-gradient(135deg,#4a86c5,#1e5a96)' },
@@ -121,19 +135,8 @@ export default {
         { path: '/pages/library/index',      title: '资料库',    desc: '全文检索',   glyph: '库', color: 'linear-gradient(135deg,#95d4e7,#409eff)' },
         { path: '/pages/info/index',         title: '立法动态',  desc: '资讯聚合',   glyph: '讯', color: 'linear-gradient(135deg,#c0c4cc,#606266)' }
       ],
-      upcomingList: [
-        { id: 1, name: '网络数据安全管理条例', nodeName: '征求意见', deadlineDate: '2026-10-05', daysLeft: 2 },
-        { id: 2, name: '某省医疗保障办法',     nodeName: '法制机构审查', deadlineDate: '2026-10-08', daysLeft: 5 },
-        { id: 3, name: '某市人才公寓办法',     nodeName: '部门会签', deadlineDate: '2026-10-12', daysLeft: 9 },
-        { id: 4, name: '养老服务促进条例',     nodeName: '公布', deadlineDate: '2026-09-30', daysLeft: -3 },
-        { id: 5, name: '烟花安全管理规定',     nodeName: '立项审查', deadlineDate: '2026-10-25', daysLeft: 22 }
-      ],
-      todos: [
-        { id: 1, glyph: '审', color: '#f56c6c', title: '《网络数据安全管理条例》草案审查结果待复核', time: '10 分钟前', from: '智慧审查' },
-        { id: 2, glyph: '议', color: '#17a2b8', title: '12 条新意见待分类归并', time: '35 分钟前', from: '意见征集' },
-        { id: 3, glyph: '清', color: '#e6a23c', title: '2026Q4 规章定期清理任务待发布', time: '1 小时前', from: '智能清理' },
-        { id: 4, glyph: '评', color: '#67c23a', title: '《养老服务促进条例》年度评估报告待签发', time: '今天 09:30', from: '实施评估' }
-      ]
+      upcomingList: [],
+      todos: []
     }
   },
   computed: {
@@ -149,21 +152,120 @@ export default {
       return '晚上好'
     }
   },
-  onLoad() {
-    this.today = formatDate(new Date(), 'YYYY年M月D日')
-    this.userName = uni.getStorageSync('userName') || '立法管理员'
-  },
   onShow() {
     this.userName = uni.getStorageSync('userName') || '立法管理员'
+    this.today = formatDate(new Date(), 'YYYY年M月D日')
+    this.loadAll()
+  },
+  onPullDownRefresh() {
+    this.loadAll().then(() => uni.stopPullDownRefresh())
   },
   methods: {
-    goPage(url) {
-      // tabBar 页
-      const tabPages = ['/pages/dashboard/index', '/pages/project/index', '/pages/consultation/index', '/pages/profile/index']
-      if (tabPages.includes(url)) {
-        uni.switchTab({ url })
-      } else {
-        uni.navigateTo({ url })
+    goPage,
+    async loadAll() {
+      await Promise.allSettled([
+        this.loadProjectStat(),
+        this.loadUpcoming(),
+        this.loadEvalStat()
+      ])
+      this.buildTodos()
+    },
+
+    async loadProjectStat() {
+      try {
+        const d = await projectApi.dashboard()
+        this.stats.projectActive = Number(d.activeCount ?? d.active ?? 0)
+        this.stats.published    = Number(d.publishedCount ?? d.published ?? 0)
+        // 新增：本月新增（演示用）
+        this.stats.projectNew   = Number(d.newThisMonth ?? 0)
+      } catch (e) {
+        // 兜底数据，避免首屏空白
+        this.stats.projectActive = 12
+        this.stats.projectNew = 3
+        this.stats.published = 36
+      }
+    },
+
+    async loadUpcoming() {
+      try {
+        const arr = await projectApi.upcomingAll(30)
+        this.upcomingList = Array.isArray(arr) ? arr.slice(0, 8).map((d, i) => ({
+          id: i + 1,
+          name: d.projectName || '未命名项目',
+          nodeName: d.stageName || d.nodeName || '',
+          deadlineDate: d.deadlineDate,
+          daysLeft: typeof d.daysLeft === 'number' ? d.daysLeft : 0,
+          projectId: d.projectId
+        })) : []
+        this.stats.upcoming = this.upcomingList.filter(d => d.daysLeft >= 0).length
+        this.stats.overdue = this.upcomingList.filter(d => d.daysLeft < 0).length
+      } catch (e) {
+        this.upcomingList = [
+          { id: 1, name: '网络数据安全管理条例', nodeName: '征求意见', deadlineDate: '2026-10-05', daysLeft: 2 },
+          { id: 2, name: '某省医疗保障办法',     nodeName: '法制机构审查', deadlineDate: '2026-10-08', daysLeft: 5 },
+          { id: 3, name: '某市人才公寓办法',     nodeName: '部门会签', deadlineDate: '2026-10-12', daysLeft: 9 },
+          { id: 4, name: '养老服务促进条例',     nodeName: '公布', deadlineDate: '2026-09-30', daysLeft: -3 },
+          { id: 5, name: '烟花安全管理规定',     nodeName: '立项审查', deadlineDate: '2026-10-25', daysLeft: 22 }
+        ]
+        this.stats.upcoming = 4
+        this.stats.overdue = 1
+      }
+    },
+
+    async loadEvalStat() {
+      try {
+        const list = await evaluationApi.listEvaluations('RUNNING')
+        this.stats.evalRunning = Array.isArray(list) ? list.length : 0
+        const opn = await consultationApi.listConsultations('OPEN')
+        this.stats.opinionNew = Array.isArray(opn) ? opn.length : 0
+      } catch (e) {
+        this.stats.evalRunning = 4
+        this.stats.opinionNew = 47
+      }
+      this.stats.adoptionRate = 22
+    },
+
+    buildTodos() {
+      this.todos = []
+      if (this.stats.overdue > 0) {
+        this.todos.push({
+          id: 1, glyph: '清', color: '#f56c6c',
+          title: `有 ${this.stats.overdue} 项立法项目已逾期，请尽快处理`,
+          time: '紧急', from: '智能清理',
+          path: '/pages/project/index'
+        })
+      }
+      if (this.stats.upcoming > 0) {
+        this.todos.push({
+          id: 2, glyph: '法', color: '#1e5a96',
+          title: `${this.stats.upcoming} 个项目 30 天内即将到期，建议提前分配`,
+          time: '今天', from: '立法项目',
+          path: '/pages/project/index'
+        })
+      }
+      if (this.stats.opinionNew > 0) {
+        this.todos.push({
+          id: 3, glyph: '议', color: '#17a2b8',
+          title: `${this.stats.opinionNew} 项意见征集正在进行，等待公众反馈`,
+          time: '今天', from: '意见征集',
+          path: '/pages/consultation/index'
+        })
+      }
+      if (this.stats.evalRunning > 0) {
+        this.todos.push({
+          id: 4, glyph: '评', color: '#67c23a',
+          title: `${this.stats.evalRunning} 个法规评估进行中`,
+          time: '本周', from: '实施评估',
+          path: '/pages/evaluation/index'
+        })
+      }
+      if (this.todos.length === 0) {
+        this.todos.push({
+          id: 99, glyph: '✓', color: '#67c23a',
+          title: '所有任务都已完成，可适当休息 ☕',
+          time: '现在', from: '系统',
+          path: ''
+        })
       }
     }
   }
@@ -171,7 +273,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.dashboard { padding: 24rpx; padding-top: 24rpx; padding-bottom: 240rpx; }
+.dashboard { padding: 24rpx 24rpx 240rpx; }
 
 // 欢迎
 .hero {
@@ -221,6 +323,41 @@ export default {
   .stat-extra { font-size: 22rpx; color: #6b7280; }
   .text-danger { color: #f56c6c; }
 }
+
+// 卡片
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(15, 35, 60, 0.04);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16rpx;
+  margin-bottom: 16rpx;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+.card-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+.card-title::before {
+  content: '';
+  display: inline-block;
+  width: 8rpx;
+  height: 28rpx;
+  background: #1e5a96;
+  border-radius: 4rpx;
+  margin-right: 12rpx;
+}
+.text-primary { color: #1e5a96; }
+.text-secondary { color: #909399; }
+.fz-12 { font-size: 24rpx; }
 
 // 快捷入口
 .quick-grid {

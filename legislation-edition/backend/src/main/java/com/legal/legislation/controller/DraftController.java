@@ -5,12 +5,23 @@ import com.legal.legislation.entity.DraftVersionHistory;
 import com.legal.legislation.entity.LegislativeDraft;
 import com.legal.legislation.service.DraftService;
 import com.legal.legislation.service.Task;
+import com.legal.legislation.service.util.ReportContentBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +36,7 @@ import java.util.Map;
 public class DraftController {
 
     private final DraftService draftService;
+    private final ReportContentBuilder reportBuilder;
 
     @Operation(summary = "提交草案生成任务（异步）",
         description = "立即返回 taskId，AI 在后台异步生成；可通过 /draft/task/{taskId} 轮询结果。")
@@ -84,12 +96,60 @@ public class DraftController {
     }
 
     @Operation(summary = "导出草案（Markdown / DOCX / HTML）",
-        description = "返回内容载荷:{fileName, content, contentType, size}，前端可据此下载或展示。")
+        description = "直接流式下载文件：MARKDOWN(text/markdown)、DOCX(application/vnd.openxmlformats-officedocument.wordprocessingml.document)、HTML(text/html)。")
     @GetMapping("/{id}/export")
-    public Result<?> export(
+    public ResponseEntity<byte[]> export(
         @PathVariable Long id,
+        @Parameter(description = "MARKDOWN | DOCX | HTML，默认 MARKDOWN")
         @RequestParam(defaultValue = "MARKDOWN") String format) {
-        return wrap(draftService.export(id, format));
+        Task<LegislativeDraft> t = draftService.getDetail(id);
+        if (t == null || !t.isSuccess() || t.getData() == null) {
+            return ResponseEntity.status(404)
+                    .body(("{\"code\":404,\"message\":\"" +
+                            (t == null ? "Service returned null" : t.getMessage()) + "\"}")
+                            .getBytes(StandardCharsets.UTF_8));
+        }
+        LegislativeDraft d = t.getData();
+        String upper = format == null ? "MARKDOWN" : format.toUpperCase();
+        String fileName = "draft-" + d.getId() + "-v" + d.getVersion() + "." + lowerExt(upper);
+
+        byte[] bytes;
+        MediaType mediaType;
+        switch (upper) {
+            case "DOCX" -> {
+                bytes = reportBuilder.buildDraftDocx(d);
+                mediaType = MediaType.parseMediaType(
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+            }
+            case "HTML" -> {
+                String md = reportBuilder.buildDraftMarkdown(d);
+                bytes = reportBuilder.wrapHtml(
+                        "立法草案 #" + d.getId() + "（第 " + d.getVersion() + " 版）", md)
+                        .getBytes(StandardCharsets.UTF_8);
+                mediaType = MediaType.parseMediaType("text/html;charset=utf-8");
+            }
+            default -> {
+                bytes = reportBuilder.buildDraftMarkdown(d).getBytes(StandardCharsets.UTF_8);
+                mediaType = MediaType.parseMediaType("text/markdown;charset=utf-8");
+            }
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(mediaType);
+        headers.setContentDispositionFormData("attachment",
+                new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+        headers.setContentLength(bytes.length);
+        headers.set("X-Export-Format", upper);
+        headers.set("Access-Control-Expose-Headers", "Content-Disposition,X-Export-Format");
+        return ResponseEntity.ok().headers(headers).body(bytes);
+    }
+
+    private static String lowerExt(String format) {
+        return switch (format) {
+            case "DOCX" -> "docx";
+            case "HTML" -> "html";
+            default     -> "md";
+        };
     }
 
     private static Long toLong(Object o) {

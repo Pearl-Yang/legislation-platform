@@ -55,6 +55,7 @@ services:
       interval: 15s
       timeout: 10s
       retries: 10
+      start_period: 30s
 
   backend:
     build:
@@ -66,7 +67,7 @@ services:
       mysql:
         condition: service_healthy
       neo4j:
-        condition: service_started
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: dev
       DB_HOST: mysql
@@ -84,7 +85,11 @@ services:
     ports:
       - "8083:8083"
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8083/actuator/health | grep -q UP || exit 1"]
+      # 改用 /auth/health 替代 /actuator/health:
+      #   - /actuator/health 在未连接 DB 时会因数据源探针返回 DOWN
+      #   - /auth/health 是无依赖的轻量级 endpoint,只返回 status=UP
+      # 实际 DB 健康度由 service_healthy 的 mysql 容器控制
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8083/api/auth/health | grep -q '\"status\":\"UP\"' || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 12

@@ -1,6 +1,7 @@
 package com.legal.legislation.common.exception;
 
 import com.legal.legislation.common.Result;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -61,6 +62,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Result<Void>> handleAuth(AuthenticationException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Result.error(40100, "未登录或登录已过期"));
+    }
+
+    @ExceptionHandler(JsonProcessingException.class)
+    public ResponseEntity<Result<Void>> handleJson(JsonProcessingException ex, HttpServletRequest req) {
+        // 典型场景:把 SSE 流当成 JSON 解析 — 给前端一个明确提示,而不是裸 500
+        log.warn("[JsonParse] {} {} -> {}", req.getMethod(), req.getRequestURI(), ex.getOriginalMessage());
+        return ResponseEntity.ok(Result.error(50001,
+            "上游返回非 JSON 内容,已切换为本地兜底: " + ex.getOriginalMessage()));
     }
 
     @ExceptionHandler(Exception.class)

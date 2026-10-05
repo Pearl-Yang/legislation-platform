@@ -20,4 +20,7 @@ public class QwenChatRequest {
     private Double                  temperature;
     private Double                  topP;
     private Integer                 maxTokens;
+    /** 是否流式 — DashScope OpenAI 兼容模式下,默认 false 即返回整段 JSON;后端走非流式即可 */
+    @Builder.Default
+    private Boolean                 stream = Boolean.FALSE;
 }

@@ -176,22 +176,31 @@ public class InfoServiceImpl implements InfoService {
         return Task.ok(data);
     }
 
-    /** 地图分布:省级 region_code -> 法规数量(供 ECharts 地图) */
+    /** 地图分布:省级 region_code -> 法规数量(供 ECharts 地图)
+     *
+     *  <p>不用 SQL GROUP BY 是为了规避 MyBatis-Plus 拼 SELECT 顺序问题(全列 + COUNT(*) 会触发 ONLY_FULL_GROUP_BY);
+     *  在 Java 端分组对千级别法规数据毫无压力。 */
     public Task<List<Map<String, Object>>> regulationMap() {
         QueryWrapper<Regulation> qw = new QueryWrapper<>();
         qw.isNotNull("region_code").ne("region_code", "000000")
-          .select("region_code", "COUNT(*) AS cnt")
-          .groupBy("region_code");
-        // 走 native SQL(因为要 group by + count)
-        List<Map<String, Object>> rows = regulationMapper.selectMaps(qw);
-        List<Map<String, Object>> out = new ArrayList<>();
-        for (Map<String, Object> r : rows) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("name",  regionNameOf((String) r.get("region_code")));
-            item.put("value", r.get("cnt"));
-            item.put("code",  r.get("region_code"));
-            out.add(item);
+          .select("region_code");
+        List<Regulation> regs = regulationMapper.selectList(qw);
+        Map<String, Long> cnt = new HashMap<>();
+        for (Regulation r : regs) {
+            String code = r.getRegionCode();
+            if (code == null || code.isBlank() || "000000".equals(code)) continue;
+            cnt.merge(code, 1L, Long::sum);
         }
+        List<Map<String, Object>> out = new ArrayList<>();
+        cnt.forEach((code, v) -> {
+            Map<String, Object> item = new HashMap<>();
+            item.put("name",  regionNameOf(code));
+            item.put("value", v);
+            item.put("code",  code);
+            out.add(item);
+        });
+        // 按数量倒序,前端可直接取 Top N
+        out.sort((a, b) -> Long.compare((Long) b.get("value"), (Long) a.get("value")));
         return Task.ok(out);
     }
 

@@ -25,7 +25,7 @@
       </div></el-col>
     </el-row>
 
-    <el-card class="mt-16">
+    <el-card class="mt-16" v-loading="loading">
       <el-tabs v-model="activeTab" @tab-change="onTabChange">
         <el-tab-pane label="全部"        name="all" />
         <el-tab-pane label="日常清理"    name="DAILY" />
@@ -33,8 +33,8 @@
         <el-tab-pane label="专项清理"    name="THEMATIC" />
       </el-tabs>
 
-      <el-table :data="filteredTasks" stripe>
-        <el-table-column label="任务名称" min-width="240" prop="taskName">
+      <el-table :data="filteredTasks" stripe :empty-text="loading ? '加载中' : '暂无清理任务'">
+        <el-table-column label="任务名称" min-width="240">
           <template #default="{ row }">
             <a @click="openTask(row)">{{ row.taskName }}</a>
             <el-tag v-if="row.theme" size="small" type="warning" effect="plain" class="ml-8">主题：{{ row.theme }}</el-tag>
@@ -55,16 +55,27 @@
         </el-table-column>
         <el-table-column label="已建议 / 候选" width="120" align="center">
           <template #default="{ row }">
-            {{ row.suggested }} / {{ row.candidates }}
+            {{ row.suggested ?? 0 }} / {{ row.candidates ?? 0 }}
           </template>
         </el-table-column>
         <el-table-column label="责任部门" prop="responsibleDept" width="120" />
-        <el-table-column label="创建时间" prop="createdAt" width="160" />
+        <el-table-column label="创建时间" width="160">
+          <template #default="{ row }">{{ formatDate(row.createdAt) }}</template>
+        </el-table-column>
         <el-table-column label="操作" width="240" align="center" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="openTask(row)">详情</el-button>
             <el-button link size="small" @click="onSuggest(row)" v-if="['PENDING','RUNNING'].includes(row.status)">AI 生成建议</el-button>
-            <el-button link size="small" @click="onExport(row)">导出报告</el-button>
+            <el-dropdown trigger="click" @command="(fmt) => onExport(row, fmt)">
+              <el-button link size="small">导出报告 ▾</el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="HTML">HTML</el-dropdown-item>
+                  <el-dropdown-item command="MARKDOWN">Markdown</el-dropdown-item>
+                  <el-dropdown-item command="DOCX">Word (docx)</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -72,25 +83,28 @@
 
     <!-- 详情抽屉 -->
     <el-drawer v-model="detailVisible" :title="`清理任务 #${active?.id} - ${active?.taskName}`" size="80%">
-      <div v-if="active" class="task-detail">
+      <div v-if="active" class="task-detail" v-loading="candidatesLoading">
         <el-descriptions :column="3" border class="mb-16">
           <el-descriptions-item label="任务类型">
             <el-tag size="small">{{ cleanupTypeLabel(active.taskType) }}</el-tag>
           </el-descriptions-item>
           <el-descriptions-item label="清理模式">
             <el-tag size="small" :type="active.cleanupMode === 'AUTO' ? 'primary' : active.cleanupMode === 'MANUAL_REVIEW' ? 'warning' : 'success'">
-              {{ active.cleanupMode === 'AUTO' ? '自动' : active.cleanupMode === 'MANUAL_REVIEW' ? '人工复核' : '混合' }}
+              {{ active.cleanupMode === 'AUTO' ? '自动' : active.cleanupMode === 'MANUAL_REVIEW' ? '人工复核' : active.cleanupMode === 'HYBRID' ? '混合' : '—' }}
             </el-tag>
           </el-descriptions-item>
           <el-descriptions-item label="状态">
             <el-tag :type="statusTag(active.status)" size="small">{{ statusLabel(active.status) }}</el-tag>
           </el-descriptions-item>
-          <el-descriptions-item label="触发来源" :span="2">{{ active.triggerSource }}</el-descriptions-item>
-          <el-descriptions-item label="创建时间">{{ active.createdAt }}</el-descriptions-item>
+          <el-descriptions-item label="触发来源" :span="2">{{ active.triggerSource || '—' }}</el-descriptions-item>
+          <el-descriptions-item label="创建时间">{{ formatDate(active.createdAt) }}</el-descriptions-item>
+          <el-descriptions-item v-if="active.theme" label="主题关键词" :span="3">
+            <el-tag size="small" type="warning">{{ active.theme }}</el-tag>
+          </el-descriptions-item>
         </el-descriptions>
 
         <h3 class="block-title">受影响法规候选（{{ candidates.length }}）</h3>
-        <el-table :data="candidates" stripe>
+        <el-table :data="candidates" stripe :empty-text="'暂无可清理候选法规'">
           <el-table-column label="法规名称" min-width="240" prop="regulationName" />
           <el-table-column label="类型" width="120">
             <template #default="{ row }">
@@ -112,7 +126,7 @@
           </el-table-column>
           <el-table-column label="置信度" width="100">
             <template #default="{ row }">
-              <el-progress v-if="row.aiSuggestion" :percentage="(row.confidence || 0) * 100" :show-text="false" :stroke-width="6" />
+              <el-progress v-if="row.aiSuggestion" :percentage="Math.round((row.confidence || 0) * 100)" :show-text="false" :stroke-width="6" />
               <span v-else class="text-secondary">—</span>
             </template>
           </el-table-column>
@@ -135,71 +149,94 @@
 
     <!-- 创建对话框 -->
     <el-dialog v-model="createVisible" title="创建清理任务" width="540px">
-      <el-form label-width="100px">
+      <el-form :model="createForm" label-width="100px">
         <el-form-item label="任务名称" required>
-          <el-input placeholder="例：2026Q4 规章集中清理" />
+          <el-input v-model="createForm.taskName" placeholder="例：2026Q4 规章集中清理" />
         </el-form-item>
         <el-form-item label="任务类型">
-          <el-radio-group>
+          <el-radio-group v-model="createForm.taskType">
             <el-radio-button value="DAILY">日常</el-radio-button>
             <el-radio-button value="PERIODIC">定期</el-radio-button>
             <el-radio-button value="THEMATIC">专项</el-radio-button>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="清理模式">
-          <el-radio-group>
+          <el-radio-group v-model="createForm.cleanupMode">
             <el-radio-button value="AUTO">自动</el-radio-button>
             <el-radio-button value="MANUAL_REVIEW">人工复核</el-radio-button>
             <el-radio-button value="HYBRID">混合</el-radio-button>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="责任部门">
-          <el-input placeholder="例：政策法规司" />
+          <el-input v-model="createForm.responsibleDept" placeholder="例：政策法规司" />
         </el-form-item>
-        <el-form-item v-if="true" label="主题（专项）">
-          <el-input placeholder="专项清理的关键字，如「数据安全」" />
+        <el-form-item v-if="createForm.taskType === 'THEMATIC'" label="主题（专项）">
+          <el-input v-model="createForm.theme" placeholder="专项清理的关键字，如「数据安全」" />
+        </el-form-item>
+        <el-form-item label="触发来源">
+          <el-input v-model="createForm.triggerSource" placeholder="例：定期计划 / 上位法修订触发 / 手动" />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="createVisible = false">取消</el-button>
-        <el-button type="primary" @click="createVisible = false">创建</el-button>
+        <el-button type="primary" :loading="creating" @click="onCreate">创建</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, computed, onMounted } from 'vue'
+import { ElMessage, ElLoading } from 'element-plus'
 import { Plus, List, Select, Warning, Loading } from '@element-plus/icons-vue'
-import { listCleanupTasks, affectedRegulations, suggestCleanup, decideSuggestion, getCleanupReport } from '@/api/legislation'
+import {
+  listCleanupTasks, createCleanupTask, getCleanupTask,
+  affectedRegulations, suggestCleanup, decideSuggestion, getCleanupReport
+} from '@/api/legislation'
 import {
   cleanupTypeLabel, projectTypeLabel, projectTypeCls,
   regStatusLabel, regStatusTag, suggestionLabel, suggestionTag
 } from '@/utils/dict'
+import { formatDate } from '@/utils'
 
+const loading = ref(false)
+const creating = ref(false)
+const candidatesLoading = ref(false)
 const activeTab = ref('all')
 const detailVisible = ref(false)
 const createVisible = ref(false)
 const active = ref(null)
+const list = ref([])
+const candidates = ref([])
 
-const tasks_ = ref([
-  { id: 1, taskName: '2026Q4 规章集中清理', taskType: 'PERIODIC', status: 'RUNNING', triggerSource: '定期计划', candidates: 124, suggested: 124, responsibleDept: '政策法规司', createdAt: '2026-10-01 09:00', cleanupMode: 'HYBRID' },
-  { id: 2, taskName: '《数据安全法》修订引发联动清理', taskType: 'DAILY', status: 'PENDING', triggerSource: '上位法《数据安全法》修订', candidates: 18, suggested: 0, responsibleDept: '网信办', createdAt: '2026-09-28 14:12', cleanupMode: 'AUTO' },
-  { id: 3, taskName: '专项：行政处罚类规章专项清理', taskType: 'THEMATIC', status: 'DONE', triggerSource: '手动发起', theme: '行政处罚', candidates: 56, suggested: 56, responsibleDept: '司法局', createdAt: '2026-08-15 10:30', cleanupMode: 'MANUAL_REVIEW' },
-  { id: 4, taskName: '2026Q3 规章集中清理', taskType: 'PERIODIC', status: 'DONE', triggerSource: '定期计划', candidates: 102, suggested: 102, responsibleDept: '政策法规司', createdAt: '2026-07-01 09:00', cleanupMode: 'HYBRID' }
-])
+const createForm = ref({
+  taskName: '', taskType: 'PERIODIC', cleanupMode: 'HYBRID',
+  responsibleDept: '', theme: '', triggerSource: '手动发起'
+})
 
-const stat = computed(() => ({
-  total: tasks_.value.length,
-  running: tasks_.value.filter(t => t.status === 'RUNNING').length,
-  done: tasks_.value.filter(t => t.status === 'DONE').length,
-  obsoleteSuggest: 24
-}))
+async function loadList () {
+  loading.value = true
+  try {
+    const { data } = await listCleanupTasks()
+    list.value = data || []
+  } catch (e) {
+    ElMessage.error('加载清理任务失败：' + (e.message || ''))
+    list.value = []
+  } finally {
+    loading.value = false
+  }
+}
 
 const filteredTasks = computed(() =>
-  activeTab.value === 'all' ? tasks_.value : tasks_.value.filter(t => t.taskType === activeTab.value)
+  activeTab.value === 'all' ? list.value : list.value.filter(t => t.taskType === activeTab.value)
 )
+
+const stat = computed(() => ({
+  total:           list.value.length,
+  running:         list.value.filter(t => t.status === 'RUNNING').length,
+  done:            list.value.filter(t => t.status === 'DONE').length,
+  obsoleteSuggest: list.value.reduce((acc, t) => acc + (t.suggested || 0), 0)
+}))
 
 const statusLabel = (s) => ({ PENDING: '待执行', RUNNING: '进行中', DONE: '已完成' }[s] || s)
 const statusTag   = (s) => ({ PENDING: 'info', RUNNING: 'warning', DONE: 'success' }[s] || 'info')
@@ -207,32 +244,88 @@ const onTabChange = () => {}
 
 const openTask = async (row) => {
   active.value = row
-  // 真实场景：candidates = await affectedRegulations(row.id)
   detailVisible.value = true
+  candidatesLoading.value = true
+  try {
+    const { data } = await affectedRegulations(row.id)
+    candidates.value = (data || []).map(c => ({
+      ...c,
+      aiSuggestion: c.aiSuggestion ?? c.suggestion ?? null,
+      confidence:   c.confidence ?? null,
+      finalDecision:c.finalDecision ?? null
+    }))
+  } catch (e) {
+    ElMessage.error('加载候选法规失败：' + (e.message || ''))
+    candidates.value = []
+  } finally {
+    candidatesLoading.value = false
+  }
 }
-
-const candidates = ref([
-  { id: 11, regulationName: '某省数据安全管理办法', regulationType: 'LOCAL_RULE', status: 'EFFECTIVE', aiSuggestion: 'MODIFY',   confidence: 0.87, finalDecision: null },
-  { id: 12, regulationName: '某市网络数据管理细则',   regulationType: 'LOCAL_RULE', status: 'EFFECTIVE', aiSuggestion: 'OBSOLETE', confidence: 0.92, finalDecision: 'OBSOLETE' },
-  { id: 13, regulationName: 'XX 部门信息安全规范',     regulationType: 'DEPT_RULE',  status: 'OBSOLETE',  aiSuggestion: 'OBSOLETE', confidence: 0.95, finalDecision: 'OBSOLETE' },
-  { id: 14, regulationName: '某行业数据收集指引',      regulationType: 'DEPT_RULE',  status: 'EFFECTIVE', aiSuggestion: 'KEEP',     confidence: 0.81, finalDecision: null },
-  { id: 15, regulationName: '某省数据交易管理办法',     regulationType: 'LOCAL_RULE', status: 'REVISING',  aiSuggestion: 'MODIFY',   confidence: 0.78, finalDecision: null }
-])
 
 const onSuggest = async (row) => {
-  await suggestCleanup(row.id)
-  ElMessage.success('AI 建议生成任务已提交')
+  try {
+    await suggestCleanup(row.id)
+    ElMessage.success('AI 建议生成任务已提交,稍后刷新列表')
+    setTimeout(() => { openTask(row); loadList() }, 800)
+  } catch (e) {
+    ElMessage.error('提交失败：' + (e.message || ''))
+  }
 }
 
-const onExport = async (row) => {
-  ElMessage.info(`导出报告：/cleanup/task/${row.id}/report（演示版返回提示）`)
+const onExport = async (row, format = 'HTML') => {
+  const ext = format === 'DOCX' ? 'docx' : format === 'MARKDOWN' ? 'md' : 'html'
+  const loadingSvc = ElLoading.service({ text: `正在生成 ${format} ...` })
+  try {
+    const { default: request } = await import('@/utils/request')
+    const resp = await request.get(`/cleanup/task/${row.id}/report`, {
+      params: { format },
+      responseType: 'blob'
+    })
+    const blob = new Blob([resp.data], { type: resp.headers?.['content-type'] || 'application/octet-stream' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `cleanup-${row.id}.${ext}`
+    a.click()
+    URL.revokeObjectURL(url)
+    ElMessage.success('导出已开始')
+  } catch (e) {
+    ElMessage.error('导出失败：' + (e.message || ''))
+  } finally {
+    loadingSvc.close()
+  }
 }
 
 const onDecide = async (row, decision) => {
-  await decideSuggestion(row.id, { finalDecision: decision })
-  row.finalDecision = decision
-  ElMessage.success(`已决策：${suggestionLabel(decision)}`)
+  try {
+    await decideSuggestion(row.id, { finalDecision: decision })
+    row.finalDecision = decision
+    ElMessage.success(`已决策：${suggestionLabel(decision)}`)
+  } catch (e) {
+    ElMessage.error('决策失败：' + (e.message || ''))
+  }
 }
+
+const onCreate = async () => {
+  if (!createForm.value.taskName) return ElMessage.warning('请填写任务名称')
+  creating.value = true
+  try {
+    await createCleanupTask(createForm.value)
+    ElMessage.success('清理任务已创建')
+    createVisible.value = false
+    createForm.value = {
+      taskName: '', taskType: 'PERIODIC', cleanupMode: 'HYBRID',
+      responsibleDept: '', theme: '', triggerSource: '手动发起'
+    }
+    loadList()
+  } catch (e) {
+    ElMessage.error('创建失败：' + (e.message || ''))
+  } finally {
+    creating.value = false
+  }
+}
+
+onMounted(loadList)
 </script>
 
 <style lang="scss" scoped>

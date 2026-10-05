@@ -35,7 +35,7 @@
       </el-form>
     </el-card>
 
-    <!-- 列表卡片（项目维度） -->
+    <!-- 列表卡片 -->
     <div class="project-list mt-16" v-loading="loading">
       <el-empty v-if="!loading && list.length === 0" description="暂无项目，点击右上角新建或调整筛选条件" />
 
@@ -63,8 +63,7 @@
             <span>整体进度</span>
             <strong>{{ p.progress || 0 }}%</strong>
           </div>
-          <el-progress :percentage="p.progress || 0" :stroke-width="6" :show-text="false"
-            :color="progressColor" />
+          <el-progress :percentage="p.progress || 0" :stroke-width="6" :show-text="false" :color="progressColor" />
           <div class="pr-prog-meta">
             <span>{{ p.doneStageCount || 0 }} / {{ p.totalStageCount || 0 }} 节点</span>
           </div>
@@ -79,7 +78,6 @@
               <el-dropdown-menu>
                 <el-dropdown-item @click="onAdvance(p)">推进下一阶段</el-dropdown-item>
                 <el-dropdown-item @click="onRollback(p)">回退到指定阶段</el-dropdown-item>
-                <el-dropdown-item>编辑基本信息</el-dropdown-item>
                 <el-dropdown-item divided @click="onDelete(p)">删除</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -156,48 +154,7 @@ const activeStatus = ref('all')
 const filter = reactive({ projectType: '', keyword: '' })
 const page = reactive({ current: 1, size: 10, total: 0 })
 
-const list = ref([
-  {
-    id: 1, projectName: '网络数据安全管理条例', projectType: 'ADMIN_REGULATION',
-    description: '为规范网络数据处理活动，保障数据安全与合法权益。',
-    status: 'ACTIVE', issuingAuthority: '国务院', publishDate: '2026-09-01',
-    documentNumber: '国务院令第 765 号',
-    currentStageName: '征求意见', currentStageStatus: 'IN_PROGRESS',
-    progress: 55, doneStageCount: 5, totalStageCount: 10
-  },
-  {
-    id: 2, projectName: '某省医疗保障办法', projectType: 'LOCAL_RULE',
-    description: '完善基本医保筹资、待遇、支付、监管的省级统筹制度。',
-    status: 'ACTIVE', issuingAuthority: '某省人民政府', publishDate: '2026-08-15',
-    documentNumber: '',
-    currentStageName: '法制机构审查', currentStageStatus: 'IN_PROGRESS',
-    progress: 70, doneStageCount: 7, totalStageCount: 10
-  },
-  {
-    id: 3, projectName: '养老服务促进条例', projectType: 'ADMIN_REGULATION',
-    description: '推动养老服务体系建设，规范养老机构运营与监管。',
-    status: 'OBSOLETE', issuingAuthority: '国务院', publishDate: '2025-12-01',
-    documentNumber: '国务院令第 752 号',
-    currentStageName: '已废止', currentStageStatus: 'DONE',
-    progress: 100, doneStageCount: 10, totalStageCount: 10
-  },
-  {
-    id: 4, projectName: '某市人才公寓管理办法', projectType: 'LOCAL_RULE',
-    description: '明确人才公寓的建设、分配、管理和退出机制。',
-    status: 'DRAFT', issuingAuthority: '某市人民政府', publishDate: '',
-    documentNumber: '',
-    currentStageName: '立项建议', currentStageStatus: 'PENDING',
-    progress: 5, doneStageCount: 0, totalStageCount: 10
-  },
-  {
-    id: 5, projectName: '烟花爆竹安全管理规定', projectType: 'DEPT_RULE',
-    description: '明确烟花爆竹的生产、储存、运输、销售全链条安全管理要求。',
-    status: 'ACTIVE', issuingAuthority: '应急管理部', publishDate: '',
-    documentNumber: '',
-    currentStageName: '立项审查', currentStageStatus: 'IN_PROGRESS',
-    progress: 20, doneStageCount: 2, totalStageCount: 9
-  }
-])
+const list = ref([])
 
 const progressColor = [
   { color: '#f43f5e', percentage: 20 },
@@ -217,16 +174,24 @@ const formRules = {
 
 const onSearch = async () => {
   loading.value = true
-  // 实际应调用：
-  // const { data } = await listProjects({
-  //   page: page.current, page_size: page.size,
-  //   projectType: filter.projectType,
-  //   status: activeStatus.value === 'all' ? undefined : activeStatus.value,
-  //   keyword: filter.keyword
-  // })
-  // list.value = data.records; page.total = data.total
-  await new Promise(r => setTimeout(r, 300))
-  loading.value = false
+  try {
+    const params = {
+      page: page.current,
+      size: page.size
+    }
+    if (filter.projectType) params.projectType = filter.projectType
+    if (activeStatus.value !== 'all') params.status = activeStatus.value
+
+    const { data } = await listProjects(params)
+    // 后端返回 MyBatis-Plus Page 结构 {records, total, current, size}
+    const records = data?.records || []
+    list.value = records
+    page.total = data?.total || 0
+  } catch (e) {
+    // 错误
+  } finally {
+    loading.value = false
+  }
 }
 
 const onReset = () => { filter.projectType = ''; filter.keyword = ''; onSearch() }
@@ -239,8 +204,8 @@ const onCreate = async () => {
       await createProject(form)
       ElMessage.success('已创建并自动初始化流程节点')
       dialogVisible.value = false
-      // 重置表单
       Object.assign(form, { projectName: '', projectType: '', description: '', legalBasis: '', coordinatingDepartments: '', priority: 'MEDIUM' })
+      page.current = 1
       onSearch()
     } finally {
       creating.value = false
@@ -250,7 +215,7 @@ const onCreate = async () => {
 
 const onAdvance = async (row) => {
   try {
-    await advanceProject(row.id)
+    await advanceProject(row.id, {})
     ElMessage.success('已推进到下一阶段')
     onSearch()
   } catch (e) {}

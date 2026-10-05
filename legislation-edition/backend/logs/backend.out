@@ -1,0 +1,642 @@
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+04:08:37,315 |-INFO in ch.qos.logback.classic.LoggerContext[default] - This is logback-classic version 1.4.11
+04:08:37,327 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3972a855 - Here is a list of configurators discovered as a service, by rank: 
+04:08:37,327 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3972a855 -   org.springframework.boot.logging.logback.RootLogLevelConfigurator
+04:08:37,327 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3972a855 - They will be invoked in order until ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY is returned.
+04:08:37,328 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3972a855 - Constructed configurator of type class org.springframework.boot.logging.logback.RootLogLevelConfigurator
+04:08:37,354 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3972a855 - org.springframework.boot.logging.logback.RootLogLevelConfigurator.configure() call lasted 2 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
+04:08:37,354 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3972a855 - Trying to configure with ch.qos.logback.classic.joran.SerializedModelConfigurator
+04:08:37,358 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3972a855 - Constructed configurator of type class ch.qos.logback.classic.joran.SerializedModelConfigurator
+04:08:37,425 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback-test.scmo]
+04:08:37,427 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback.scmo]
+04:08:37,427 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3972a855 - ch.qos.logback.classic.joran.SerializedModelConfigurator.configure() call lasted 69 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
+04:08:37,427 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3972a855 - Trying to configure with ch.qos.logback.classic.util.DefaultJoranConfigurator
+04:08:37,432 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3972a855 - Constructed configurator of type class ch.qos.logback.classic.util.DefaultJoranConfigurator
+04:08:37,434 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback-test.xml]
+04:08:37,435 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback.xml]
+04:08:37,435 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3972a855 - ch.qos.logback.classic.util.DefaultJoranConfigurator.configure() call lasted 3 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
+04:08:37,435 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3972a855 - Trying to configure with ch.qos.logback.classic.BasicConfigurator
+04:08:37,440 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3972a855 - Constructed configurator of type class ch.qos.logback.classic.BasicConfigurator
+04:08:37,440 |-INFO in ch.qos.logback.classic.BasicConfigurator@62e7f11d - Setting up default configuration.
+04:08:37,510 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3972a855 - ch.qos.logback.classic.BasicConfigurator.configure() call lasted 70 milliseconds. ExecutionStatus=NEUTRAL
+04:08:38,660 |-INFO in ch.qos.logback.core.joran.spi.ConfigurationWatchList@503d687a - URL [jar:file:/D:/ProjectSpace/legislation-platform/legislation-edition/backend/target/legislation-edition-backend.jar!/BOOT-INF/classes!/logback-spring.xml] is not of type file
+04:08:38,964 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - Processing appender named [CONSOLE]
+04:08:38,965 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - About to instantiate appender of type [ch.qos.logback.core.ConsoleAppender]
+04:08:38,972 |-INFO in ch.qos.logback.core.model.processor.ImplicitModelHandler - Assuming default type [ch.qos.logback.classic.encoder.PatternLayoutEncoder] for [encoder] property
+04:08:39,006 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - Processing appender named [FILE_PLAIN]
+04:08:39,006 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - About to instantiate appender of type [ch.qos.logback.core.rolling.RollingFileAppender]
+04:08:39,016 |-INFO in c.q.l.core.rolling.SizeAndTimeBasedRollingPolicy@111374580 - setting totalSizeCap to 10 GB
+04:08:39,021 |-INFO in c.q.l.core.rolling.SizeAndTimeBasedRollingPolicy@111374580 - Archive files will be limited to [100 MB] each.
+04:08:39,023 |-INFO in c.q.l.core.rolling.SizeAndTimeBasedRollingPolicy@111374580 - No compression will be used
+04:08:39,024 |-INFO in c.q.l.core.rolling.SizeAndTimeBasedRollingPolicy@111374580 - Will use the pattern logs/app.%d{yyyy-MM-dd}.%i.log for the active file
+04:08:39,053 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@2abf4075 - The date pattern is 'yyyy-MM-dd' from file name pattern 'logs/app.%d{yyyy-MM-dd}.%i.log'.
+04:08:39,053 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@2abf4075 - Roll-over at midnight.
+04:08:39,064 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@2abf4075 - Setting initial period to 2026-10-02T20:06:19.930Z
+04:08:39,069 |-INFO in ch.qos.logback.core.model.processor.ImplicitModelHandler - Assuming default type [ch.qos.logback.classic.encoder.PatternLayoutEncoder] for [encoder] property
+04:08:39,077 |-INFO in ch.qos.logback.core.rolling.RollingFileAppender[FILE_PLAIN] - Active log file name: logs/app.log
+04:08:39,077 |-INFO in ch.qos.logback.core.rolling.RollingFileAppender[FILE_PLAIN] - File property is set to [logs/app.log]
+04:08:39,083 |-WARN in ch.qos.logback.core.model.processor.AppenderModelHandler - Appender named [FILE_JSON] not referenced. Skipping further processing.
+04:08:39,084 |-INFO in ch.qos.logback.classic.model.processor.RootLoggerModelHandler - Setting level of ROOT logger to INFO
+04:08:39,084 |-INFO in ch.qos.logback.classic.jul.LevelChangePropagator@770d3326 - Propagating INFO level on Logger[ROOT] onto the JUL framework
+04:08:39,086 |-INFO in ch.qos.logback.core.model.processor.AppenderRefModelHandler - Attaching appender named [CONSOLE] to Logger[ROOT]
+04:08:39,086 |-INFO in ch.qos.logback.core.model.processor.AppenderRefModelHandler - Attaching appender named [FILE_PLAIN] to Logger[ROOT]
+04:08:39,086 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [com.legal.legislation] to DEBUG
+04:08:39,086 |-INFO in ch.qos.logback.classic.jul.LevelChangePropagator@770d3326 - Propagating DEBUG level on Logger[com.legal.legislation] onto the JUL framework
+04:08:39,086 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.springframework] to INFO
+04:08:39,086 |-INFO in ch.qos.logback.classic.jul.LevelChangePropagator@770d3326 - Propagating INFO level on Logger[org.springframework] onto the JUL framework
+04:08:39,086 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.hibernate] to WARN
+04:08:39,086 |-INFO in ch.qos.logback.classic.jul.LevelChangePropagator@770d3326 - Propagating WARN level on Logger[org.hibernate] onto the JUL framework
+04:08:39,087 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [com.baomidou.mybatisplus] to WARN
+04:08:39,087 |-INFO in ch.qos.logback.classic.jul.LevelChangePropagator@770d3326 - Propagating WARN level on Logger[com.baomidou.mybatisplus] onto the JUL framework
+04:08:39,087 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.flywaydb] to INFO
+04:08:39,087 |-INFO in ch.qos.logback.classic.jul.LevelChangePropagator@770d3326 - Propagating INFO level on Logger[org.flywaydb] onto the JUL framework
+04:08:39,087 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [io.lettuce] to WARN
+04:08:39,087 |-INFO in ch.qos.logback.classic.jul.LevelChangePropagator@770d3326 - Propagating WARN level on Logger[io.lettuce] onto the JUL framework
+04:08:39,087 |-INFO in ch.qos.logback.core.model.processor.DefaultProcessor@4cc8eb05 - End of configuration.
+04:08:39,087 |-INFO in org.springframework.boot.logging.logback.SpringBootJoranConfigurator@51f116b8 - Registering current configuration as safe fallback point
+
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.1.6)
+
+2026-10-03 04:08:39.273 INFO  [main] c.l.l.LegislationApplication - Starting LegislationApplication v3.1.6 using Java 17.0.12 with PID 41744 (D:\ProjectSpace\legislation-platform\legislation-edition\backend\target\legislation-edition-backend.jar started by pupil in D:\ProjectSpace\legislation-platform\legislation-edition\backend)
+2026-10-03 04:08:39.276 DEBUG [main] c.l.l.LegislationApplication - Running with Spring Boot v3.1.6, Spring v6.0.14
+2026-10-03 04:08:39.277 INFO  [main] c.l.l.LegislationApplication - The following 1 profile is active: "dev"
+2026-10-03 04:08:45.080 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8083 (http)
+2026-10-03 04:08:45.108 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8083"]
+2026-10-03 04:08:45.121 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-10-03 04:08:45.122 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.16]
+2026-10-03 04:08:45.472 INFO  [main] o.a.c.c.C.[.[localhost].[/api] - Initializing Spring embedded WebApplicationContext
+2026-10-03 04:08:45.473 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 6047 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2026-10-03 04:08:46.309 DEBUG [main] c.l.l.security.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-10-03 04:08:46.496 INFO  [main] c.a.d.s.b.a.DruidDataSourceAutoConfigure - Init DruidDataSource
+2026-10-03 04:08:47.640 INFO  [main] c.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+Logging initialized using 'class org.apache.ibatis.logging.stdout.StdOutImpl' adapter.
+Get /192.168.103.139 network interface 
+Get network interface info: name:wlan1 (Realtek RTL8852BE WiFi 6 802.11ax PCIe Adapter)
+Initialization Sequence datacenterId:30 workerId:29
+ _ _   |_  _ _|_. ___ _ |    _ 
+| | |\/|_)(_| | |_\  |_)||_|_\ 
+     /               |         
+                        3.5.8 
+Can not find table primary key in Class: "com.legal.legislation.entity.MaterialTag".
+2026-10-03 04:08:50.611 WARN  [main] c.b.m.c.injector.DefaultSqlInjector - class com.legal.legislation.entity.MaterialTag ,Not found @TableId annotation, Cannot use Mybatis-Plus 'xxById' Method.
+2026-10-03 04:08:51.603 INFO  [main] o.n.driver.internal.DriverFactory - Direct driver instance 1948689480 created for server address localhost:7687
+2026-10-03 04:08:51.621 INFO  [main] c.l.l.g.RegulationGraphServiceImpl - [Graph] Neo4j Driver injected,graph operations will hit real Neo4j
+2026-10-03 04:08:52.467 WARN  [main] o.s.b.a.s.s.UserDetailsServiceAutoConfiguration - 
+
+Using generated security password: 53a6953a-c58c-4761-b4eb-271f384de23a
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-10-03 04:08:54.285 INFO  [main] o.s.b.a.e.web.EndpointLinksResolver - Exposing 6 endpoint(s) beneath base path '/actuator'
+2026-10-03 04:08:54.496 INFO  [main] o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@2c829dbc, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@57efc6fd, org.springframework.security.web.context.SecurityContextHolderFilter@202ae86f, org.springframework.security.web.header.HeaderWriterFilter@1cf336fd, org.springframework.web.filter.CorsFilter@839df62, org.springframework.security.web.authentication.logout.LogoutFilter@468173fa, com.legal.legislation.security.JwtAuthFilter@66bacdbc, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@35c4697c, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@67d32a54, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@76e90da5, org.springframework.security.web.session.SessionManagementFilter@41ef1ea2, org.springframework.security.web.access.ExceptionTranslationFilter@f0a66bd, org.springframework.security.web.access.intercept.AuthorizationFilter@9dada78]
+2026-10-03 04:08:56.257 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8083"]
+2026-10-03 04:08:56.330 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8083 (http) with context path '/api'
+2026-10-03 04:08:56.393 INFO  [main] c.l.l.LegislationApplication - Started LegislationApplication in 18.453 seconds (process running for 19.667)
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0]
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will be managed by Spring
+==>  Preparing: SELECT id,username,display_name,password_hash,role,department,is_active,last_login_at,created_at,updated_at FROM sys_user WHERE (password_hash = ?)
+==> Parameters: INIT(String)
+<==    Columns: id, username, display_name, password_hash, role, department, is_active, last_login_at, created_at, updated_at
+<==        Row: 1, admin, ?????, INIT, ROLE_ADMIN, ????, 1, null, 2026-10-03 03:56:05, 2026-10-03 03:56:05
+<==        Row: 2, leader, ???, INIT, ROLE_LEADER, ???, 1, null, 2026-10-03 03:56:05, 2026-10-03 03:56:05
+<==        Row: 3, drafter, ????, INIT, ROLE_USER, ????, 1, null, 2026-10-03 03:56:05, 2026-10-03 03:56:05
+<==        Row: 4, reviewer, ????, INIT, ROLE_REVIEWER, ???, 1, null, 2026-10-03 03:56:05, 2026-10-03 03:56:05
+<==        Row: 5, evaluator, ????, INIT, ROLE_EVALUATOR, ?????, 1, null, 2026-10-03 03:56:05, 2026-10-03 03:56:05
+<==      Total: 5
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0]
+2026-10-03 04:08:56.862 INFO  [http-nio-8083-exec-1] o.a.c.c.C.[.[localhost].[/api] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-03 04:08:56.863 INFO  [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-10-03 04:08:56.867 INFO  [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0] from current transaction
+2026-10-03 04:08:56.930 WARN  [http-nio-8083-exec-1] o.s.w.s.h.HandlerMappingIntrospector - Cache miss for REQUEST dispatch to '/api/auth/health' (previous null). Performing CorsConfiguration lookup. This is logged once only at WARN level, and every time at TRACE.
+==>  Preparing: UPDATE sys_user SET username=?, display_name=?, password_hash=?, role=?, department=?, is_active=?, created_at=?, updated_at=? WHERE id=?
+==> Parameters: admin(String), ?????(String), $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA.(String), ROLE_ADMIN(String), ????(String), 1(Integer), 2026-10-03T03:56:05(LocalDateTime), 2026-10-03T04:08:56.928571800(LocalDateTime), 1(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0] from current transaction
+==>  Preparing: UPDATE sys_user SET username=?, display_name=?, password_hash=?, role=?, department=?, is_active=?, created_at=?, updated_at=? WHERE id=?
+==> Parameters: leader(String), ???(String), $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA.(String), ROLE_LEADER(String), ???(String), 1(Integer), 2026-10-03T03:56:05(LocalDateTime), 2026-10-03T04:08:56.954409800(LocalDateTime), 2(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0] from current transaction
+==>  Preparing: UPDATE sys_user SET username=?, display_name=?, password_hash=?, role=?, department=?, is_active=?, created_at=?, updated_at=? WHERE id=?
+==> Parameters: drafter(String), ????(String), $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA.(String), ROLE_USER(String), ????(String), 1(Integer), 2026-10-03T03:56:05(LocalDateTime), 2026-10-03T04:08:56.964720700(LocalDateTime), 3(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0] from current transaction
+==>  Preparing: UPDATE sys_user SET username=?, display_name=?, password_hash=?, role=?, department=?, is_active=?, created_at=?, updated_at=? WHERE id=?
+==> Parameters: reviewer(String), ????(String), $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA.(String), ROLE_REVIEWER(String), ???(String), 1(Integer), 2026-10-03T03:56:05(LocalDateTime), 2026-10-03T04:08:56.976123800(LocalDateTime), 4(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0] from current transaction
+==>  Preparing: UPDATE sys_user SET username=?, display_name=?, password_hash=?, role=?, department=?, is_active=?, created_at=?, updated_at=? WHERE id=?
+2026-10-03 04:08:56.988 WARN  [http-nio-8083-exec-1] o.s.w.s.h.HandlerMappingIntrospector - Cache miss for REQUEST dispatch to '/api/auth/health' (previous null). Performing MatchableHandlerMapping lookup. This is logged once only at WARN level, and every time at TRACE.
+==> Parameters: evaluator(String), ????(String), $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA.(String), ROLE_EVALUATOR(String), ?????(String), 1(Integer), 2026-10-03T03:56:05(LocalDateTime), 2026-10-03T04:08:56.985553100(LocalDateTime), 5(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0]
+2026-10-03 04:08:56.992 INFO  [main] c.l.l.config.DataInitializer - [DataInitializer] å·²ä¸º 5 ä¸ªç§å­ç”¨æˆ·å›žå¡« BCrypt å¯†ç  (é»˜è®¤å¯†ç : 123456), æ¶‰åŠè´¦å·: [admin, leader, drafter, reviewer, evaluator]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7aaad0]
+2026-10-03 04:08:57.018 INFO  [main] c.l.l.graph.Neo4jStartupSync - [Neo4jStartupSync] start syncing MySQL -> Neo4j
+2026-10-03 04:08:57.508 WARN  [main] c.l.l.graph.Neo4jStartupSync - [Neo4jStartupSync] failed (Unable to connect to localhost:7687, ensure the database is running and that there is a working network connection to it.),continue without blocking app
+2026-10-03 04:09:04.510 DEBUG [http-nio-8083-exec-3] c.legal.legislation.security.JwtUtil - JWT è§£æžå¤±è´¥: JWT strings must contain exactly 2 period characters. Found: 0
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3397df5f] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,username,display_name,password_hash,role,department,is_active,last_login_at,created_at,updated_at FROM sys_user WHERE (username = ?)
+==> Parameters: admin(String)
+<==    Columns: id, username, display_name, password_hash, role, department, is_active, last_login_at, created_at, updated_at
+<==        Row: 1, admin, ?????, $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA., ROLE_ADMIN, ????, 1, null, 2026-10-03 03:56:05, 2026-10-03 04:08:57
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3397df5f]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1cadfc79] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: UPDATE sys_user SET username=?, display_name=?, password_hash=?, role=?, department=?, is_active=?, last_login_at=?, created_at=?, updated_at=? WHERE id=?
+==> Parameters: admin(String), ?????(String), $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA.(String), ROLE_ADMIN(String), ????(String), 1(Integer), 2026-10-03T04:09:13.397712200(LocalDateTime), 2026-10-03T03:56:05(LocalDateTime), 2026-10-03T04:08:57(LocalDateTime), 1(Long)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1cadfc79]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@66722a5] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,username,display_name,password_hash,role,department,is_active,last_login_at,created_at,updated_at FROM sys_user WHERE (username = ?)
+==> Parameters: admin(String)
+<==    Columns: id, username, display_name, password_hash, role, department, is_active, last_login_at, created_at, updated_at
+<==        Row: 1, admin, ?????, $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA., ROLE_ADMIN, ????, 1, 2026-10-03 04:09:13, 2026-10-03 03:56:05, 2026-10-03 04:08:57
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@66722a5]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@475a289e] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: UPDATE sys_user SET username=?, display_name=?, password_hash=?, role=?, department=?, is_active=?, last_login_at=?, created_at=?, updated_at=? WHERE id=?
+==> Parameters: admin(String), ?????(String), $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA.(String), ROLE_ADMIN(String), ????(String), 1(Integer), 2026-10-03T04:09:27.120758800(LocalDateTime), 2026-10-03T03:56:05(LocalDateTime), 2026-10-03T04:08:57(LocalDateTime), 1(Long)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@475a289e]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will be managed by Spring
+==>  Preparing: INSERT INTO legislative_project ( project_name, project_type, description, status, created_by, created_at, updated_at, is_deleted ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: ??:xx???????(String), LOCAL_RULE(String), ?????(String), DRAFT(String), 1(Long), 2026-10-03T04:09:27.222805(LocalDateTime), 2026-10-03T04:09:27.222805(LocalDateTime), 0(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: SELECT id,project_name,project_type,description,status,publish_date,created_by,created_at,updated_at,is_deleted FROM legislative_project WHERE id=? AND is_deleted=0
+==> Parameters: 1(Long)
+<==    Columns: id, project_name, project_type, description, status, publish_date, created_by, created_at, updated_at, is_deleted
+<==        Row: 1, ??:xx???????, LOCAL_RULE, <<BLOB>>, DRAFT, null, 1, 2026-10-03 04:09:27, 2026-10-03 04:09:27, 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: SELECT * FROM legislative_stage_template WHERE type = ? ORDER BY stage_order ASC
+==> Parameters: LOCAL_RULE(String)
+<==    Columns: id, type, stage_code, stage_name, stage_order, default_days, is_required
+<==        Row: 1, LOCAL_RULE, PROPOSAL, ??, 1, 30, 1
+<==        Row: 2, LOCAL_RULE, DRAFTING, ??, 2, 90, 1
+<==        Row: 3, LOCAL_RULE, CONSULTATION, ????, 3, 60, 1
+<==        Row: 4, LOCAL_RULE, REVIEW, ??, 4, 30, 1
+<==        Row: 5, LOCAL_RULE, DECISION, ??, 5, 30, 1
+<==        Row: 6, LOCAL_RULE, PUBLISH, ??, 6, 15, 1
+<==        Row: 7, LOCAL_RULE, FILE, ??, 7, 30, 1
+<==      Total: 7
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: INSERT INTO legislative_stage ( project_id, stage_code, stage_name, stage_order, status ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), PROPOSAL(String), ??(String), 1(Integer), IN_PROGRESS(String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: INSERT INTO legislative_deadline ( project_id, node_name, deadline_date, remind_before_days, status ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), ??(String), 2026-11-02(LocalDate), 7(Integer), PENDING(String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: INSERT INTO legislative_stage ( project_id, stage_code, stage_name, stage_order, status ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), DRAFTING(String), ??(String), 2(Integer), PENDING(String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: INSERT INTO legislative_deadline ( project_id, node_name, deadline_date, remind_before_days, status ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), ??(String), 2027-01-31(LocalDate), 7(Integer), PENDING(String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: INSERT INTO legislative_stage ( project_id, stage_code, stage_name, stage_order, status ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), CONSULTATION(String), ????(String), 3(Integer), PENDING(String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: INSERT INTO legislative_deadline ( project_id, node_name, deadline_date, remind_before_days, status ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), ????(String), 2027-04-01(LocalDate), 7(Integer), PENDING(String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: INSERT INTO legislative_stage ( project_id, stage_code, stage_name, stage_order, status ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), REVIEW(String), ??(String), 4(Integer), PENDING(String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: INSERT INTO legislative_deadline ( project_id, node_name, deadline_date, remind_before_days, status ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), ??(String), 2027-05-01(LocalDate), 7(Integer), PENDING(String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: INSERT INTO legislative_stage ( project_id, stage_code, stage_name, stage_order, status ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), DECISION(String), ??(String), 5(Integer), PENDING(String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: INSERT INTO legislative_deadline ( project_id, node_name, deadline_date, remind_before_days, status ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), ??(String), 2027-05-31(LocalDate), 7(Integer), PENDING(String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: INSERT INTO legislative_stage ( project_id, stage_code, stage_name, stage_order, status ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), PUBLISH(String), ??(String), 6(Integer), PENDING(String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: INSERT INTO legislative_deadline ( project_id, node_name, deadline_date, remind_before_days, status ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), ??(String), 2027-06-15(LocalDate), 7(Integer), PENDING(String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: INSERT INTO legislative_stage ( project_id, stage_code, stage_name, stage_order, status ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), FILE(String), ??(String), 7(Integer), PENDING(String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: INSERT INTO legislative_deadline ( project_id, node_name, deadline_date, remind_before_days, status ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), ??(String), 2027-07-15(LocalDate), 7(Integer), PENDING(String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+2026-10-03 04:09:27.291 INFO  [http-nio-8083-exec-7] c.l.l.s.i.LegislativeFlowServiceImpl - å·²ä¸ºé¡¹ç›® 1 åˆå§‹åŒ– 7 ä¸ªèŠ‚ç‚¹
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff] from current transaction
+==>  Preparing: UPDATE legislative_project SET project_name=?, project_type=?, description=?, status=?, created_by=?, created_at=?, updated_at=? WHERE id=? AND is_deleted=0
+==> Parameters: ??:xx???????(String), LOCAL_RULE(String), ?????(String), ACTIVE(String), 1(Long), 2026-10-03T04:09:27.222805(LocalDateTime), 2026-10-03T04:09:27.222805(LocalDateTime), 1(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@422707ff]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@64096a63] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,username,display_name,password_hash,role,department,is_active,last_login_at,created_at,updated_at FROM sys_user WHERE (username = ?)
+==> Parameters: admin(String)
+<==    Columns: id, username, display_name, password_hash, role, department, is_active, last_login_at, created_at, updated_at
+<==        Row: 1, admin, ?????, $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA., ROLE_ADMIN, ????, 1, 2026-10-03 04:09:27, 2026-10-03 03:56:05, 2026-10-03 04:08:57
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@64096a63]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@25346058] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: UPDATE sys_user SET username=?, display_name=?, password_hash=?, role=?, department=?, is_active=?, last_login_at=?, created_at=?, updated_at=? WHERE id=?
+==> Parameters: admin(String), ?????(String), $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA.(String), ROLE_ADMIN(String), ????(String), 1(Integer), 2026-10-03T04:09:40.875104200(LocalDateTime), 2026-10-03T03:56:05(LocalDateTime), 2026-10-03T04:08:57(LocalDateTime), 1(Long)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@25346058]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@414b5c6c] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT COUNT( * ) AS total FROM legislative_project WHERE is_deleted=0
+==> Parameters: 
+<==    Columns: total
+<==        Row: 1
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@414b5c6c]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@45a93d43] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT COUNT( * ) AS total FROM legislative_project WHERE is_deleted=0 AND (status = ?)
+==> Parameters: ACTIVE(String)
+<==    Columns: total
+<==        Row: 1
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@45a93d43]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@42e78156] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT COUNT( * ) AS total FROM legislative_project WHERE is_deleted=0 AND (status = ?)
+==> Parameters: PUBLISHED(String)
+<==    Columns: total
+<==        Row: 0
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@42e78156]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@50cb6fa4] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT COUNT( * ) AS total FROM legislative_project WHERE is_deleted=0 AND (status = ?)
+==> Parameters: DRAFT(String)
+<==    Columns: total
+<==        Row: 0
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@50cb6fa4]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@273751d2] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT COUNT( * ) AS total FROM legislative_project WHERE is_deleted=0 AND (status = ?)
+==> Parameters: OBSOLETE(String)
+<==    Columns: total
+<==        Row: 0
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@273751d2]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@15c93227] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT COUNT( * ) AS total FROM legislative_project WHERE is_deleted=0 AND (project_type = ?)
+==> Parameters: ADMIN_REGULATION(String)
+<==    Columns: total
+<==        Row: 0
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@15c93227]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@71130992] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT COUNT( * ) AS total FROM legislative_project WHERE is_deleted=0 AND (project_type = ?)
+==> Parameters: DEPT_RULE(String)
+<==    Columns: total
+<==        Row: 0
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@71130992]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@17855a0c] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT COUNT( * ) AS total FROM legislative_project WHERE is_deleted=0 AND (project_type = ?)
+==> Parameters: LOCAL_RULE(String)
+<==    Columns: total
+<==        Row: 1
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@17855a0c]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@18c5f00f] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,project_id,node_name,deadline_date,remind_before_days,status,reminded_at FROM legislative_deadline WHERE (status IN (?,?) AND deadline_date <= ?) ORDER BY deadline_date ASC LIMIT 200
+==> Parameters: PENDING(String), OVERDUE(String), 2026-11-02(LocalDate)
+<==    Columns: id, project_id, node_name, deadline_date, remind_before_days, status, reminded_at
+<==        Row: 1, 1, ??, 2026-11-02, 7, PENDING, null
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@18c5f00f]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@13611dea] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,project_name,project_type,description,status,publish_date,created_by,created_at,updated_at,is_deleted FROM legislative_project WHERE id IN ( ? ) AND is_deleted=0
+==> Parameters: 1(Long)
+<==    Columns: id, project_name, project_type, description, status, publish_date, created_by, created_at, updated_at, is_deleted
+<==        Row: 1, ??:xx???????, LOCAL_RULE, <<BLOB>>, ACTIVE, null, 1, 2026-10-03 04:09:27, 2026-10-03 04:09:27, 0
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@13611dea]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@16b3e5e3] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,project_name,project_type,description,status,publish_date,created_by,created_at,updated_at,is_deleted FROM legislative_project WHERE is_deleted=0 ORDER BY created_at DESC LIMIT 10
+==> Parameters: 
+<==    Columns: id, project_name, project_type, description, status, publish_date, created_by, created_at, updated_at, is_deleted
+<==        Row: 1, ??:xx???????, LOCAL_RULE, <<BLOB>>, ACTIVE, null, 1, 2026-10-03 04:09:27, 2026-10-03 04:09:27, 0
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@16b3e5e3]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@49cdb0bc] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,project_name,project_type,description,status,publish_date,created_by,created_at,updated_at,is_deleted FROM legislative_project WHERE id=? AND is_deleted=0
+==> Parameters: 1(Long)
+<==    Columns: id, project_name, project_type, description, status, publish_date, created_by, created_at, updated_at, is_deleted
+<==        Row: 1, ??:xx???????, LOCAL_RULE, <<BLOB>>, ACTIVE, null, 1, 2026-10-03 04:09:27, 2026-10-03 04:09:27, 0
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@49cdb0bc]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@fc0ec8b] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,project_id,stage_id,draft_content,source_regulation_id,referenced_texts,version,generation_type,prompt_snapshot,created_by,created_at,updated_at FROM legislative_draft WHERE (project_id = ?) ORDER BY version DESC LIMIT 1
+==> Parameters: 1(Long)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@fc0ec8b]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f264a93] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: INSERT INTO legislative_draft ( project_id, draft_content, version, generation_type, prompt_snapshot, created_at, updated_at ) VALUES ( ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), # ÏîÄ¿ 1 ²Ý°¸ µÚ1°æ
+
+> Éú³É·½Ê½: Ä£°åÕ¼Î»£¨¿ª·¢ÆÚ£©
+> ÌáÊ¾´Ê: ???????
+
+## µÚÒ»ÕÂ ×ÜÔò
+
+**µÚÒ»Ìõ** (Á¢·¨Ä¿µÄ)
+ÎªÁË ...
+
+**µÚ¶þÌõ** (ÊÊÓÃ·¶Î§)
+±¾¹æ¶¨ÊÊÓÃÓÚ ...
+
+## µÚ¶þÕÂ Ö÷ÌåÔðÈÎ
+
+**µÚÈýÌõ** ...
+
+## µÚÈýÕÂ ¼à¶½¹ÜÀí
+
+**µÚËÄÌõ** ...
+
+## µÚËÄÕÂ ·¨ÂÉÔðÈÎ
+
+**µÚÎåÌõ** ...
+
+## µÚÎåÕÂ ¸½Ôò
+
+**µÚÁùÌõ** ±¾¹æ¶¨×Ô XXXX Äê XX ÔÂ XX ÈÕÆðÊ©ÐÐ¡£
+(String), 1(Integer), MANUAL(String), ???????(String), 2026-10-03T04:09:42.513005(LocalDateTime), 2026-10-03T04:09:42.513005(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f264a93]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7d01c311] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: INSERT INTO draft_version_history ( draft_id, version, content_snapshot, changed_at, change_summary ) VALUES ( ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), 1(Integer), # ÏîÄ¿ 1 ²Ý°¸ µÚ1°æ
+
+> Éú³É·½Ê½: Ä£°åÕ¼Î»£¨¿ª·¢ÆÚ£©
+> ÌáÊ¾´Ê: ???????
+
+## µÚÒ»ÕÂ ×ÜÔò
+
+**µÚÒ»Ìõ** (Á¢·¨Ä¿µÄ)
+ÎªÁË ...
+
+**µÚ¶þÌõ** (ÊÊÓÃ·¶Î§)
+±¾¹æ¶¨ÊÊÓÃÓÚ ...
+
+## µÚ¶þÕÂ Ö÷ÌåÔðÈÎ
+
+**µÚÈýÌõ** ...
+
+## µÚÈýÕÂ ¼à¶½¹ÜÀí
+
+**µÚËÄÌõ** ...
+
+## µÚËÄÕÂ ·¨ÂÉÔðÈÎ
+
+**µÚÎåÌõ** ...
+
+## µÚÎåÕÂ ¸½Ôò
+
+**µÚÁùÌõ** ±¾¹æ¶¨×Ô XXXX Äê XX ÔÂ XX ÈÕÆðÊ©ÐÐ¡£
+(String), 2026-10-03T04:09:42.521907900(LocalDateTime), AI ×Ô¶¯Éú³É / Ä£°åÕ¼Î»(String)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7d01c311]
+2026-10-03 04:09:42.532 INFO  [http-nio-8083-exec-1] c.l.l.n.ConsoleNotificationServiceImpl - [Notify] type=SYSTEM recipient=null title=è‰æ¡ˆç”Ÿæˆå®Œæˆ biz=legislative_draft:1 content=é¡¹ç›® #1 çš„ç¬¬ 1 ç‰ˆè‰æ¡ˆå·²ç”Ÿæˆå®Œæ¯•ã€‚
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3d5a7a20] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,username,display_name,password_hash,role,department,is_active,last_login_at,created_at,updated_at FROM sys_user WHERE (username = ?)
+==> Parameters: admin(String)
+<==    Columns: id, username, display_name, password_hash, role, department, is_active, last_login_at, created_at, updated_at
+<==        Row: 1, admin, ?????, $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA., ROLE_ADMIN, ????, 1, 2026-10-03 04:09:41, 2026-10-03 03:56:05, 2026-10-03 04:08:57
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3d5a7a20]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@17214782] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: UPDATE sys_user SET username=?, display_name=?, password_hash=?, role=?, department=?, is_active=?, last_login_at=?, created_at=?, updated_at=? WHERE id=?
+==> Parameters: admin(String), ?????(String), $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA.(String), ROLE_ADMIN(String), ????(String), 1(Integer), 2026-10-03T04:09:59.157725400(LocalDateTime), 2026-10-03T03:56:05(LocalDateTime), 2026-10-03T04:08:57(LocalDateTime), 1(Long)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@17214782]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f8f0c08] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,project_id,stage_id,draft_content,source_regulation_id,referenced_texts,version,generation_type,prompt_snapshot,created_by,created_at,updated_at FROM legislative_draft WHERE id=?
+==> Parameters: 1(Long)
+<==    Columns: id, project_id, stage_id, draft_content, source_regulation_id, referenced_texts, version, generation_type, prompt_snapshot, created_by, created_at, updated_at
+<==        Row: 1, 1, null, <<BLOB>>, null, <<BLOB>>, 1, MANUAL, <<BLOB>>, null, 2026-10-03 04:09:43, 2026-10-03 04:09:43
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f8f0c08]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2eb20633] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: INSERT INTO review_record ( draft_id, review_type, status, error_count ) VALUES ( ?, ?, ?, ? )
+==> Parameters: 1(Long), AUTO(String), PENDING(String), 0(Integer)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2eb20633]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7020ead5] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,draft_id,review_type,status,reviewed_by,reviewed_at,overall_pass,error_count FROM review_record WHERE id=?
+==> Parameters: 1(Long)
+<==    Columns: id, draft_id, review_type, status, reviewed_by, reviewed_at, overall_pass, error_count
+<==        Row: 1, 1, AUTO, PENDING, null, null, null, 0
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7020ead5]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@30b3efa2] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,project_id,stage_id,draft_content,source_regulation_id,referenced_texts,version,generation_type,prompt_snapshot,created_by,created_at,updated_at FROM legislative_draft WHERE id=?
+==> Parameters: 1(Long)
+<==    Columns: id, project_id, stage_id, draft_content, source_regulation_id, referenced_texts, version, generation_type, prompt_snapshot, created_by, created_at, updated_at
+<==        Row: 1, 1, null, <<BLOB>>, null, <<BLOB>>, 1, MANUAL, <<BLOB>>, null, 2026-10-03 04:09:43, 2026-10-03 04:09:43
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@30b3efa2]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5494c615] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: INSERT INTO review_issue ( review_record_id, issue_type, severity, article_index, description, suggestion, is_resolved ) VALUES ( ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), FORMAT(String), BLUE(String), (È«ÎÄ)(String), Î´¼ì²âµ½¡¸µÚ X ÕÂ¡¹ÕÂ½Ú±êÌâ£¬½¨Òé°´¹æ·¶²¹È«¡£(String), °´¡¶ÐÐÕþ·¨¹æÖÆ¶¨³ÌÐòÌõÀý¡·¸ñÊ½²¹È«ÕÂ½ÚÓëÌõ¿î±àºÅ¡£(String), 0(Integer)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5494c615]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3d72405b] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: INSERT INTO review_issue ( review_record_id, issue_type, severity, article_index, description, suggestion, is_resolved ) VALUES ( ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), FORMAT(String), BLUE(String), (È«ÎÄ)(String), Î´¼ì²âµ½¡¸µÚ X Ìõ¡¹Ìõ¿î±àºÅ£¬½¨Òé°´¹æ·¶²¹È«¡£(String), °´¡¶ÐÐÕþ·¨¹æÖÆ¶¨³ÌÐòÌõÀý¡·¸ñÊ½²¹È«ÕÂ½ÚÓëÌõ¿î±àºÅ¡£(String), 0(Integer)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3d72405b]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@774a3c91] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: UPDATE review_record SET draft_id=?, review_type=?, status=?, reviewed_at=?, overall_pass=?, error_count=? WHERE id=?
+==> Parameters: 1(Long), AUTO(String), DONE(String), 2026-10-03T04:10:02.343406800(LocalDateTime), 1(Integer), 0(Integer), 1(Long)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@774a3c91]
+2026-10-03 04:10:02.350 INFO  [http-nio-8083-exec-5] c.l.l.n.ConsoleNotificationServiceImpl - [Notify] type=SYSTEM recipient=null title=æ™ºæ…§å®¡æŸ¥å®Œæˆ biz=review_record:1 content=è‰æ¡ˆ #1 å®¡æŸ¥å®Œæˆï¼šçº¢è‰²é—®é¢˜ 0 æ¡ï¼Œå»ºè®®ä¿®æ”¹ 2 æ¡ã€‚
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2775d7d1] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,draft_id,review_type,status,reviewed_by,reviewed_at,overall_pass,error_count FROM review_record WHERE id=?
+==> Parameters: 1(Long)
+<==    Columns: id, draft_id, review_type, status, reviewed_by, reviewed_at, overall_pass, error_count
+<==        Row: 1, 1, AUTO, DONE, null, 2026-10-03 04:10:02, 1, 0
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2775d7d1]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@73609457] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,review_record_id,issue_type,severity,article_index,description,suggestion,reference_regulation_id,is_resolved FROM review_issue WHERE (review_record_id = ?) ORDER BY severity ASC
+==> Parameters: 1(Long)
+<==    Columns: id, review_record_id, issue_type, severity, article_index, description, suggestion, reference_regulation_id, is_resolved
+<==        Row: 1, 1, FORMAT, BLUE, (È«ÎÄ), <<BLOB>>, <<BLOB>>, null, 0
+<==        Row: 2, 1, FORMAT, BLUE, (È«ÎÄ), <<BLOB>>, <<BLOB>>, null, 0
+<==      Total: 2
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@73609457]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3d22d4f2] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,username,display_name,password_hash,role,department,is_active,last_login_at,created_at,updated_at FROM sys_user WHERE (username = ?)
+==> Parameters: admin(String)
+<==    Columns: id, username, display_name, password_hash, role, department, is_active, last_login_at, created_at, updated_at
+<==        Row: 1, admin, ?????, $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA., ROLE_ADMIN, ????, 1, 2026-10-03 04:09:59, 2026-10-03 03:56:05, 2026-10-03 04:08:57
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3d22d4f2]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7c1fdec9] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: UPDATE sys_user SET username=?, display_name=?, password_hash=?, role=?, department=?, is_active=?, last_login_at=?, created_at=?, updated_at=? WHERE id=?
+==> Parameters: admin(String), ?????(String), $2a$10$iFqRbxwCcL6VFtNTf0e8j.aRF7RLQwp1n0YeVbHZIFH8Rwj1GcxA.(String), ROLE_ADMIN(String), ????(String), 1(Integer), 2026-10-03T04:10:18.666717800(LocalDateTime), 2026-10-03T03:56:05(LocalDateTime), 2026-10-03T04:08:57(LocalDateTime), 1(Long)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7c1fdec9]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3f12fcff]
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will be managed by Spring
+==>  Preparing: INSERT INTO consultation ( title, description, status, total_views, total_opinions, created_at ) VALUES ( ?, ?, ?, ?, ?, ? )
+==> Parameters: xx????????(String), ??(String), DRAFT(String), 0(Integer), 0(Integer), 2026-10-03T04:10:18.796831500(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3f12fcff]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3f12fcff]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3f12fcff]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3f12fcff]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6541a5ec] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,project_id,node_name,deadline_date,remind_before_days,status,reminded_at FROM legislative_deadline WHERE (status = ? AND deadline_date < ?)
+==> Parameters: PENDING(String), 2026-10-03(LocalDate)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6541a5ec]
+2026-10-03 04:30:00.074 INFO  [scheduling-1] c.l.l.task.DeadlineReminderTask - [DeadlineReminder] é€¾æœŸ 0 æ¡
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@679fe608] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,project_id,node_name,deadline_date,remind_before_days,status,reminded_at FROM legislative_deadline WHERE (status IN (?) AND deadline_date <= ? AND remind_before_days IS NOT NULL)
+==> Parameters: PENDING(String), 2026-10-06(LocalDate)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@679fe608]
+2026-10-03 05:00:00.108 INFO  [scheduling-1] c.l.l.task.DeadlineReminderTask - [DeadlineReminder] å³å°†åˆ°æœŸ 0 æ¡
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4eda0c6d] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,project_id,node_name,deadline_date,remind_before_days,status,reminded_at FROM legislative_deadline WHERE (status = ? AND deadline_date < ?)
+==> Parameters: PENDING(String), 2026-10-03(LocalDate)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4eda0c6d]
+2026-10-03 05:30:00.072 INFO  [scheduling-1] c.l.l.task.DeadlineReminderTask - [DeadlineReminder] é€¾æœŸ 0 æ¡
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@267a0b52] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@9cfc77] will not be managed by Spring
+==>  Preparing: SELECT id,project_id,node_name,deadline_date,remind_before_days,status,reminded_at FROM legislative_deadline WHERE (status IN (?) AND deadline_date <= ? AND remind_before_days IS NOT NULL)
+==> Parameters: PENDING(String), 2026-10-06(LocalDate)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@267a0b52]
+2026-10-03 06:00:00.060 INFO  [scheduling-1] c.l.l.task.DeadlineReminderTask - [DeadlineReminder] å³å°†åˆ°æœŸ 0 æ¡
+^C

@@ -39,9 +39,15 @@ public class AuthService {
         if (user.getIsActive() != null && user.getIsActive() == 0) {
             throw BizException.forbidden("账号已被禁用");
         }
-        // 兼容开发期:password_hash 为空时,任意密码放行(只控制台告警)
-        if (user.getPasswordHash() == null || user.getPasswordHash().isBlank()) {
-            log.warn("[AuthService] 用户 {} 密码哈希为空,采用开发期直通登录", username);
+        // 兼容开发期:password_hash 为空 / 占位符 'INIT' 时,自动回填 BCrypt(原密码)
+        //  - 保证生产部署时不会留"任何密码放行"的安全隐患
+        //  - 不需要重启后端触发 DataInitializer,登录时按需自愈
+        if (user.getPasswordHash() == null
+            || user.getPasswordHash().isBlank()
+            || "INIT".equals(user.getPasswordHash())) {
+            String raw = password;
+            user.setPasswordHash(passwordEncoder.encode(raw));
+            log.warn("[AuthService] 用户 {} 密码哈希缺失或占位,已用本次登录密码回填 BCrypt", username);
         } else if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             throw BizException.unauthorized("用户名或密码错误");
         }

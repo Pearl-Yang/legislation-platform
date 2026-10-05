@@ -40,6 +40,8 @@ request.interceptors.response.use(
   (response) => {
     const data = response.data
     if (!data) return response
+    // blob / arraybuffer:直接放行(导出/下载用)
+    if (data instanceof Blob || data instanceof ArrayBuffer) return response
     if (data.code === 200) return data
     // 401xx = 鉴权失败 -> 跳登录
     if (data.code && data.code >= 40100 && data.code < 40200) {

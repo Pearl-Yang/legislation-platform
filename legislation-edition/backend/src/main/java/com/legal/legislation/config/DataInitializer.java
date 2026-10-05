@@ -6,59 +6,74 @@ import com.legal.legislation.mapper.SysUserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
- * 数据初始化器。
+ * 启动期数据初始化器。
  *
- * 启动时:
- *  - 给 password_hash 为空的用户补上 BCrypt 哈希(开发期默认密码 123456)
- *  - 给 last_login_at 为空的用户填当前时间(便于前端显示)
+ * <p>职责(立法版当前阶段):
+ * <ul>
+ *   <li>扫描 sys_user 表中 password_hash = 'INIT' 的种子用户,
+ *       用 BCrypt(123456) 回填,确保登录走标准 BCrypt 校验路径</li>
+ *   <li>打印一行"账号初始化摘要"到控制台,便于 Docker 部署时一眼确认</li>
+ * </ul>
  *
- * 生产环境:
- *  - 通过 SQL 注入或管理后台维护真实密码,本类不会再覆盖
- *  - 当 password_hash 已存在(非空)时,本类完全跳过,不会重置
+ * <p>注意:任何失败必须 warn 而非抛异常,避免阻塞 backend 启动。
+ * 数据库不可达时由 Spring 自动装配失败而非本类。
  */
 @Slf4j
 @Component
+@Order(1)   // 早于任何业务 Runner
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
-    /** 开发期统一默认密码,生产请通过管理后台或 SQL 改写。 */
-    public static final String DEV_DEFAULT_PASSWORD = "123456";
+    private static final String DEFAULT_PASSWORD = "123456";
+    private static final String PLACEHOLDER      = "INIT";
 
-    private final SysUserMapper userMapper;
+    private final SysUserMapper   userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JdbcTemplate     jdbcTemplate;
 
     @Override
+    @Transactional
     public void run(String... args) {
-        try {
-            ensurePasswordHashes();
-        } catch (Exception ex) {
-            log.warn("[DataInitializer] 初始化失败,非致命,继续启动: {}", ex.getMessage());
-        }
+        ensureSeedPasswords();
     }
 
-    private void ensurePasswordHashes() {
-        var users = userMapper.selectList(
-            new QueryWrapper<SysUser>().isNull("password_hash").or().eq("password_hash", "")
-        );
-        if (users.isEmpty()) {
-            log.info("[DataInitializer] 所有用户密码哈希已就位,无需初始化");
+    /**
+     * 找出 password_hash = 'INIT' 的种子用户,用 BCrypt 加密 DEFAULT_PASSWORD 覆盖。
+     * 幂等:已加密过的用户(password_hash 以 $2a$ / $2b$ / $2y$ 开头)不会再次处理。
+     */
+    private void ensureSeedPasswords() {
+        // ⚠️ sys_user 表没有 is_deleted 字段,但 application.yml 全局开了逻辑删除过滤
+        // MyBatis Plus 的 selectList 会自动追加 "AND is_deleted = 0",导致表里查不到任何行
+        // 这里用 JdbcTemplate 直查,绕开逻辑删除过滤
+        List<Long> seedIds;
+        try {
+            seedIds = jdbcTemplate.queryForList(
+                "SELECT id FROM sys_user WHERE password_hash = ?", Long.class, PLACEHOLDER);
+        } catch (Exception ex) {
+            log.warn("[DataInitializer] 扫描种子用户失败: {}", ex.getMessage());
             return;
         }
-        String hash = passwordEncoder.encode(DEV_DEFAULT_PASSWORD);
-        int updated = 0;
-        for (SysUser u : users) {
-            u.setPasswordHash(hash);
-            if (u.getCreatedAt() == null) u.setCreatedAt(LocalDateTime.now());
-            userMapper.updateById(u);
-            updated++;
-            log.info("[DataInitializer] 用户 {} ({}) 已初始化密码为 123456", u.getUsername(), u.getRole());
+        if (seedIds.isEmpty()) {
+            log.info("[DataInitializer] 种子用户密码已就绪,无需初始化 (INIT 占位 = 0)");
+            return;
         }
-        log.info("[DataInitializer] 共初始化 {} 个用户密码", updated);
+        String hash = passwordEncoder.encode(DEFAULT_PASSWORD);
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+        int updated = jdbcTemplate.update(
+            "UPDATE sys_user SET password_hash = ?, updated_at = ? WHERE password_hash = ?",
+            hash, now, PLACEHOLDER);
+        log.info("[DataInitializer] 已为 {} 个种子用户回填 BCrypt 密码 (默认密码: {}), 涉及账号 ids={}",
+            updated, DEFAULT_PASSWORD, seedIds);
     }
 }

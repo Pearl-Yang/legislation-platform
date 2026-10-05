@@ -7,16 +7,25 @@
         <el-tag :type="projectStatusTag(project?.status)" size="small" effect="light" class="ml-8">
           {{ projectStatusLabel(project?.status) }}
         </el-tag>
+        <!-- 期限预警徽章(7 天内 / 已逾期) -->
+        <el-tag
+          v-if="projectAlertBadge"
+          :type="projectAlertBadge.type"
+          size="small"
+          class="ml-8"
+          effect="dark"
+        >
+          <el-icon><AlarmClock /></el-icon>
+          {{ projectAlertBadge.text }}
+        </el-tag>
       </div>
       <div class="header-actions">
-        <el-button :icon="EditPen" plain @click="onAdvance">推进下一阶段</el-button>
-        <el-button :icon="RefreshLeft" plain @click="onRollback">回退</el-button>
-        <el-button :icon="Download" plain>导出材料清单</el-button>
+        <el-button :icon="EditPen" plain :disabled="!project?.id" @click="onAdvance">推进下一阶段</el-button>
+        <el-button :icon="RefreshLeft" plain :disabled="!project?.id" @click="onRollback">回退</el-button>
       </div>
     </div>
 
     <el-row :gutter="16">
-      <!-- 左：项目信息 + 时间轴 -->
       <el-col :xs="24" :md="16">
         <!-- 项目基础信息 -->
         <el-card>
@@ -34,18 +43,33 @@
               {{ currentStage?.stageName || '—' }}
             </el-descriptions-item>
             <el-descriptions-item label="整体进度" :span="2">
-              <el-progress :percentage="progress" :stroke-width="14" :text-inside="true"
-                :color="progressColor" />
+              <el-progress :percentage="progress" :stroke-width="14" :text-inside="true" :color="progressColor" />
             </el-descriptions-item>
             <el-descriptions-item label="发布机关">{{ project?.issuingAuthority || '未指定' }}</el-descriptions-item>
             <el-descriptions-item label="发文字号">{{ project?.documentNumber || '尚未取得' }}</el-descriptions-item>
             <el-descriptions-item label="拟发布">{{ project?.publishDate || '—' }}</el-descriptions-item>
-            <el-descriptions-item label="优先级">
-              <el-tag :type="priorityTag(project?.priority)" size="small">{{ priorityLabel(project?.priority) }}</el-tag>
-            </el-descriptions-item>
+            <el-descriptions-item label="立项依据" :span="2">{{ project?.legalBasis || '—' }}</el-descriptions-item>
             <el-descriptions-item label="协调部门" :span="2">{{ project?.coordinatingDepartments || '无' }}</el-descriptions-item>
             <el-descriptions-item label="项目描述" :span="2">{{ project?.description || '—' }}</el-descriptions-item>
           </el-descriptions>
+        </el-card>
+
+        <!-- Day4 新增:ECharts 流程图(从立項 → 公布 的可视化路径) -->
+        <el-card class="mt-16">
+          <template #header>
+            <div class="flex-between">
+              <span class="title">
+                <el-icon class="warn-icon"><Operation /></el-icon>
+                流程图可视化(依《{{ templateBasis }}》)
+              </span>
+              <el-radio-group v-model="flowView" size="small">
+                <el-radio-button value="chart">图示</el-radio-button>
+                <el-radio-button value="list">列表</el-radio-button>
+              </el-radio-group>
+            </div>
+          </template>
+          <v-chart v-if="flowView === 'chart' && stages.length" :option="flowOption" autoresize style="height: 360px;" />
+          <el-empty v-else-if="!stages.length" description="暂无流程节点数据" />
         </el-card>
 
         <!-- 流程时间轴 -->
@@ -54,7 +78,7 @@
             <div class="flex-between">
               <span class="title">
                 <el-icon class="warn-icon"><Operation /></el-icon>
-                流程节点（依《{{ templateBasis }}》）
+                流程节点明细(依《{{ templateBasis }}》)
               </span>
               <el-radio-group v-model="statusFilter" size="small">
                 <el-radio-button value="all">全部</el-radio-button>
@@ -65,79 +89,58 @@
             </div>
           </template>
 
-          <el-steps :active="activeIndex" direction="vertical" finish-status="success" space="80px" class="stage-steps">
+          <el-empty v-if="!stages.length" description="暂无流程节点数据" />
+          <el-steps v-else :active="activeIndex" direction="vertical" finish-status="success" space="80px" class="stage-steps">
             <el-step
               v-for="s in filteredStages"
               :key="s.id"
               :title="s.stageName"
-              :description="stageDescription(s)"
+              :description="s.stageCode || ''"
               :status="stepStatus(s)"
             >
               <template #description>
                 <div class="stage-desc">
                   <div class="sd-line">
-                    <span class="sd-label">法规依据：</span>
-                    <el-tag size="small" effect="plain" type="info">{{ s.legalBasis || '通用' }}</el-tag>
-                  </div>
-                  <div class="sd-line">
-                    <span class="sd-label">法定期限：</span>
+                    <span class="sd-label">法定期限:</span>
                     <span>{{ s.defaultDays || 30 }} 天</span>
                   </div>
-                  <div v-if="s.operatorTime" class="sd-line">
-                    <span class="sd-label">操作：</span>
-                    <span>操作人 ID {{ s.operatorId }} · {{ s.operatorTime }}</span>
+                  <div v-if="s.startedAt" class="sd-line">
+                    <span class="sd-label">开始:</span>
+                    <span>{{ s.startedAt }}</span>
+                  </div>
+                  <div v-if="s.completedAt" class="sd-line">
+                    <span class="sd-label">完成:</span>
+                    <span>{{ s.completedAt }}</span>
                   </div>
                   <div v-if="s.remark" class="sd-line">
-                    <span class="sd-label">备注：</span>
+                    <span class="sd-label">备注:</span>
                     <span>{{ s.remark }}</span>
                   </div>
-                  <div v-if="s.requiredDocs && s.requiredDocs.length" class="sd-line">
-                    <span class="sd-label">所需材料：</span>
-                    <el-tag v-for="d in s.requiredDocs" :key="d" size="small" effect="plain">{{ d }}</el-tag>
+                  <!-- 节点自身的 7 天预警 -->
+                  <div v-if="deadlineBadgeFor(s).text" class="sd-line">
+                    <el-tag :type="deadlineBadgeFor(s).type" size="small" effect="dark">
+                      <el-icon><AlarmClock /></el-icon>
+                      {{ deadlineBadgeFor(s).text }}
+                    </el-tag>
                   </div>
-                  <div class="sd-actions">
-                    <el-button v-if="s.status === 'IN_PROGRESS'" size="small" type="primary" @click="onAdvance">提交 / 推进</el-button>
-                    <el-button v-if="s.status === 'IN_PROGRESS'" size="small" plain @click="onRollback">退回</el-button>
-                    <el-button v-if="s.status === 'IN_PROGRESS'" size="small" plain>加签</el-button>
-                    <el-button size="small" plain @click="showMaterials(s)">查看材料</el-button>
+                  <div class="sd-actions" v-if="s.status === 'IN_PROGRESS'">
+                    <el-button size="small" type="primary" @click="onAdvance">提交 / 推进</el-button>
+                    <el-button size="small" plain @click="onRollback">退回</el-button>
                   </div>
                 </div>
               </template>
             </el-step>
           </el-steps>
         </el-card>
-
-        <!-- 节点材料 -->
-        <el-card class="mt-16">
-          <template #header>
-            <span class="title">节点附件材料</span>
-          </template>
-          <el-table :data="documents" stripe size="default">
-            <el-table-column label="材料类型" prop="documentType" width="140" />
-            <el-table-column label="文件名称" min-width="220" prop="documentName" />
-            <el-table-column label="上传时间" width="110" prop="uploadedAt" />
-            <el-table-column label="状态" width="100">
-              <template #default="{ row }">
-                <el-tag :type="row.status === '有效' ? 'success' : 'info'" size="small">{{ row.status }}</el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" width="120" align="center" fixed="right">
-              <template #default>
-                <el-button link type="primary" size="small">预览</el-button>
-                <el-button link size="small">下载</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
       </el-col>
 
-      <!-- 右：期限预警 + 关联法规 + 草案入口 -->
+      <!-- 右:期限预警 + 关联法规 + 草案入口 -->
       <el-col :xs="24" :md="8">
         <el-card>
           <template #header>
             <span class="title">
               <el-icon class="warn-icon"><BellFilled /></el-icon>
-              期限预警
+              期限预警({{ deadlines.length }})
             </span>
           </template>
           <div class="deadline-list">
@@ -161,102 +164,47 @@
           <template #header>
             <span class="title">AI 草案生成</span>
           </template>
-          <p class="tip-text">基于本项目类型 + 当前节点，自动加载上位法与异地参考规章，AI 辅助生成草案正文</p>
-          <el-button type="primary" :icon="MagicStick" class="w-full" @click="$router.push('/app/draft/generate')">前往生成</el-button>
-        </el-card>
-
-        <el-card class="mt-16">
-          <template #header>
-            <span class="title">关联法规（{{ relatedRegulations.length }}）</span>
-          </template>
-          <div class="rel-list">
-            <div v-for="r in relatedRegulations" :key="r.id" class="rel-row">
-              <span class="type-badge" :class="projectTypeCls(r.regulationType)">
-                {{ projectTypeLabel(r.regulationType) }}
-              </span>
-              <a class="rel-name" @click="onOpenRelation(r)">{{ r.regulationName }}</a>
-              <el-tag size="small" effect="plain">{{ r.relationType }}</el-tag>
-            </div>
-            <el-empty v-if="!relatedRegulations.length" description="暂未关联法规" :image-size="60" />
-          </div>
-        </el-card>
-
-        <el-card class="mt-16">
-          <template #header>
-            <span class="title">公平竞争审查 / 风险评估</span>
-          </template>
-          <div class="check-list">
-            <div class="check-row">
-              <span>公平竞争审查（起草前）</span>
-              <el-tag type="success" size="small">已通过</el-tag>
-            </div>
-            <div class="check-row">
-              <span>社会稳定风险评估</span>
-              <el-tag type="warning" size="small">进行中</el-tag>
-            </div>
-          </div>
+          <p class="tip-text">基于本项目类型 + 当前节点,自动加载上位法与异地参考规章,AI 辅助生成草案正文</p>
+          <el-button type="primary" :icon="MagicStick" class="w-full" @click="goDraftFromProject">前往生成</el-button>
         </el-card>
       </el-col>
     </el-row>
-
-    <!-- 节点材料抽屉 -->
-    <el-drawer v-model="drawerVisible" :title="`节点材料：${currentStageName}`" size="540px">
-      <el-upload
-        action="#"
-        :auto-upload="false"
-        list-type="text"
-        :on-change="onUploadChange"
-        :show-file-list="true"
-        multiple
-      >
-        <el-button type="primary" :icon="Upload">点击上传</el-button>
-        <template #tip>
-          <div class="el-upload__tip">支持 .docx / .pdf / .xlsx / .zip，单文件不超过 50MB</div>
-        </template>
-      </el-upload>
-    </el-drawer>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import {
-  ArrowLeft, EditPen, RefreshLeft, Download, Operation, BellFilled,
-  AlarmClock, MagicStick, Upload
+  ArrowLeft, EditPen, RefreshLeft, Operation, BellFilled,
+  AlarmClock, MagicStick
 } from '@element-plus/icons-vue'
-import { getProject, listStages, currentStage as apiCurrentStage,
-         progress as apiProgress, deadlines as apiDeadlines, advanceProject, rollbackProject } from '@/api/legislation'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { GraphChart as EGraphChart } from 'echarts/charts'
+import {
+  TitleComponent, TooltipComponent, LegendComponent
+} from 'echarts/components'
+import VChart from 'vue-echarts'
+import {
+  getProject, advanceProject, rollbackProject, listStages
+} from '@/api/legislation'
 import { projectTypeLabel, projectTypeCls, projectStatusLabel, projectStatusTag,
-         stageStatusCls, STAGE_TEMPLATE_ADMIN, STAGE_TEMPLATE_RULE } from '@/utils/dict'
+         stageStatusCls } from '@/utils/dict'
 
-const route = useRoute()
+use([CanvasRenderer, EGraphChart, TitleComponent, TooltipComponent, LegendComponent])
+
+const route  = useRoute()
+const router = useRouter()
 const loading = ref(false)
+const flowView = ref('chart')
 
-const project = ref({
-  id: 1, projectName: '网络数据安全管理条例', projectType: 'ADMIN_REGULATION',
-  description: '为规范网络数据处理活动，保障数据安全与合法权益',
-  status: 'ACTIVE', issuingAuthority: '国务院', publishDate: '2026-09-01',
-  documentNumber: '国务院令第 765 号', priority: 'HIGH',
-  coordinatingDepartments: '网信办、公安部、工信部'
-})
-
-const stages = ref([
-  { id: 1, stageCode: 'PROPOSAL',        stageName: '立项建议',     stageOrder: 1, status: 'DONE', legalBasis: '条例第7条',  defaultDays: 15, operatorTime: '2026-07-10' },
-  { id: 2, stageCode: 'PROPOSAL_REVIEW', stageName: '立项审查',     stageOrder: 2, status: 'DONE', legalBasis: '条例第8条',  defaultDays: 30, operatorTime: '2026-07-25' },
-  { id: 3, stageCode: 'DRAFTING',        stageName: '起草',         stageOrder: 3, status: 'DONE', legalBasis: '条例第9-12条', defaultDays: 90, operatorTime: '2026-08-30' },
-  { id: 4, stageCode: 'PUBLIC_COMMENT',  stageName: '征求意见',     stageOrder: 4, status: 'IN_PROGRESS', legalBasis: '条例第14条', defaultDays: 30, operatorTime: '2026-09-15', requiredDocs: ['征求意见稿','起草说明'] },
-  { id: 5, stageCode: 'EXPERT_REVIEW',   stageName: '专家论证',     stageOrder: 5, status: 'PENDING', legalBasis: '条例第14条', defaultDays: 30 },
-  { id: 6, stageCode: 'RISK_ASSESSMENT', stageName: '社会稳定风险评估', stageOrder: 6, status: 'PENDING', legalBasis: '中办发〔2010〕25号', defaultDays: 30 },
-  { id: 7, stageCode: 'LEGAL_REVIEW',    stageName: '法制机构审查', stageOrder: 7, status: 'PENDING', legalBasis: '条例第13条', defaultDays: 30 },
-  { id: 8, stageCode: 'DELIBERATION',    stageName: '审议',         stageOrder: 8, status: 'PENDING', legalBasis: '条例第17-18条', defaultDays: 30 },
-  { id: 9, stageCode: 'PUBLICATION',     stageName: '公布',         stageOrder: 9, status: 'PENDING', legalBasis: '条例第21-22条', defaultDays: 15 },
-  { id: 10, stageCode: 'FILING',         stageName: '备案',         stageOrder: 10, status: 'PENDING', legalBasis: '条例第23条', defaultDays: 30 }
-])
-
-const currentStage = ref(stages.value.find(s => s.status === 'IN_PROGRESS'))
-const progress = ref(55)
+const project = ref(null)
+const stages = ref([])
+const currentStage = ref(null)
+const progress = ref(0)
+const deadlines = ref([])
 const statusFilter = ref('all')
 
 const templateBasis = computed(() =>
@@ -270,7 +218,7 @@ const filteredStages = computed(() => {
   return stages.value.filter(s => {
     if (statusFilter.value === 'done')    return s.status === 'DONE'
     if (statusFilter.value === 'current') return s.status === 'IN_PROGRESS'
-    if (statusFilter.value === 'pending') return s.status === 'PENDING'
+    if (statusFilter.value === 'pending') return ['PENDING','WAITING'].includes(s.status)
     return true
   })
 })
@@ -287,27 +235,109 @@ const stepStatus = (s) => {
   return 'wait'
 }
 
-const stageDescription = (s) => s.stageCode
+// ============= Day4 新增:ECharts graph 流程图 =============
+const STAGE_COLOR = {
+  DONE:        '#10b981',
+  IN_PROGRESS: '#4f46e5',
+  PENDING:     '#94a3b8',
+  RETURNED:    '#f43f5e',
+  SKIPPED:     '#cbd5e1'
+}
+const STAGE_ICON = {
+  DONE:        '✓',
+  IN_PROGRESS: '●',
+  PENDING:     '○',
+  RETURNED:    '!',
+  SKIPPED:     '—'
+}
+const flowOption = computed(() => {
+  const list = stages.value
+  if (!list.length) return {}
+  const nodes = list.map((s, i) => ({
+    id:    String(s.id || s.stageCode || i),
+    name:  s.stageName,
+    value: s.status,
+    x:     100 + (i % 5) * 200,
+    y:     200 + Math.floor(i / 5) * 200,
+    symbolSize: s.status === 'IN_PROGRESS' ? 56 : 40,
+    itemStyle: {
+      color: STAGE_COLOR[s.status] || '#94a3b8',
+      borderColor: '#fff',
+      borderWidth: s.status === 'IN_PROGRESS' ? 4 : 2,
+      shadowBlur: s.status === 'IN_PROGRESS' ? 18 : 0,
+      shadowColor: STAGE_COLOR[s.status] || '#4f46e5'
+    },
+    label: {
+      show: true,
+      formatter: (p) => {
+        const stage = list.find(s => (s.id || s.stageCode) == p.dataName) || list[p.dataIndex]
+        const ico = STAGE_ICON[stage?.status] || '?'
+        return `{ico|${ico}}\n{name|${p.data.name}}`
+      },
+      rich: {
+        ico: { fontSize: 18, fontWeight: 'bold', color: '#fff', padding: [0, 0, 4, 0] },
+        name:{ fontSize: 11, color: '#1e293b', fontWeight: 600 }
+      },
+      position: 'inside'
+    }
+  }))
+  const links = list.slice(0, -1).map((s, i) => ({
+    source: String(s.id || s.stageCode || i),
+    target: String(list[i + 1].id || list[i + 1].stageCode || (i + 1)),
+    lineStyle: {
+      color: list[i + 1].status === 'IN_PROGRESS' ? '#4f46e5' : '#94a3b8',
+      width: list[i + 1].status === 'IN_PROGRESS' ? 3 : 2,
+      type:  list[i + 1].status === 'IN_PROGRESS' ? 'solid' : 'dashed',
+      curveness: 0.05
+    },
+    symbol: ['none', 'arrow'],
+    symbolSize: 8
+  }))
+  return {
+    tooltip: {
+      formatter: (p) => {
+        if (p.dataType === 'node') {
+          return `<strong>${p.data.name}</strong><br/>状态:${p.data.value}`
+        }
+        return ''
+      }
+    },
+    series: [{
+      type: 'graph',
+      layout: 'none',
+      roam: false,
+      draggable: false,
+      data: nodes,
+      links,
+      edgeSymbol: ['none', 'arrow'],
+      emphasis: { focus: 'adjacency', lineStyle: { width: 4 } },
+      animationDuration: 800,
+      animationEasing: 'cubicOut'
+    }]
+  }
+})
 
-const deadlines = ref([
-  { id: 1, nodeName: '提交征求意见汇总', deadlineDate: '2026-10-05', daysLeft: 2,  deadlineType: '法定' },
-  { id: 2, nodeName: '法制机构审查签发', deadlineDate: '2026-10-08', daysLeft: 5,  deadlineType: '计划' },
-  { id: 3, nodeName: '备案',             deadlineDate: '2026-10-30', daysLeft: 27, deadlineType: '法定' }
-])
+// ============= Day4 新增:项目级 + 节点级 7 天预警 badge =============
+const projectAlertBadge = computed(() => {
+  if (!deadlines.value.length) return null
+  const soonest = deadlines.value.reduce((min, d) => {
+    if (d.daysLeft == null) return min
+    return (min == null || d.daysLeft < min) ? d.daysLeft : min
+  }, null)
+  if (soonest == null) return null
+  if (soonest < 0)  return { type: 'danger',  text: `已逾期 ${-soonest} 天` }
+  if (soonest < 7)  return { type: 'warning', text: `${soonest} 天内到期` }
+  return null
+})
 
-const documents = ref([
-  { id: 1, documentType: '立项申请表', documentName: '网络数据安全管理条例立项申请表.docx', uploadedAt: '2026-07-10', status: '有效' },
-  { id: 2, documentType: '论证报告',   documentName: '立法必要性与可行性论证报告.pdf',     uploadedAt: '2026-07-20', status: '有效' },
-  { id: 3, documentType: '成本效益分析', documentName: '立法成本效益分析报告.docx',       uploadedAt: '2026-07-22', status: '有效' },
-  { id: 4, documentType: '起草说明',   documentName: '起草说明（含背景与制度设计）.docx', uploadedAt: '2026-08-30', status: '有效' },
-  { id: 5, documentType: '征求意见稿', documentName: '网络数据安全管理条例（征求意见稿）.docx', uploadedAt: '2026-09-15', status: '有效' }
-])
-
-const relatedRegulations = ref([
-  { id: 1, regulationName: '中华人民共和国数据安全法', regulationType: 'ADMIN_REGULATION', relationType: '上位法依据' },
-  { id: 2, regulationName: '中华人民共和国网络安全法', regulationType: 'ADMIN_REGULATION', relationType: '上位法依据' },
-  { id: 3, regulationName: '某省数据交易管理办法',     regulationType: 'LOCAL_RULE',       relationType: '需配套清理' }
-])
+function deadlineBadgeFor (stage) {
+  // 根据阶段 defaultDays + 进度模拟一个近似截止日;真实场景用 stage.deadlineDate
+  const dl = (deadlines.value || []).find(d => d.nodeCode === stage.stageCode || d.stageCode === stage.stageCode)
+  if (!dl) return { type: '' }
+  if (dl.daysLeft < 0) return { type: 'danger',  text: `逾期 ${-dl.daysLeft} 天` }
+  if (dl.daysLeft < 7) return { type: 'warning', text: `${dl.daysLeft} 天内到期` }
+  return { type: 'info', text: `${dl.daysLeft} 天` }
+}
 
 const progressColor = [
   { color: '#f43f5e', percentage: 20 },
@@ -316,31 +346,54 @@ const progressColor = [
   { color: '#4f46e5', percentage: 100 }
 ]
 
-const priorityLabel = (p) => ({ HIGH: '高', MEDIUM: '中', LOW: '低' }[p] || '—')
-const priorityTag   = (p) => ({ HIGH: 'danger', MEDIUM: 'warning', LOW: 'info' }[p] || 'info')
-
-const drawerVisible = ref(false)
-const currentStageName = ref('')
-const showMaterials = (s) => { currentStageName.value = s.stageName; drawerVisible.value = true }
-const onUploadChange = (file) => { ElMessage.success(`已选择文件：${file.name}（待上传到后端）`) }
+async function loadDetail () {
+  loading.value = true
+  try {
+    const id = Number(route.params.id)
+    const { data } = await getProject(id)
+    project.value      = data?.project || null
+    stages.value       = data?.stages || []
+    currentStage.value = data?.currentStage || null
+    progress.value     = data?.progress || 0
+    deadlines.value    = data?.deadlines || []
+    // 兜底:主动拉 stages(若后端没给)
+    if (!stages.value.length) {
+      try {
+        const { data: sList } = await listStages(id)
+        stages.value = sList || []
+      } catch (_) {}
+    }
+  } catch (e) {
+    ElMessage.error('加载项目详情失败:' + (e.message || ''))
+  } finally {
+    loading.value = false
+  }
+}
 
 const onAdvance = async () => {
-  await advanceProject(project.value.id)
-  ElMessage.success('已推进到下一阶段')
+  if (!project.value?.id) return
+  try {
+    await advanceProject(project.value.id, {})
+    ElMessage.success('已推进到下一阶段')
+    loadDetail()
+  } catch (e) {}
 }
+
 const onRollback = async () => {
-  ElMessage.info('回退需选目标节点，已记录到操作日志')
+  if (!project.value?.id) return
+  try {
+    const { value } = await ElMessageBox.prompt('请输入目标阶段顺序号(从 1 开始)', '回退阶段', { inputPattern: /^\d+$/, inputErrorMessage: '请输入正整数' })
+    await rollbackProject(project.value.id, { targetStageOrder: Number(value) })
+    ElMessage.success('已回退到指定阶段')
+    loadDetail()
+  } catch (e) {}
 }
 
-const onOpenRelation = (r) => {
-  ElMessage.info(`跳转到法规详情：${r.regulationName}`)
+const goDraftFromProject = () => {
+  router.push({ path: '/app/draft/generate', query: { projectId: project.value?.id } })
 }
 
-onMounted(async () => {
-  // 真实场景调用：
-  // project.value = await getProject(route.params.id)
-  // stages.value  = await listStages(route.params.id)
-})
+onMounted(loadDetail)
 </script>
 
 <style lang="scss" scoped>
@@ -377,26 +430,5 @@ onMounted(async () => {
   .dr-title { font-size: 13px; font-weight: 500; }
   .dr-meta  { font-size: 12px; color: $text-secondary; margin-top: 2px; }
   .dr-content { flex: 1; }
-}
-
-.rel-list { display: flex; flex-direction: column; gap: 8px; }
-.rel-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 6px;
-  background: $bg-page;
-  &:hover { background: $primary-lighter; }
-  .rel-name { flex: 1; color: $primary-color; font-size: 13px; cursor: pointer; }
-}
-
-.check-list { display: flex; flex-direction: column; gap: 10px; }
-.check-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 8px 12px;
-  background: $bg-page;
-  border-radius: 6px;
-  font-size: 13px;
 }
 </style>

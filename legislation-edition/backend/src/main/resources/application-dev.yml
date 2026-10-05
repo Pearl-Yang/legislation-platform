@@ -1,44 +1,92 @@
-spring:
-  config:
-    activate:
-      on-profile: dev
+# =============================================================================
+# 本地开发 profile(docker compose / 本地 mvn spring-boot:run 都使用它)
+#
+# 用法:
+#   mvn spring-boot:run
+# 或:
+#   java -jar legislation-edition-backend.jar --spring.profiles.active=dev
+#
+# 默认连接 docker compose 启动的 MySQL(3306 / root:root123);
+# 不在 docker 时,把下面 host 改成 localhost,并保证 MySQL 已建库 + 跑过 schema.sql
+# =============================================================================
 
+server:
+  port: 8083
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: legislation-edition-backend
+
+  # ======== MySQL / Druid ========
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:legal_legislation}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:123456}
     druid:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:legal_legislation}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-      username: ${DB_USER:root}
-      password: ${DB_PASSWORD:root123}
-      initial-size: 5
-      min-idle: 5
+      initial-size: 2
+      min-idle: 2
       max-active: 20
-      max-wait: 60000
+      max-wait: 10000
+      validation-query: SELECT 1
+      test-while-idle: true
 
-# Neo4j 知识图谱(可选,未启动时图谱接口走空实现)
-neo4j:
-  enabled: ${NEO4J_ENABLED:false}
-  uri: ${NEO4J_URI:bolt://localhost:7687}
-  username: ${NEO4J_USER:neo4j}
-  password: ${NEO4J_PASSWORD:legislation@2026}
+  # ======== 关闭自动 Flyway:本地用 legislation_schema.sql 一次性初始化 ========
+  flyway:
+    enabled: false
 
+# ======== MyBatis-Plus ========
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.legal.legislation.entity
+  global-config:
+    db-config:
+      # 与 LegislativeProject.isDeleted 字段对齐(@TableLogic 注解已显式标注,
+      # 这里再写一遍是为了让全局配置与 entity 一致,避免被默认的 deleted 干扰)
+      logic-delete-field: is_deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: auto
+
+# ======== JWT(开发期使用内置密钥,生产请通过环境变量注入) ========
 jwt:
   secret: ${JWT_SECRET:legislationIntelligencePlatformSecretKey2026PaddedForHmac256}
   expiration: ${JWT_EXPIRATION:86400000}
 
+# ======== 缓存(开发期走内存,生产切换 redis) ========
+legislation:
+  cache:
+    type: ${CACHE_TYPE:memory}        # memory(默认) | redis
+  cors:
+    allowed-origins: "*"
+  qwen:
+    mode: ${QWEN_MODE:offline}        # online(走 dashscope) | offline(本地规则)
+    apiKey: ${QWEN_API_KEY:}
+    baseUrl: ${QWEN_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode}
+    model: ${QWEN_MODEL:qwen-plus}
+
+# ======== AI 功能开关 ========
 ai:
   draft-generation:
     enabled: ${AI_DRAFT_ENABLED:false}
-    provider: aliyun
-    api-key: ${DASHSCOPE_API_KEY:}
-    model: ${AI_MODEL:qwen-long}
-    top-ksimilarity: 5
   review:
     enabled: ${AI_REVIEW_ENABLED:false}
   evaluation:
     enabled: ${AI_EVAL_ENABLED:false}
 
+# ======== 日志 ========
 logging:
   level:
+    root: INFO
     com.legal: DEBUG
-    org.springframework.security: INFO
+    com.baomidou.mybatisplus: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [%thread] %logger{20} - %msg%n"
+  file:
+    name: logs/legislation-backend.log

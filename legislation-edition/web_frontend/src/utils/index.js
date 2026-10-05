@@ -3,6 +3,7 @@
  */
 
 import dayjs from 'dayjs'
+import { ElMessage } from 'element-plus'
 
 /** 日期格式化 */
 export const formatDate = (d, fmt = 'YYYY-MM-DD') => dayjs(d).format(fmt)
@@ -38,6 +39,41 @@ export const downloadBlob = (blob, filename) => {
   a.click()
   document.body.removeChild(a)
   window.URL.revokeObjectURL(url)
+}
+
+/**
+ * 从 axios blob 响应里自动取服务端给的 Content-Disposition 文件名并触发下载。
+ * - response: axios 响应对象（responseType: 'blob'）
+ * - fallbackName: 兜底文件名
+ */
+export const downloadFromResponse = (response, fallbackName) => {
+  const blob = response?.data
+  if (!blob) {
+    ElMessage?.error?.('下载失败：响应为空')
+    return
+  }
+  // 错误流:服务端可能返回 application/json 的 {code,message}
+  if (blob.type && blob.type.includes('application/json') && blob.size < 4096) {
+    // 转成文本读 message
+    const reader = new FileReader()
+    reader.onload = () => {
+      try {
+        const j = JSON.parse(reader.result)
+        ElMessage?.error?.(j.message || '导出失败')
+      } catch { /* ignore */ }
+    }
+    reader.readAsText(blob)
+    return
+  }
+  let name = fallbackName
+  const dispo = response.headers?.['content-disposition'] || response.headers?.['Content-Disposition']
+  if (dispo) {
+    const m = /filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i.exec(dispo)
+    if (m) {
+      try { name = decodeURIComponent(m[1] || m[2] || fallbackName) } catch { name = m[2] || fallbackName }
+    }
+  }
+  downloadBlob(blob, name)
 }
 
 /** 高亮关键词 */

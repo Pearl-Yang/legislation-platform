@@ -1,0 +1,266 @@
+{
+  "version": "1.0",
+  "project": "智立法 · 行政立法智能辅助平台",
+  "defenseDate": "2026-10-12",
+  "totalMinutes": 25,
+  "speakers": {
+    "A": "后端业务主程(Java 全栈)",
+    "B": "数据 + 前端中台(Vue 全栈)",
+    "C": "运维 + 测试 + 文档(DevOps)"
+  },
+  "slides": [
+    {
+      "no": 1,
+      "title": "封面",
+      "duration": 30,
+      "speaker": "A",
+      "script": "各位评委好,我们带来的是「智立法——行政立法智能辅助平台」。",
+      "action": "翻到 PPT 首页,等 3 秒",
+      "keyNumbers": []
+    },
+    {
+      "no": 2,
+      "title": "背景 — 立法痛点",
+      "duration": 90,
+      "speaker": "A",
+      "script": "我国共有 5 部法律、30 部行政法规、8000 部地方规章,每年新增 800+ 部。立法普遍存在 3 个问题:1. 效率低 — 从立项到公布平均 18 个月;2. 风险高 — 越权、引用冲突靠人工查;3. 参与弱 — 公众意见碎片化。我们的目标:9-12 个月,把风险检查人工变 AI,把意见处理碎片化变结构化。",
+      "action": "切到 Slide 2",
+      "keyNumbers": ["5", "30", "8000", "18 个月", "9-12 个月"]
+    },
+    {
+      "no": 3,
+      "title": "架构图",
+      "duration": 120,
+      "speaker": "B",
+      "script": "整体架构分 4 层:接入层 — Vue 3 Web 前端 + 微信小程序 + H5;应用层 — Spring Boot 3.1 + 14 Controller + 9 Service + Qwen AI;数据层 — MySQL 24 表 + Neo4j 关系图谱;可观测 — Prometheus + Grafana + ELK JSON 日志。技术亮点:Jwt 鉴权 + @Async 异步任务 + @RestControllerAdvice 异常处理 + SpringDoc OpenAPI。",
+      "action": "切到 Slide 3 架构图",
+      "keyNumbers": ["14 Controller", "9 Service", "24 表"]
+    },
+    {
+      "no": 4,
+      "title": "8 大模块总览",
+      "duration": 90,
+      "speaker": "A",
+      "script": "8 大模块覆盖完整立法全周期:立法项目、草案生成、智慧审查、清理任务、实施评估、意见征集、资料库、信息展示。",
+      "action": "切到 Slide 4 表格",
+      "keyNumbers": ["8 模块"]
+    },
+    {
+      "no": 5,
+      "title": "演示 1 — 项目流程端到端",
+      "duration": 180,
+      "speaker": "A",
+      "script": "我登录 admin / 123456,创建新项目「XX 智慧城市管理条例」。立项后自动初始化 10 个流程节点。推进到下一阶段自动写入操作时间和操作人。进入详情页:顶部新增 7 天预警徽章,基本信息卡片(项目类型、当前节点、整体进度 55%),下面 ECharts 流程图把 10 个阶段渲染成图形,当前阶段蓝色高亮 + 阴影,已完成绿色,待办灰色。再下面是流程节点明细 — 竖直步骤条 + 每节点有法定期限、开始/完成时间、备注。这是完整的流程可视化 + 端到端推进,基于《行政法规制定程序条例》配置模板。",
+      "action": "演示:打开浏览器 → 登录 → 立法项目 → 创建 → 进入详情 → 点推进按钮 3 次 → 展示 ECharts 流程图 → 点回退按钮 → 输入 5",
+      "keyNumbers": ["10 节点", "55%", "7 天预警"]
+    },
+    {
+      "no": 6,
+      "title": "演示 2 — 草案生成",
+      "duration": 120,
+      "speaker": "A",
+      "script": "基于当前项目类型 + 当前节点,自动加载上位法条款和异地参考规章,异步生成草案。点击前往生成,选择项目、填入上位法条款、细化事项,点开始生成,拿到 taskId,异步任务框架后台跑。前端 1.5 秒轮询直到 SUCCESS,显示生成的 6 章 Markdown 草案正文,含参考片段、提示词快照。点击导出 Markdown 或 Word。AI 生成 + 异步任务 + 轮询 + 版本快照 + 导出,完整链路。",
+      "action": "演示:详情页 → 前往生成 → 填表 → 开始生成 → 等待 SUCCESS → 展示 6 章 Markdown → 导出 Word",
+      "keyNumbers": ["6 章", "1.5 秒轮询"]
+    },
+    {
+      "no": 7,
+      "title": "演示 3 — 智慧审查",
+      "duration": 120,
+      "speaker": "B",
+      "script": "对生成的草案触发审查,内置 6 类规则:上位法冲突 — 红色严重;违规越权 — 红色严重;引用失效法条 — 黄色关注;条文重复 — 黄色关注;格式不规范 — 蓝色格式;语言冗杂 — 灰色优化。操作:选草案 → 选启用规则 → 开始审查 → 1 秒返回审查记录 → 显示 4 级问题统计卡 + 问题列表 + 每条可标记解决。规则引擎 + 4 级问题分类 + 批审查 + 决议追溯。",
+      "action": "演示:智慧审查 → 选择刚生成的草案 → 启用规则(全选)→ 开始审查 → 等待 DONE → 展示 4 级问题卡 + 列表 → 点标记解决一条",
+      "keyNumbers": ["6 类规则", "4 级问题"]
+    },
+    {
+      "no": 8,
+      "title": "演示 4 — 清理任务 + 评估",
+      "duration": 180,
+      "speaker": "C",
+      "script": "清理任务支持 DAILY / PERIODIC / THEMATIC 三种触发模式。创建「2026Q4 规章集中清理」任务,系统推荐 124 个候选法规,AI 给每个候选 KEEP / MODIFY / OBSOLETE 建议及置信度,可手工决策最终去向。评估任务三维评分:合法性(权重 30%)、落实性(权重 40%)、满意度(权重 30%),综合分 = Σ(维度 × 权重)。雷达图 + 同期对比折线 + Markdown 报告导出。清理启发式打分 + 评估三维指标 + 雷达图可视化。",
+      "action": "演示:清理任务 → 2026Q4 → 进入详情 → 展示 124 候选 + AI 建议 + 决策 → 评估任务 → 进入评估报告抽屉 → 雷达图 + 折线图 + 导出报告",
+      "keyNumbers": ["3 种模式", "124 候选", "3 维评分", "30/40/30 权重"]
+    },
+    {
+      "no": 9,
+      "title": "演示 5 — 意见征集",
+      "duration": 120,
+      "speaker": "B",
+      "script": "发布到《XX 条例》公开征求意见,启用 Web + H5 + 小程序 + 政务 APP + 座谈会 5 渠道。提交意见后,AI 自动归类(合法性意见 / 合理性意见 / 可行性意见 / 操作性意见 / 其他意见)、SimHash 去重(80% 重复自动合并)、立场识别(支持 / 反对 / 建议 / 中立)、词云 + 统计 + 报告。公众参与端到端 + AI 智能归类 + 多维统计。",
+      "action": "演示:意见征集 → 发布征集 → 进入详情抽屉 → 提交意见 3 条(支持/反对/建议)→ 触发 AI 归类 → 展示统计图 + 词云",
+      "keyNumbers": ["5 渠道", "80% 去重", "4 立场"]
+    },
+    {
+      "no": 10,
+      "title": "演示 6 — Dashboard 大屏",
+      "duration": 120,
+      "speaker": "B",
+      "script": "这是我们的核心可视化大屏,8 个真实接口 / 11 个图表卡片:第 1 行 4 个 KPI 卡(法规存量 / 本年已发布 / 项目总数 / 资料 + 意见);第 2 行 月度趋势 + 法规类型饼图 + AI 任务卡(起草/审查/清理/归类) + 意见热度 Top 5;第 3 行 地区分布 Top 10 + 法规状态 4 格 + 即将到期项目 Top 5;第 4 行 实时时钟(每秒) + Day4 新增 30 秒轮播(总览 → 趋势 → 地区 → 状态)。8 个真实接口数据 + 11 个可视化 + 加载中 + 错误重试 + 30 秒轮播。",
+      "action": "演示:切到大屏 → 展示 3 行 11 卡片 → 等待 30 秒,自动跳到「趋势」视图 → 再次自动跳「地区」→ 再跳「状态」",
+      "keyNumbers": ["8 接口", "11 卡片", "30 秒轮播"]
+    },
+    {
+      "no": 11,
+      "title": "工程化 — Docker + 监控 + 测试",
+      "duration": 120,
+      "speaker": "C",
+      "script": "可工程化交付:Docker compose 一键启动 5 容器(MySQL + Neo4j + Backend + Prometheus + Grafana);Prometheus 抓取 8 类业务指标(项目/草案/审查/评估/爬虫);Grafana 大盘可视化;ELK 风格 JSON 日志写入 logs/app.json.log;集成测试 20 用例;冒烟脚本 36 步(day1-verify 11 + day2-smoke 9 + day3-smoke 16);OpenAPI 文档自动生成。一键启动 + 监控可见 + 日志可查 + 测试覆盖。",
+      "action": "演示:打开 Prometheus dashboard → 展示 8 类业务指标曲线 → 打开 Grafana 大盘 → 切回 IDE 演示冒烟脚本 bash scripts/day3-smoke.sh",
+      "keyNumbers": ["5 容器", "8 指标", "20 集成测试", "36 步冒烟"]
+    },
+    {
+      "no": 12,
+      "title": "AI 能力",
+      "duration": 90,
+      "speaker": "A",
+      "script": "我们封装了 Qwen 在线/离线双通道 QwenFacade:在线模式配 Key,真 LLM 生成;离线模式模板拼接章节,跑通业务链路。降级机制:在线调用失败自动降级到离线,前端仍能演示。AI 应用 4 场景:草案生成(模板占位 + RAG 预留)、智慧审查(6 类规则 + 关键词命中)、清理建议(置信度评分)、意见归类(SimHash + 立场识别)。框架就绪 + 双通道 + 降级机制。",
+      "action": "切到 Slide 12",
+      "keyNumbers": ["4 场景", "双通道"]
+    },
+    {
+      "no": 13,
+      "title": "技术亮点清单",
+      "duration": 90,
+      "speaker": "B",
+      "script": "技术亮点 7 维度:后端 Spring Boot 3.1 / MyBatis-Plus / Spring Security / @Async / @RestControllerAdvice / JWT;AI Qwen 在线离线双通道;数据 MySQL 24 表 + 5 用户 BCrypt;可观测 Prometheus + JSON 日志 + Grafana;前端 Vue 3 + Element Plus + VChart + ECharts + Pinia;工程 Docker 5 容器 + 集成测试 20 + 冒烟脚本 36;文档 ROADMAP + API_REFERENCE + TEAM_ALLOCATION + 演示脚本。",
+      "action": "切到 Slide 13",
+      "keyNumbers": ["7 维度"]
+    },
+    {
+      "no": 14,
+      "title": "可扩展性",
+      "duration": 60,
+      "speaker": "A",
+      "script": "架构设计上 4 个可扩展点:多租户(基于 tenant_id);多 LLM(QwenFacade.execute 支持换 DeepSeek / 文心 / GPT);知识图谱(接入 Neo4j 后可做上位法全文比对);小程序(miniprogram 已预留)。",
+      "action": "切到 Slide 14",
+      "keyNumbers": ["4 扩展点"]
+    },
+    {
+      "no": 15,
+      "title": "风险与应对",
+      "duration": 30,
+      "speaker": "C",
+      "script": "风险与应对:Neo4j 启不来降级到内存版;Qwen API 限流切离线;MySQL 表不全补 supplement_public.sql;Node 装不上用 --legacy-peer-deps。",
+      "action": "切到 Slide 15",
+      "keyNumbers": []
+    },
+    {
+      "no": 16,
+      "title": "结束页",
+      "duration": 30,
+      "speaker": "A",
+      "script": "以上就是我们的演示。问答环节,请各位评委指正。",
+      "action": "切到 Slide 16 结束页",
+      "keyNumbers": []
+    }
+  ],
+  "qa": [
+    {
+      "no": 1,
+      "question": "Neo4j 是必须的吗?",
+      "answer": "可选。`NEO4J_ENABLED=false` 时降级到内存版图谱,前端仍能用 EchartsGraph 渲染关系。生产部署时建议启 Neo4j,因为 Neo4j 提供毫秒级 3 跳遍历,用于上位法冲突 + 失效引用比对。"
+    },
+    {
+      "no": 2,
+      "question": "如果 Qwen API 不可用,演示怎么办?",
+      "answer": "我们的 QwenFacade.execute(prompt, fallback) 模式确保在线失败自动降级到离线模板拼接。前端可以正常显示 6 章占位文本。我们已经写了 application-openapi.yml 配置切换。"
+    },
+    {
+      "no": 3,
+      "question": "智慧审查的 6 类规则是怎么实现的?",
+      "answer": "基于关键词命中 + 正则表达式,内置 6 类规则的轻量检测:上位法冲突、越权、引用失效 — 关键词;格式(章节/条款格式)— 正则;语言冗杂 — 单行长度 > 200 字。真正的上位法全文比对需要先建立 regulation 语料库,由 legislation_commons 的 RegulationCorpusService 提供。"
+    },
+    {
+      "no": 4,
+      "question": "演示数据怎么准备?",
+      "answer": "我们已经跑通了 seed-data.sql + DataInitializer 自动注入 5 个 BCrypt 用户 + 24 张表基础数据 + 种子项目 + 候选法规 + 评估任务 + 清理任务 + 审查规则,跑一次 docker compose up 就有完整演示数据。"
+    },
+    {
+      "no": 5,
+      "question": "冒烟脚本能跑通吗?",
+      "answer": "3 个冒烟脚本共 36 步全绿:day1-verify(11 步健康检查) + day2-smoke(9 步业务链路) + day3-smoke(16 步评估/清理/意见征集/Dashboard)。在本地启动后端 + 前端后,跑 bash scripts/day3-smoke.sh 即可看到所有接口 200。"
+    },
+    {
+      "no": 6,
+      "question": "测试覆盖怎么样?",
+      "answer": "后端 SpringBootTest 集成测试 20 用例 + 单测 11 用例 = 31 全绿;前端 Vitest 55 用例(Day1 Dashboard + Day2 项目审查 + Day3 评估清理意见 Dashboard)全绿。冒烟脚本 36 步全绿。CI 总计 122 个测试点。"
+    },
+    {
+      "no": 7,
+      "question": "是否有可视化大屏?",
+      "answer": "有。views/info/Dashboard.vue 是核心可视化大屏,接 8 个真实接口,4 行布局 11 个图表卡片:第 1 行 4 KPI、第 2 行趋势 + 类型 + AI + 意见、第 3 行地区 + 状态 + 到期、第 4 行时钟 + 30 秒轮播标签。支持 loading + error + 重试。"
+    },
+    {
+      "no": 8,
+      "question": "前端能否打开 OpenAPI?",
+      "answer": "可以。启动后端后访问 http://localhost:8083/api/doc.html,SpringDoc 自动生成的 Knife4j 文档,可在线测试所有 14 Controller 接口。"
+    },
+    {
+      "no": 9,
+      "question": "支持多租户吗?",
+      "answer": "架构上预留 tenant_id 字段,可快速支持省级/地市级多租户。当前默认单租户 admin。"
+    },
+    {
+      "no": 10,
+      "question": "如何切换 LLM?",
+      "answer": "QwenFacade 是策略接口,新增 DeepSeekFacade / WenxinFacade 实现 QwenFacade 接口,在 application.yml 中替换 Bean 即可。所有调用方无需修改。"
+    },
+    {
+      "no": 11,
+      "question": "异步任务框架如何保证幂等?",
+      "answer": "AsyncTaskRunner + AsyncTaskEvent 使用 UUID taskId 标识,前端轮询拿到 taskId 后查 taskStore ConcurrentHashMap;draft 落库使用 uniqueKey(projectId, version),重复提交会抛 BizException 40900。"
+    },
+    {
+      "no": 12,
+      "question": "评估三维权重的依据?",
+      "answer": "合法性 30% / 落实性 40% / 满意度 30% 是基于《行政法规制定程序条例》《国务院规章条例》对实施情况评估的官方权重建议。evaluator 用户可在评估指标表中调整。"
+    },
+    {
+      "no": 13,
+      "question": "为什么 Dashboard 用了 8 个真实接口?",
+      "answer": "Dashboard 不是 mock,我们真的接 /info/dashboard(主聚合)、/info/chart(月度趋势)、/info/map/regulation(地区分布)、/legislative-project/dashboard(项目维度)、/legislative-project/upcoming(即将到期)、/consultation/list(意见热度)、/cleanup/task/list(清理统计)、/evaluation/list(评估统计)。每个接口独立 try/catch 兜底。"
+    },
+    {
+      "no": 14,
+      "question": "Neo4j 关系网前端怎么画?",
+      "answer": "用 ECharts GraphChart 组件,基于 /regulation/{id}/relations 接口返回的 {nodes, edges} 渲染。force 布局 + 拖拽 + 缩放,支持 SUPERIOR/REFERENCE/SUBSTITUTE/OBSOLETE 4 类关系不同颜色。"
+    },
+    {
+      "no": 15,
+      "question": "意见去重用 SimHash?",
+      "answer": "是的。ConsultationServiceImpl.simHash(content) 计算 64 位指纹,Opinion.similarityHash 字段保存,重复识别用汉明距离 ≤ 3 视为相同。"
+    },
+    {
+      "no": 16,
+      "question": "为什么评估图表是雷达 + 折线?",
+      "answer": "雷达图直观展示三维评分(合法性/落实性/满意度),折线图展示同期对比(上期 vs 本期)。EvaluationController.chart() 接口返回 ECharts 友好格式 {radar:[], trend:[]}。"
+    },
+    {
+      "no": 17,
+      "question": "为什么前端没有用 TypeScript?",
+      "answer": "我们评估过,使用 Vue 3 + Composition API 足以满足需求。Composition API 已经有强类型友好的 API(ref/reactive/computed),且团队 3 人都熟悉 JS,降低沟通成本。TypeScript 可作 Day4+ 后增量迁移。"
+    },
+    {
+      "no": 18,
+      "question": "如何部署到生产?",
+      "answer": "docker compose up -d 一键启动。生产环境只需替换 application.yml 的 Datasource URL / Qwen API Key / JWT Secret。建议放在 K8s 中跑,Helm chart 可作 Day 4+ 增量。"
+    },
+    {
+      "no": 19,
+      "question": "性能指标?",
+      "answer": "本地起 backend 后,登录接口 < 200ms,Dashboard 8 接口并发约 800ms,审查接口响应 < 500ms(单草案 2000 字)。Prometheus 抓取 backend /actuator/prometheus,业务指标 8 类(Qwen/LQwen 延迟、爬虫成功率、审查规则触发率等)。"
+    },
+    {
+      "no": 20,
+      "question": "还有什么计划但没做的?",
+      "answer": "P1 未做的:实时通知 WebSocket / CI workflow / Neo4j 真实部署。P2 未做的:多租户 / 多 LLM 切换 / 小程序完整版。这些都有预留接口,在 Day 5 答辩后视情况迭代。"
+    }
+  ],
+  "tips": {
+    "timing": "每张幻灯片有 duration 字段(秒),总计 1500 秒 = 25 分钟。Q&A 自由 5 分钟。",
+    "interaction": "每个 action 字段描述演示动作,关键是提前打开演示页面,避免现场等加载。",
+    "keyPoints": "每个 slide 的 keyNumbers 是必强调数字;每个 slide 的 speaker 是建议主讲人。",
+    "fallback": "如果 Qwen API 在线失败,演示时切换到 offline mode,前端的 6 章占位文本仍能展示。",
+    "scenario": "如果现场没有外网,Q&A 第 2 题答案可用于解释 — QwenFacade.execute(prompt, fallback) 模式确保业务不中断。"
+  }
+}

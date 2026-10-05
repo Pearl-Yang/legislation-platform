@@ -6,12 +6,21 @@ import com.legal.legislation.entity.Opinion;
 import com.legal.legislation.entity.OpinionReply;
 import com.legal.legislation.service.ConsultationService;
 import com.legal.legislation.service.Task;
+import com.legal.legislation.service.util.ReportContentBuilder;
+import com.legal.legislation.entity.Consultation;
+import com.legal.legislation.entity.Opinion;
+import com.legal.legislation.entity.OpinionReply;
+import com.legal.legislation.mapper.ConsultationMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -24,6 +33,8 @@ import java.util.Map;
 public class ConsultationController {
 
     private final ConsultationService consultationService;
+    private final ReportContentBuilder reportBuilder;
+    private final ConsultationMapper consultationMapper;
 
     @Operation(summary = "列出征集公告")
     @GetMapping("/list")
@@ -96,10 +107,72 @@ public class ConsultationController {
         return wrap(consultationService.dedup(id));
     }
 
-    @Operation(summary = "导出征集报告")
+    @Operation(summary = "导出征集报告",
+        description = "流式下载：MARKDOWN(text/markdown)、DOCX(application/vnd.openxmlformats-officedocument.wordprocessingml.document)、HTML(text/html)。默认 HTML。")
     @GetMapping("/{id}/report")
-    public Result<?> report(@PathVariable Long id) {
-        return wrap(consultationService.exportReport(id));
+    public ResponseEntity<byte[]> report(
+        @PathVariable Long id,
+        @Parameter(description = "MARKDOWN | DOCX | HTML，默认 HTML")
+        @RequestParam(defaultValue = "HTML") String format) {
+        Task<Map<String, Object>> stat = consultationService.getStatistics(id);
+        if (stat == null || !stat.isSuccess() || stat.getData() == null) {
+            return ResponseEntity.status(404)
+                    .body(("{\"code\":404,\"message\":\"" +
+                            (stat == null ? "Service returned null" : stat.getMessage()) + "\"}")
+                            .getBytes(StandardCharsets.UTF_8));
+        }
+        Consultation c = consultationMapper.selectById(id);
+        if (c == null) {
+            return ResponseEntity.status(404)
+                    .body("{\"code\":404,\"message\":\"征集不存在\"}".getBytes(StandardCharsets.UTF_8));
+        }
+        Map<String, Object> data = stat.getData();
+        @SuppressWarnings("unchecked")
+        Map<String, Map<String, Integer>> byCategory =
+                (Map<String, Map<String, Integer>>) data.get("byCategory");
+        Integer totalViews    = (Integer) data.get("totalViews");
+        Integer totalOpinions = c.getTotalOpinions() == null ? 0 : c.getTotalOpinions();
+        String bodyMd = "## 征集概况\n\n- 标题: " + c.getTitle() + "\n- 起止: " + c.getStartDate() + " ~ " + c.getEndDate() + "\n";
+        String upper  = format == null ? "HTML" : format.toUpperCase();
+        String fileName = "consultation-" + id + "." + lowerExt(upper);
+
+        byte[] bytes;
+        MediaType mediaType;
+        switch (upper) {
+            case "MARKDOWN" -> {
+                bytes = reportBuilder.buildConsultationMarkdown(id, c.getTitle(), c.getStatus(),
+                        totalViews, totalOpinions, byCategory, bodyMd)
+                        .getBytes(StandardCharsets.UTF_8);
+                mediaType = MediaType.parseMediaType("text/markdown;charset=utf-8");
+            }
+            case "DOCX" -> {
+                bytes = reportBuilder.buildConsultationDocx(id, c.getTitle(), c.getStatus(),
+                        totalViews, totalOpinions, byCategory, bodyMd);
+                mediaType = MediaType.parseMediaType(
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+            }
+            default -> {
+                bytes = reportBuilder.wrapHtml(c.getTitle() + " · 意见征集报告", bodyMd)
+                        .getBytes(StandardCharsets.UTF_8);
+                mediaType = MediaType.parseMediaType("text/html;charset=utf-8");
+            }
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(mediaType);
+        headers.setContentDispositionFormData("attachment",
+                new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+        headers.setContentLength(bytes.length);
+        headers.set("X-Export-Format", upper);
+        headers.set("Access-Control-Expose-Headers", "Content-Disposition,X-Export-Format");
+        return ResponseEntity.ok().headers(headers).body(bytes);
+    }
+
+    private static String lowerExt(String format) {
+        return switch (format == null ? "" : format.toUpperCase()) {
+            case "MARKDOWN" -> "md";
+            case "DOCX"     -> "docx";
+            default         -> "html";
+        };
     }
 
     @Operation(summary = "回复意见")

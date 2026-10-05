@@ -5,11 +5,25 @@
   "description": "智立法 - 行政立法智能辅助平台微信小程序",
   "scripts": {
     "dev": "uni -p mp-weixin",
-    "build": "uni build -p mp-weixin"
+    "dev:mp-weixin": "uni -p mp-weixin",
+    "build": "uni build -p mp-weixin",
+    "build:mp-weixin": "uni build -p mp-weixin"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "3.0.0-4020920240930001",
+    "@dcloudio/uni-components": "3.0.0-4020920240930001",
+    "@dcloudio/uni-mp-weixin": "3.0.0-4020920240930001",
+    "vue": "^3.4.21",
+    "vue-i18n": "^9.1.9"
   },
   "devDependencies": {
-    "@dcloudio/uni-app-vite": "3.0.0-4020920250117001",
-    "vite": "^5.0.0",
-    "sass": "^1.64.0"
+    "@dcloudio/types": "^3.4.8",
+    "@dcloudio/uni-app-vite": "3.0.0-4020920240930001",
+    "@dcloudio/uni-automator": "3.0.0-4020920240930001",
+    "@dcloudio/uni-cli-shared": "3.0.0-4020920240930001",
+    "@dcloudio/uni-stacktracey": "3.0.0-4020920240930001",
+    "@dcloudio/vite-plugin-uni": "3.0.0-4020920240930001",
+    "sass": "^1.72.0",
+    "vite": "5.2.8"
   }
 }

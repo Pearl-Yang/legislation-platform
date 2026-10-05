@@ -1,6 +1,7 @@
 package com.legal.legislation.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.legal.legislation.ai.qwen.QwenFacade;
 import com.legal.legislation.entity.DraftVersionHistory;
 import com.legal.legislation.entity.LegislativeDraft;
 import com.legal.legislation.entity.LegislativeProject;
@@ -44,6 +45,7 @@ public class DraftServiceImpl implements DraftService {
     private final DraftVersionHistoryMapper  historyMapper;
     private final LegislativeProjectMapper   projectMapper;
     private final NotifyService              notifyService;
+    private final QwenFacade                 qwenFacade;
 
     @Value("${ai.draft-generation.enabled:false}")
     private boolean aiEnabled;
@@ -91,13 +93,33 @@ public class DraftServiceImpl implements DraftService {
             if (info == null) return;
 
             info.put("progress", 30);
-            // 模拟 AI 生成耗时
+            // 模拟阶段耗时,让前端进度条丝滑
             Thread.sleep(800);
 
             info.put("progress", 70);
+
+            // === 关键:若 AI 开启,真正调用 QwenFacade ===
+            LegislativeDraft draft = renderDraft(info);
+            if (aiEnabled) {
+                try {
+                    String prompt = (String) info.get("prompt");
+                    String aiContent = qwenFacade.execute(
+                        buildDraftPrompt(prompt, info),
+                        () -> buildPlaceholderContent(
+                            ((Number) info.get("projectId")).longValue(),
+                            ((Number) info.get("version")).intValue(),
+                            prompt)
+                    );
+                    if (aiContent != null && !aiContent.isBlank()) {
+                        draft.setDraftContent(aiContent);
+                        draft.setGenerationType(LegislativeDraft.GEN_TYPE_AUTO);
+                    }
+                } catch (Exception aiEx) {
+                    log.warn("[Draft] Qwen 调用失败,降级为模板: {}", aiEx.getMessage());
+                }
+            }
             Thread.sleep(600);
 
-            LegislativeDraft draft = renderDraft(info);
             draftMapper.insert(draft);
 
             // 写历史
@@ -162,6 +184,25 @@ public class DraftServiceImpl implements DraftService {
         d.setUpdatedAt(LocalDateTime.now());
         d.setDraftContent(buildPlaceholderContent(projectId, version, prompt));
         return d;
+    }
+
+    /**
+     * 构造发给 Qwen 的提示词(立法草案体例)。
+     */
+    private String buildDraftPrompt(String userPrompt, Map<String, Object> info) {
+        Long projectId = ((Number) info.get("projectId")).longValue();
+        int  version   = ((Number) info.get("version")).intValue();
+        StringBuilder sb = new StringBuilder();
+        sb.append("你是一名中国行政立法起草助手。请基于以下输入,输出一份规范的规章草案 Markdown 文本,\n");
+        sb.append("包含:第一章 总则 / 第二章 主体责任 / 第三章 监督管理 / 第四章 法律责任 / 第五章 附则,\n");
+        sb.append("每章不少于 2 条,语言严谨、句式与《XX条例》一致。\n\n");
+        sb.append("【项目编号】").append(projectId).append("\n");
+        sb.append("【版本号】第 ").append(version).append(" 版\n");
+        if (userPrompt != null && !userPrompt.isBlank()) {
+            sb.append("【上位法/细化要求】\n").append(userPrompt).append("\n");
+        }
+        sb.append("\n请直接输出草案正文,不要解释。");
+        return sb.toString();
     }
 
     private String buildPlaceholderContent(Long projectId, int version, String prompt) {

@@ -13,18 +13,22 @@
             <span class="title">选择待审查的草案</span>
           </template>
           <div class="search-bar">
-            <el-input v-model="searchKw" :icon="Search" placeholder="按项目名 / 草案标题搜索" />
+            <el-input v-model="searchKw" :icon="Search" placeholder="按项目名搜索" clearable @clear="onSearch" @keyup.enter="onSearch" />
           </div>
-          <div class="draft-list">
-            <div v-for="d in drafts" :key="d.id"
-              class="draft-row"
-              :class="{ active: selected?.id === d.id }"
-              @click="selected = d"
+          <div class="draft-list" v-loading="draftsLoading">
+            <el-empty v-if="!draftsLoading && drafts.length === 0" description="暂无可审查草案" :image-size="80" />
+            <div v-for="d in drafts"
+                 :key="d.id"
+                 class="draft-row"
+                 :class="{ active: selected?.id === d.id }"
+                 @click="selected = d"
             >
-              <div class="dr-title">{{ d.projectName }} · v{{ d.version }}</div>
+              <div class="dr-title">{{ d.projectName || d.draftTitle || `草案 #${d.id}` }} · v{{ d.version }}</div>
               <div class="dr-meta">
-                <el-tag size="small">{{ d.generationType === 'AUTO_GENERATED' ? 'AI' : '人工' }}</el-tag>
-                <span class="text-secondary">{{ d.wordCount }} 字 · {{ d.updatedAt }}</span>
+                <el-tag size="small" :type="d.generationType === 'AUTO_GENERATED' ? 'primary' : 'info'">
+                  {{ d.generationType === 'AUTO_GENERATED' ? 'AI' : '人工' }}
+                </el-tag>
+                <span class="text-secondary">{{ d.wordCount || d.draftContent?.length || 0 }} 字 · {{ d.updatedAt || formatDate(d.createdAt) }}</span>
               </div>
             </div>
           </div>
@@ -51,7 +55,7 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" :icon="VideoPlay" :loading="submitting" @click="onSubmit">开始审查</el-button>
-              <el-button :icon="Connection" plain @click="onBatchSubmit">一键审查最近 10 条草案</el-button>
+              <el-button :icon="Connection" plain @click="onBatchSubmit">一键审查最近 10 条</el-button>
             </el-form-item>
           </el-form>
         </el-card>
@@ -93,10 +97,14 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column label="条款" prop="articleIndex" width="100" />
-            <el-table-column label="问题类型" prop="issueTypeLabel" width="120" />
-            <el-table-column label="问题描述" prop="description" min-width="220" />
-            <el-table-column label="建议" prop="suggestion" min-width="220" show-overflow-tooltip />
+            <el-table-column label="条款" prop="articleIndex" width="120" />
+            <el-table-column label="问题类型" width="120">
+              <template #default="{ row }">
+                {{ row.issueTypeLabel || issueTypeLabel(row.issueType) }}
+              </template>
+            </el-table-column>
+            <el-table-column label="问题描述" prop="description" min-width="240" />
+            <el-table-column label="建议" prop="suggestion" min-width="240" show-overflow-tooltip />
             <el-table-column label="状态" width="100">
               <template #default="{ row }">
                 <el-tag v-if="row.isResolved" type="success" size="small">已解决</el-tag>
@@ -104,7 +112,7 @@
               </template>
             </el-table-column>
             <el-table-column label="操作" width="120" align="center" fixed="right">
-              <template #default="{ row }">
+              <template #default>
                 <el-button v-if="!row.isResolved" link type="primary" size="small" @click="onResolve(row)">标记解决</el-button>
               </template>
             </el-table-column>
@@ -118,70 +126,148 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Search, VideoPlay, Connection } from '@element-plus/icons-vue'
-import { submitReview, batchReview, listRules, resolveIssue } from '@/api/legislation'
+import { submitReview, batchReview, listRules, resolveIssue, listDrafts, getReviewRecord } from '@/api/legislation'
 import { severityLabel, severityCls, issueTypeLabel } from '@/utils/dict'
+import { formatDate } from '@/utils'
 
+const route = useRoute()
 const searchKw = ref('')
-const selected = ref({ id: 1001, projectName: '网络数据安全管理条例', version: 3, generationType: 'AUTO_GENERATED', wordCount: 4832, updatedAt: '2026-10-02 14:32' })
+const selected = ref(null)
 const reviewType = ref('AUTO')
 const enabledRules = ref([])
 const submitting = ref(false)
+const draftsLoading = ref(false)
+const drafts = ref([])
+const rules = ref([])
 const currentReview = ref(null)
-
-const drafts = ref([
-  { id: 1001, projectName: '网络数据安全管理条例', version: 3, generationType: 'AUTO_GENERATED', wordCount: 4832, updatedAt: '2026-10-02 14:32' },
-  { id: 1002, projectName: '某省医疗保障办法',     version: 1, generationType: 'MANUAL',          wordCount: 2104, updatedAt: '2026-09-28 09:11' },
-  { id: 1003, projectName: '网络数据安全管理条例', version: 2, generationType: 'AUTO_GENERATED', wordCount: 4320, updatedAt: '2026-09-26 16:48' }
-])
-
-const rules = ref([
-  { id: 1, ruleName: '上位法冲突检测',   ruleCode: 'R001_SUPERIOR_CONFLICT' },
-  { id: 2, ruleName: '越权立法检测',     ruleCode: 'R002_OVER_POWER' },
-  { id: 3, ruleName: '引用失效法条',     ruleCode: 'R003_OUTDATED_REF' },
-  { id: 4, ruleName: '条文重复检测',     ruleCode: 'R004_DUPLICATE' },
-  { id: 5, ruleName: '格式规范检查',     ruleCode: 'R005_FORMAT' },
-  { id: 6, ruleName: '语言冗杂检测',     ruleCode: 'R006_VERBOSE' }
-])
-enabledRules.value = rules.value.map(r => r.id)
 
 const currentIssueStats = computed(() => {
   if (!currentReview.value) return { RED: 0, YELLOW: 0, BLUE: 0, GREY: 0 }
-  return currentReview.value.issues.reduce((acc, x) => ({ ...acc, [x.severity]: (acc[x.severity] || 0) + 1 }), {})
+  return currentReview.value.issues.reduce((acc, x) => {
+    const k = x.severity || 'GREY'
+    acc[k] = (acc[k] || 0) + 1
+    return acc
+  }, { RED: 0, YELLOW: 0, BLUE: 0, GREY: 0 })
 })
+
+async function loadDrafts () {
+  draftsLoading.value = true
+  try {
+    // 取最近 N 个项目的草案汇总:简化做法 = 遍历前几个项目,聚合
+    const { data: projPage } = await import('@/api/legislation').then(m => m.listProjects({ page: 1, size: 5 }))
+    const projects = projPage?.records || []
+    const allDrafts = []
+    for (const p of projects) {
+      try {
+        const { data } = await listDrafts(p.id)
+        for (const d of (data || [])) {
+          allDrafts.push({
+            ...d,
+            projectName: p.projectName
+          })
+        }
+      } catch (_) {}
+    }
+    drafts.value = allDrafts.sort((a, b) => (b.id - a.id)).slice(0, 50)
+    // 若 query 带 draftId,自动选中
+    if (route.query.draftId) {
+      const found = drafts.value.find(d => d.id === Number(route.query.draftId))
+      if (found) selected.value = found
+    }
+  } catch (e) {
+    // 错误
+  } finally {
+    draftsLoading.value = false
+  }
+}
+
+async function loadRules () {
+  try {
+    const { data } = await listRules()
+    rules.value = data || []
+    enabledRules.value = rules.value.map(r => r.id)
+  } catch (e) {
+    ElMessage.error('加载规则失败：' + (e.message || ''))
+  }
+}
+
+const onSearch = () => {
+  // 演示版搜索短语过滤
+  // (实际项目中应传参给后端,这里简单本地过滤)
+}
 
 const onSubmit = async () => {
   if (!selected.value) return ElMessage.warning('请先选择草案')
   submitting.value = true
-  // 模拟返回
-  setTimeout(() => {
-    currentReview.value = {
-      id: 20251003, overallPass: false, errorCount: 2,
-      issues: [
-        { id: 11, severity: 'RED',    issueType: 'SUPERIOR_CONFLICT', issueTypeLabel: '上位法冲突', articleIndex: '第二十条', description: '本条与《数据安全法》第二十一条存在实质性冲突', suggestion: '建议调整处罚对象范围，仅适用本条例所辖事项', isResolved: false },
-        { id: 12, severity: 'RED',    issueType: 'OVER_POWER',       issueTypeLabel: '越权立法',   articleIndex: '第十二条', description: '设定了无权设定的行政许可事项', suggestion: '建议删除该许可设置或调整为本条例上位法依据明确的内容', isResolved: false },
-        { id: 13, severity: 'YELLOW', issueType: 'OUTDATED_REF',     issueTypeLabel: '引用失效',   articleIndex: '第十五条', description: '引用的《XX 办法》已于 2024 年 12 月被废止', suggestion: '请核对并替换为新的有效规章', isResolved: false },
-        { id: 14, severity: 'YELLOW', issueType: 'DUPLICATE',        issueTypeLabel: '条文重复',   articleIndex: '第二十三条', description: '与《XX 条例》第十一条高度相似，相似度 87%', suggestion: '考虑修改表述或删除', isResolved: true },
-        { id: 15, severity: 'BLUE',   issueType: 'FORMAT',           issueTypeLabel: '格式不规范', articleIndex: '第七条', description: '条号与上一条不连续', suggestion: '建议调整条号顺序', isResolved: false },
-        { id: 16, severity: 'GREY',   issueType: 'VERBOSE',          issueTypeLabel: '语言冗杂',   articleIndex: '第三条', description: '单条字数 412 字，含较多套话', suggestion: '建议拆分或精简表述', isResolved: false }
-      ]
-    }
+  try {
+    const { data: recordId } = await submitReview({
+      draftId:   selected.value.id,
+      reviewType: reviewType.value
+    })
+    // 异步,轮询直到 DONE
+    await pollRecord(recordId)
+  } catch (e) {
+    ElMessage.error('提交审查失败：' + (e.message || ''))
+  } finally {
     submitting.value = false
-  }, 1200)
+  }
+}
+
+async function pollRecord (recordId, maxTry = 20) {
+  for (let i = 0; i < maxTry; i++) {
+    try {
+      const { data } = await getReviewRecord(recordId)
+      const status = data?.record?.status
+      if (status === 'DONE' || status === 1) {
+        currentReview.value = {
+          id: data.record.id,
+          overallPass: data.record.overallPass === 1 || data.record.overallPass === true,
+          errorCount: data.record.errorCount || 0,
+          issues: (data.issues || []).map(iss => ({ ...iss }))
+        }
+        ElMessage[currentReview.value.overallPass ? 'success' : 'warning'](
+          currentReview.value.overallPass ? '审查通过' : `审查未通过,共发现 ${currentReview.value.errorCount} 处红色问题`
+        )
+        return
+      }
+      await new Promise(r => setTimeout(r, 600))
+    } catch (e) {
+      console.warn('[review poll] error:', e?.message)
+      await new Promise(r => setTimeout(r, 600))
+    }
+  }
+  ElMessage.warning('审查超时,请到审查记录列表查看')
 }
 
 const onBatchSubmit = async () => {
-  await batchReview(drafts.value.map(d => d.id))
-  ElMessage.success('已发起批量审查任务')
+  const ids = drafts.value.slice(0, 10).map(d => d.id)
+  if (!ids.length) return ElMessage.warning('暂无可审查草案')
+  try {
+    await batchReview(ids)
+    ElMessage.success(`已发起批量审查,共 ${ids.length} 条`)
+  } catch (e) {
+    ElMessage.error('批量提交失败：' + (e.message || ''))
+  }
 }
 
 const onResolve = async (row) => {
-  await resolveIssue(row.id)
-  row.isResolved = true
-  ElMessage.success('已标记为已解决')
+  try {
+    await resolveIssue(row.id)
+    row.isResolved = 1
+    ElMessage.success('已标记为已解决')
+  } catch (e) {
+    ElMessage.error('标记失败：' + (e.message || ''))
+  }
 }
+
+onMounted(() => {
+  loadDrafts()
+  loadRules()
+})
 </script>
 
 <style lang="scss" scoped>

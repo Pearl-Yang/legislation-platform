@@ -108,17 +108,39 @@ const onLogin = async () => {
         username: form.username,
         password: form.password
       })
-      // res 已经是 { code, message, data: { token, userId, ... } } 格式
-      const data = res.data || res
-      localStorage.setItem('token',       data.token)
-      localStorage.setItem('userId',      String(data.userId))
-      localStorage.setItem('userName',    data.displayName || data.username)
-      localStorage.setItem('userRole',    data.role || 'ROLE_USER')
-      localStorage.setItem('department',  data.department || '')
+      // request.js 拦截器在 code===200 时已剥掉 axios 外壳,直接返回 { code, message, data:{...} }
+      // 这里兼容两种可能:① 拦截器已剥壳 → res.data 存在;② 拦截器未命中 → res.data 才是业务 data
+      const payload = (res && res.data && typeof res.data === 'object' && 'token' in res.data)
+        ? res.data
+        : res
+      const token       = payload?.token
+      if (!token) throw new Error('登录响应缺少 token')
+      localStorage.setItem('token',       token)
+      localStorage.setItem('userId',      String(payload.userId ?? ''))
+      localStorage.setItem('userName',    payload.displayName || payload.username || form.username)
+      localStorage.setItem('userRole',    payload.role || 'ROLE_USER')
+      localStorage.setItem('department',  payload.department || '')
+      // 同步到 Pinia user store(axios 拦截器和路由守卫都从 store 读 token)
+      try {
+        const { useUserStore } = await import('@/store/user')
+        const userStore = useUserStore()
+        userStore.setLogin({
+          token,
+          userInfo: {
+            id: payload.userId,
+            username: payload.username,
+            displayName: payload.displayName,
+            role: payload.role,
+            department: payload.department
+          }
+        })
+      } catch (e) { console.warn('userStore 同步失败', e) }
       ElMessage.success('登录成功')
-      router.push(route.query.redirect || '/app/dashboard')
+      const target = route.query.redirect || '/app/dashboard'
+      router.replace(target).catch(() => { router.replace('/app/dashboard') })
+      setTimeout(() => { if (router.currentRoute.value.path === '/login') router.replace(target) }, 200)
     } catch (err) {
-      // request.js 已经 ElMessage.error 过了,这里只关 loading
+      // 业务错误已被 request.js 拦截器 ElMessage.error 过了;这里只 console 便于排查
       console.error('登录失败', err)
     } finally {
       loading.value = false
