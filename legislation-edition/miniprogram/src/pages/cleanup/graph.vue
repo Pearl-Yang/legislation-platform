@@ -9,7 +9,12 @@
       <view class="form-row">
         <text class="form-key">查看节点 ID</text>
         <view class="search-row">
-          <input v-model="rootId" type="number" class="input" placeholder="如：1" />
+          <input
+            v-model="rootId"
+            type="number"
+            class="input"
+            placeholder="如：1"
+          />
           <view class="btn" @click="load">查询</view>
         </view>
       </view>
@@ -20,21 +25,34 @@
             v-for="d in [1, 2, 3]"
             :key="d"
             :class="['depth-tag', depth === d ? 'depth-active' : '']"
-            @click="depth = d; load()"
-          >{{ d }} 层</view>
+            @click="
+              depth = d;
+              load();
+            "
+            >{{ d }} 层</view
+          >
         </view>
       </view>
     </view>
 
     <!-- 节点列表（展开式关系图） -->
     <view class="card" v-if="root">
-      <view class="card-title">🎯 中心：{{ root.regulationName }}</view>
+      <view class="card-title"
+        ><app-icon name="target" :size="32" /> 中心：{{
+          root.regulationName
+        }}</view
+      >
 
       <view class="rel-block">
         <view class="rel-row rel-up">
           <text class="rel-tag">↑ 上位法</text>
           <view class="rel-list">
-            <view v-for="n in upNodes" :key="'u'+n.id" class="rel-node" @click="goNode(n.id)">
+            <view
+              v-for="n in upNodes"
+              :key="'u' + n.id"
+              class="rel-node"
+              @click="goNode(n.id)"
+            >
               {{ n.regulationName }}
             </view>
             <view v-if="!upNodes.length" class="text-secondary fz-12">无</view>
@@ -52,10 +70,17 @@
         <view class="rel-row rel-down">
           <text class="rel-tag">↓ 下位法</text>
           <view class="rel-list">
-            <view v-for="n in downNodes" :key="'d'+n.id" class="rel-node" @click="goNode(n.id)">
+            <view
+              v-for="n in downNodes"
+              :key="'d' + n.id"
+              class="rel-node"
+              @click="goNode(n.id)"
+            >
               {{ n.regulationName }}
             </view>
-            <view v-if="!downNodes.length" class="text-secondary fz-12">无</view>
+            <view v-if="!downNodes.length" class="text-secondary fz-12"
+              >无</view
+            >
           </view>
         </view>
 
@@ -64,7 +89,12 @@
         <view class="rel-row rel-ref">
           <text class="rel-tag">⟲ 引用</text>
           <view class="rel-list">
-            <view v-for="n in refNodes" :key="'r'+n.id" class="rel-node" @click="goNode(n.id)">
+            <view
+              v-for="n in refNodes"
+              :key="'r' + n.id"
+              class="rel-node"
+              @click="goNode(n.id)"
+            >
               {{ n.regulationName }}
             </view>
             <view v-if="!refNodes.length" class="text-secondary fz-12">无</view>
@@ -75,10 +105,15 @@
 
     <!-- 关系边列表 -->
     <view class="card" v-if="edges.length">
-      <view class="card-title">🔗 关系明细</view>
+      <view class="card-title"
+        ><app-icon name="link" :size="32" /> 关系明细</view
+      >
       <view v-for="(e, i) in edges" :key="i" class="edge-row">
         <text class="edge-name">{{ nodeName(e.sourceId) }}</text>
-        <text :class="['edge-rel', `rel-${(e.relationType||'').toLowerCase()}`]">{{ relLabel(e.relationType) }}</text>
+        <text
+          :class="['edge-rel', `rel-${(e.relationType || '').toLowerCase()}`]"
+          >{{ relLabel(e.relationType) }}</text
+        >
         <text class="edge-name">{{ nodeName(e.targetId) }}</text>
       </view>
     </view>
@@ -88,8 +123,8 @@
 </template>
 
 <script>
-import Empty from '@/components/Empty.vue'
-import { cleanupApi } from '@/api/index.js'
+import Empty from "@/components/Empty.vue";
+import { cleanupApi } from "@/api/index.js";
 
 export default {
   components: { Empty },
@@ -99,59 +134,88 @@ export default {
       depth: 2,
       root: null,
       nodes: [],
-      edges: []
-    }
+      edges: [],
+    };
   },
   computed: {
-    upNodes()   { return this.nodes.filter(n => this.isUp(n)) },
-    downNodes() { return this.nodes.filter(n => this.isDown(n)) },
-    refNodes()  { return this.nodes.filter(n => !this.isUp(n) && !this.isDown(n)) }
+    upNodes() {
+      return this.nodes.filter((n) => this.isUp(n));
+    },
+    downNodes() {
+      return this.nodes.filter((n) => this.isDown(n));
+    },
+    refNodes() {
+      return this.nodes.filter((n) => !this.isUp(n) && !this.isDown(n));
+    },
   },
   methods: {
     relLabel(t) {
       const map = {
-        UPPER: '上位',
-        LOWER: '下位',
-        REFER: '引用',
-        REPLACE: '替代',
-        ABOLISH: '废止'
-      }
-      return map[t] || t
+        UPPER: "上位",
+        LOWER: "下位",
+        REFER: "引用",
+        REPLACE: "替代",
+        ABOLISH: "废止",
+      };
+      return map[t] || t;
     },
     isUp(n) {
       // 与 root 形成 LOWER 关系的，被视为 root 的上位
-      return this.edges.some(e => e.sourceId === n.id && e.targetId === this.root.id && e.relationType === 'LOWER')
+      return this.edges.some(
+        (e) =>
+          e.sourceId === n.id &&
+          e.targetId === this.root.id &&
+          e.relationType === "LOWER",
+      );
     },
     isDown(n) {
-      return this.edges.some(e => e.sourceId === this.root.id && e.targetId === n.id && e.relationType === 'LOWER')
+      return this.edges.some(
+        (e) =>
+          e.sourceId === this.root.id &&
+          e.targetId === n.id &&
+          e.relationType === "LOWER",
+      );
     },
     nodeName(id) {
-      if (this.root && this.root.id === id) return this.root.regulationName
-      const n = this.nodes.find(x => x.id === id)
-      return n ? n.regulationName : '#' + id
+      if (this.root && this.root.id === id) return this.root.regulationName;
+      const n = this.nodes.find((x) => x.id === id);
+      return n ? n.regulationName : "#" + id;
     },
 
     async load() {
       try {
-        const resp = await cleanupApi.regulationRelations(this.rootId, this.depth)
-        this.root   = resp?.root || (resp?.nodes || []).find(n => n.id === Number(this.rootId)) || null
-        this.nodes = (resp?.nodes || []).filter(n => n.id !== Number(this.rootId))
-        this.edges = resp?.edges || []
+        const resp = await cleanupApi.regulationRelations(
+          this.rootId,
+          this.depth,
+        );
+        this.root =
+          resp?.root ||
+          (resp?.nodes || []).find((n) => n.id === Number(this.rootId)) ||
+          null;
+        this.nodes = (resp?.nodes || []).filter(
+          (n) => n.id !== Number(this.rootId),
+        );
+        this.edges = resp?.edges || [];
       } catch (e) {
-        uni.showToast({ title: '加载失败', icon: 'none' })
-        this.root = null
-        this.nodes = []
-        this.edges = []
+        uni.showToast({ title: "加载失败", icon: "none" });
+        this.root = null;
+        this.nodes = [];
+        this.edges = [];
       }
     },
 
-    goNode(id) { this.rootId = id; this.load() }
-  }
-}
+    goNode(id) {
+      this.rootId = id;
+      this.load();
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-.graph-page { padding: 24rpx 24rpx 200rpx; }
+.graph-page {
+  padding: 24rpx 24rpx 200rpx;
+}
 .hero {
   background: linear-gradient(120deg, #1e5a96, #4a86c5);
   color: #fff;
@@ -159,12 +223,30 @@ export default {
   border-radius: 16rpx;
   margin-bottom: 24rpx;
 }
-.hero-title { font-size: 36rpx; font-weight: 700; }
-.hero-desc  { font-size: 24rpx; opacity: 0.9; margin-top: 8rpx; }
+.hero-title {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+.hero-desc {
+  font-size: 24rpx;
+  opacity: 0.9;
+  margin-top: 8rpx;
+}
 
-.form-row  { margin-bottom: 16rpx; }
-.form-key  { font-size: 26rpx; color: #1f2937; display: block; margin-bottom: 8rpx; }
-.search-row { display: flex; gap: 12rpx; align-items: center; }
+.form-row {
+  margin-bottom: 16rpx;
+}
+.form-key {
+  font-size: 26rpx;
+  color: #1f2937;
+  display: block;
+  margin-bottom: 8rpx;
+}
+.search-row {
+  display: flex;
+  gap: 12rpx;
+  align-items: center;
+}
 .input {
   flex: 1;
   border: 1rpx solid #e5e7eb;
@@ -181,7 +263,10 @@ export default {
   font-size: 26rpx;
 }
 
-.depth-row { display: flex; gap: 12rpx; }
+.depth-row {
+  display: flex;
+  gap: 12rpx;
+}
 .depth-tag {
   padding: 12rpx 24rpx;
   background: #f5f7fa;
@@ -203,7 +288,7 @@ export default {
   margin-bottom: 16rpx;
 }
 .card-title::before {
-  content: '';
+  content: "";
   display: inline-block;
   width: 8rpx;
   height: 28rpx;
@@ -255,8 +340,12 @@ export default {
   background: #d1d5db;
   margin: 8rpx 0;
 }
-.text-secondary { color: #909399; }
-.fz-12 { font-size: 24rpx; }
+.text-secondary {
+  color: #64748b;
+}
+.fz-12 {
+  font-size: 24rpx;
+}
 
 .edge-row {
   display: flex;
@@ -264,7 +353,9 @@ export default {
   gap: 16rpx;
   padding: 16rpx 8rpx;
   border-bottom: 1rpx solid #f3f4f6;
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
 }
 .edge-name {
   flex: 1;

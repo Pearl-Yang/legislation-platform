@@ -7,11 +7,15 @@
     "dev": "uni -p mp-weixin",
     "dev:mp-weixin": "uni -p mp-weixin",
     "build": "uni build -p mp-weixin",
-    "build:mp-weixin": "uni build -p mp-weixin"
+    "build:mp-weixin": "uni build -p mp-weixin",
+    "dev:h5": "uni -p h5 --host 127.0.0.1 --port 3004",
+    "build:h5": "uni build -p h5",
+    "test": "node --test tests/session-request.test.mjs tests/consultation-view.test.mjs"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-4020920240930001",
     "@dcloudio/uni-components": "3.0.0-4020920240930001",
+    "@dcloudio/uni-h5": "3.0.0-4020920240930001",
     "@dcloudio/uni-mp-weixin": "3.0.0-4020920240930001",
     "vue": "^3.4.21",
     "vue-i18n": "^9.1.9"

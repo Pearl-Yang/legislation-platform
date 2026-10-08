@@ -17,23 +17,28 @@
 
 <script>
 export default {
-  name: 'StageBar',
+  name: "StageBar",
   props: {
-    stages: { type: Array, required: true } // [{ stageName, status, ... }]
+    stages: { type: Array, required: true }, // [{ stageName, status, ... }]
   },
-  emits: ['tap'],
+  emits: ["tap"],
   methods: {
     dotCls(s) {
       switch (s.status) {
-        case 'DONE':        return 'dot-done'
-        case 'IN_PROGRESS': return 'dot-doing'
-        case 'RETURNED':    return 'dot-returned'
-        case 'SKIPPED':     return 'dot-skipped'
-        default:            return 'dot-pending'
+        case "DONE":
+          return "dot-done";
+        case "IN_PROGRESS":
+          return "dot-doing";
+        case "RETURNED":
+          return "dot-returned";
+        case "SKIPPED":
+          return "dot-skipped";
+        default:
+          return "dot-pending";
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -41,10 +46,12 @@ export default {
   display: flex;
   align-items: flex-start;
   padding: 24rpx 0;
+  overflow-x: auto;
 }
 .stage-cell {
   position: relative;
-  flex: 1;
+  flex: 1 0 120rpx;
+  min-width: 120rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -65,15 +72,25 @@ export default {
   z-index: 1;
   background: #d1d5db;
 }
-.dot-pending { background: #d1d5db; }
-.dot-done    { background: #67c23a; }
-.dot-doing   {
+.dot-pending {
+  background: #d1d5db;
+}
+.dot-done {
+  background: #39734c;
+}
+.dot-doing {
   background: #1e5a96;
   box-shadow: 0 0 0 6rpx rgba(30, 90, 150, 0.15);
 }
-.dot-returned{ background: #f56c6c; }
-.dot-skipped { background: #909399; }
-.dot-ok { line-height: 1; }
+.dot-returned {
+  background: #a44342;
+}
+.dot-skipped {
+  background: #64748b;
+}
+.dot-ok {
+  line-height: 1;
+}
 .stage-line {
   position: absolute;
   top: 14rpx;

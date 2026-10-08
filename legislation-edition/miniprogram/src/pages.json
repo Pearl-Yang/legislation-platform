@@ -1,42 +1,183 @@
 {
   "pages": [
-    { "path": "pages/index/index",         "style": { "navigationBarTitleText": "智立法", "navigationStyle": "custom" } },
-    { "path": "pages/dashboard/index",    "style": { "navigationBarTitleText": "工作台" } },
-    { "path": "pages/project/index",      "style": { "navigationBarTitleText": "立法项目" } },
-    { "path": "pages/project/detail",     "style": { "navigationBarTitleText": "项目详情" } },
-    { "path": "pages/draft/index",        "style": { "navigationBarTitleText": "草案生成" } },
-    { "path": "pages/draft/detail",      "style": { "navigationBarTitleText": "草案详情" } },
-    { "path": "pages/review/index",       "style": { "navigationBarTitleText": "智慧审查" } },
-    { "path": "pages/review/detail",      "style": { "navigationBarTitleText": "审查详情" } },
-    { "path": "pages/cleanup/index",      "style": { "navigationBarTitleText": "智能清理" } },
-    { "path": "pages/cleanup/graph",      "style": { "navigationBarTitleText": "关系图谱" } },
-    { "path": "pages/cleanup/detail",     "style": { "navigationBarTitleText": "清理详情" } },
-    { "path": "pages/evaluation/index",   "style": { "navigationBarTitleText": "实施评估" } },
-    { "path": "pages/evaluation/detail",  "style": { "navigationBarTitleText": "评估详情" } },
-    { "path": "pages/consultation/index", "style": { "navigationBarTitleText": "意见征集" } },
-    { "path": "pages/consultation/publish", "style": { "navigationBarTitleText": "发布意见" } },
-    { "path": "pages/consultation/detail","style": { "navigationBarTitleText": "征集详情" } },
-    { "path": "pages/library/index",      "style": { "navigationBarTitleText": "资料库" } },
-    { "path": "pages/library/detail",     "style": { "navigationBarTitleText": "资料详情" } },
-    { "path": "pages/info/index",         "style": { "navigationBarTitleText": "立法动态" } },
-    { "path": "pages/profile/index",      "style": { "navigationBarTitleText": "我的" } }
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "智立法",
+        "navigationStyle": "custom",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/dashboard/index",
+      "style": {
+        "navigationBarTitleText": "工作台",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/project/index",
+      "style": {
+        "navigationBarTitleText": "立法项目",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/project/detail",
+      "style": {
+        "navigationBarTitleText": "项目详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/draft/index",
+      "style": {
+        "navigationBarTitleText": "草案生成",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/draft/detail",
+      "style": {
+        "navigationBarTitleText": "草案详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/review/index",
+      "style": {
+        "navigationBarTitleText": "智慧审查",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/review/detail",
+      "style": {
+        "navigationBarTitleText": "审查详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/cleanup/index",
+      "style": {
+        "navigationBarTitleText": "智能清理",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/cleanup/graph",
+      "style": {
+        "navigationBarTitleText": "关系图谱",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/cleanup/detail",
+      "style": {
+        "navigationBarTitleText": "清理详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/evaluation/index",
+      "style": {
+        "navigationBarTitleText": "实施评估",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/evaluation/detail",
+      "style": {
+        "navigationBarTitleText": "评估详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/consultation/index",
+      "style": {
+        "navigationBarTitleText": "意见征集",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/consultation/publish",
+      "style": {
+        "navigationBarTitleText": "发布意见",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/consultation/detail",
+      "style": {
+        "navigationBarTitleText": "征集详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/library/index",
+      "style": {
+        "navigationBarTitleText": "资料库",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/library/detail",
+      "style": {
+        "navigationBarTitleText": "资料详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/info/index",
+      "style": {
+        "navigationBarTitleText": "立法动态",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/profile/index",
+      "style": {
+        "navigationBarTitleText": "我的",
+        "enablePullDownRefresh": false
+      }
+    }
   ],
   "globalStyle": {
-    "navigationBarTextStyle": "white",
+    "navigationBarTextStyle": "black",
     "navigationBarTitleText": "智立法",
-    "navigationBarBackgroundColor": "#1e5a96",
-    "backgroundColor": "#f5f7fa"
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f2f5f9"
   },
   "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#1e5a96",
+    "color": "#617085",
+    "selectedColor": "#235a91",
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
     "list": [
-      { "pagePath": "pages/dashboard/index",    "text": "工作台" },
-      { "pagePath": "pages/project/index",      "text": "立法项目" },
-      { "pagePath": "pages/consultation/index", "text": "意见征集" },
-      { "pagePath": "pages/profile/index",      "text": "我的" }
+      {
+        "pagePath": "pages/dashboard/index",
+        "text": "工作台",
+        "iconPath": "static/icons/layout-dashboard-muted.png",
+        "selectedIconPath": "static/icons/layout-dashboard-accent.png"
+      },
+      {
+        "pagePath": "pages/project/index",
+        "text": "立法项目",
+        "iconPath": "static/icons/scale-muted.png",
+        "selectedIconPath": "static/icons/scale-accent.png"
+      },
+      {
+        "pagePath": "pages/consultation/index",
+        "text": "意见征集",
+        "iconPath": "static/icons/messages-square-muted.png",
+        "selectedIconPath": "static/icons/messages-square-accent.png"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的",
+        "iconPath": "static/icons/user-round-muted.png",
+        "selectedIconPath": "static/icons/user-round-accent.png"
+      }
     ]
   }
 }

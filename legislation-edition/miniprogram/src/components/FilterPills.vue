@@ -1,25 +1,25 @@
 <template>
   <view class="filter-pills">
-    <view
+    <button
       v-for="o in options"
       :key="o.value"
       :class="['pill', modelValue === o.value ? 'pill-active' : '']"
       @click="$emit('update:modelValue', o.value)"
     >
       {{ o.label }}
-    </view>
+    </button>
   </view>
 </template>
 
 <script>
 export default {
-  name: 'FilterPills',
+  name: "FilterPills",
   props: {
-    options:   { type: Array, required: true }, // [{label, value}]
-    modelValue:{ type: [String, Number], default: '' }
+    options: { type: Array, required: true }, // [{label, value}]
+    modelValue: { type: [String, Number], default: "" },
   },
-  emits: ['update:modelValue']
-}
+  emits: ["update:modelValue"],
+};
 </script>
 
 <style lang="scss" scoped>
@@ -44,5 +44,16 @@ export default {
   background: linear-gradient(135deg, #1e5a96, #4a86c5);
   color: #fff;
   font-weight: 600;
+}
+button {
+  min-height: 88rpx;
+  line-height: 1.5;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+button::after {
+  border: none;
 }
 </style>
