@@ -1,71 +1,101 @@
 <template>
-  <view class="filter-bar">
-    <view class="search-wrap">
-      <view class="search-icon">🔍</view>
-      <input
+  <view class="filter-bar"
+    ><view class="search-wrap"
+      ><app-icon
+        class="search-icon"
+        name="search"
+        :size="32"
+        tone="muted"
+      /><input
         class="search-input"
-        v-model="kw"
+        :value="modelValue"
         :placeholder="placeholder"
         confirm-type="search"
-        @confirm="onSearch"
-      />
-      <view v-if="kw" class="search-clear" @click="clear">✕</view>
-    </view>
-    <slot />
-  </view>
+        @input="onInput"
+        @confirm="search"
+      /><button
+        v-if="modelValue"
+        class="search-clear"
+        aria-label="清空搜索"
+        @click="clear"
+      >
+        ×
+      </button></view
+    ><slot
+  /></view>
 </template>
-
 <script>
-import { debounce } from '@/utils/index.js'
-
 export default {
-  name: 'SearchBar',
   props: {
-    placeholder: { type: String, default: '搜索关键词' },
-    value:      { type: String, default: '' }
+    placeholder: { type: String, default: "搜索关键词" },
+    modelValue: { type: String, default: "" },
   },
-  emits: ['input', 'search'],
-  data() { return { kw: this.value } },
-  watch: {
-    value(v) { this.kw = v }
-  },
-  mounted() {
-    this.$emit('input', this.kw)
-    this.debouncedEmit = debounce((val) => {
-      this.$emit('search', val)
-    }, 400)
+  emits: ["update:modelValue", "search"],
+  data: () => ({ timer: null }),
+  beforeUnmount() {
+    clearTimeout(this.timer);
   },
   methods: {
-    onSearch() { this.$emit('search', this.kw) },
-    clear() { this.kw = ''; this.$emit('search', '') }
-  }
-}
+    onInput(e) {
+      const value = e.detail.value;
+      this.$emit("update:modelValue", value);
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => this.$emit("search", value), 400);
+    },
+    search() {
+      clearTimeout(this.timer);
+      this.$emit("search", this.modelValue);
+    },
+    clear() {
+      clearTimeout(this.timer);
+      this.$emit("update:modelValue", "");
+      this.$emit("search", "");
+    },
+  },
+};
 </script>
-
-<style lang="scss" scoped>
+<style scoped>
 .filter-bar {
   display: flex;
   align-items: center;
   gap: 16rpx;
-  padding: 16rpx 24rpx;
+  padding: 20rpx 24rpx;
   background: #fff;
-  border-bottom: 1rpx solid #f3f4f6;
 }
 .search-wrap {
   flex: 1;
-  position: relative;
   display: flex;
   align-items: center;
-  background: #f5f7fa;
-  border-radius: 32rpx;
-  padding: 0 24rpx;
-  height: 64rpx;
+  min-width: 0;
+  background: #f0f4f8;
+  border: 1rpx solid #e1e8f0;
+  border-radius: 14rpx;
+  padding: 0 20rpx;
+  min-height: 88rpx;
 }
-.search-icon  { font-size: 24rpx; color: #909399; margin-right: 8rpx; }
-.search-input { flex: 1; font-size: 26rpx; color: #1f2937; }
+.search-icon {
+  font-size: 40rpx;
+  color: #566d87;
+  margin-right: 12rpx;
+}
+.search-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 28rpx;
+  color: #23364d;
+  height: 84rpx;
+}
 .search-clear {
-  font-size: 22rpx;
-  color: #909399;
-  padding: 0 12rpx;
+  width: 76rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 34rpx;
+  background: transparent;
+  color: #526277;
+  padding: 0;
+  margin: 0;
+}
+.search-clear::after {
+  border: none;
 }
 </style>

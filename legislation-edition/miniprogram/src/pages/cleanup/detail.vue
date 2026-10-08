@@ -8,10 +8,15 @@
         </view>
       </view>
       <view class="row2">
-        <view class="type-tag" :style="{ background: typeColor(task.taskType) }">
+        <view
+          class="type-tag"
+          :style="{ background: typeColor(task.taskType) }"
+        >
           {{ typeLabel(task.taskType) }}
         </view>
-        <text class="text-secondary fz-12" v-if="task.theme">主题：{{ task.theme }}</text>
+        <text class="text-secondary fz-12" v-if="task.theme"
+          >主题：{{ task.theme }}</text
+        >
       </view>
       <view class="meta">
         <text class="meta-key">创建</text>
@@ -24,8 +29,12 @@
     </view>
 
     <view class="action-bar">
-      <button class="btn-secondary" @click="loadAffected">👁 受影响法规</button>
-      <button class="btn-primary"   @click="onSuggest">⚡ AI 生成建议</button>
+      <button class="btn-secondary" @click="loadAffected">
+        <app-icon name="eye" :size="32" /> 受影响法规
+      </button>
+      <button class="btn-primary" @click="onSuggest">
+        <app-icon name="file-pen-line" :size="32" tone="white" /> AI 生成建议
+      </button>
     </view>
 
     <!-- 受影响 -->
@@ -41,98 +50,163 @@
 
     <!-- 报告 -->
     <view class="card" v-if="reportContent">
-      <view class="card-title">📋 清理报告</view>
+      <view class="card-title"
+        ><app-icon name="clipboard-list" :size="32" /> 清理报告</view
+      >
       <view class="report">{{ reportContent }}</view>
     </view>
   </view>
-  <empty v-else-if="!loading" text="任务不存在" />
-  <loading-block v-else text="加载中…" />
+  <data-state
+    v-else
+    :loading="loading"
+    :error="error"
+    :empty="!loading && !error"
+    title="暂无详情"
+    description="记录可能已移除，请返回列表查看"
+    @retry="reload"
+  />
 </template>
 
 <script>
-import Empty from '@/components/Empty.vue'
-import LoadingBlock from '@/components/LoadingBlock.vue'
+import DataState from "@/components/DataState.vue";
+import Empty from "@/components/Empty.vue";
+import LoadingBlock from "@/components/LoadingBlock.vue";
 import {
-  CLEANUP_TYPE, CLEANUP_STATUS, REGULATION_STATUS,
-  relativeTime, showLoading, hideLoading
-} from '@/utils/index.js'
-import { cleanupApi } from '@/api/index.js'
+  CLEANUP_TYPE,
+  CLEANUP_STATUS,
+  REGULATION_STATUS,
+  relativeTime,
+  showLoading,
+  hideLoading,
+} from "@/utils/index.js";
+import { cleanupApi } from "@/api/index.js";
 
 export default {
-  components: { Empty, LoadingBlock },
+  components: { DataState, Empty, LoadingBlock },
   data() {
     return {
-      id: null, task: null, loading: true,
-      affected: [], reportContent: ''
-    }
+      id: null,
+      task: null,
+      error: "",
+      loading: true,
+      affected: [],
+      reportContent: "",
+    };
   },
-  onLoad(opts) { this.id = Number(opts.id) || null },
-  onShow() { this.reload() },
+  onLoad(opts) {
+    this.id = Number(opts.id) || null;
+  },
+  onShow() {
+    this.reload();
+  },
   methods: {
-    typeLabel(t)  { return (CLEANUP_TYPE[t] || { label: t }).label },
-    typeColor(t)  { return (CLEANUP_TYPE[t] || { color: '#909399' }).color },
-    statusLabel(s){ return (CLEANUP_STATUS[s] || { label: s }).label },
-    regStatusLabel(s) { return (REGULATION_STATUS[s] || { label: s }).label },
+    typeLabel(t) {
+      return (CLEANUP_TYPE[t] || { label: t }).label;
+    },
+    typeColor(t) {
+      return (CLEANUP_TYPE[t] || { color: "#64748b" }).color;
+    },
+    statusLabel(s) {
+      return (CLEANUP_STATUS[s] || { label: s }).label;
+    },
+    regStatusLabel(s) {
+      return (REGULATION_STATUS[s] || { label: s }).label;
+    },
     relativeTime,
 
     async reload() {
-      this.loading = true
+      this.error = "";
+      this.loading = true;
       try {
-        this.task = await cleanupApi.cleanupDetail(this.id)
+        this.task = await cleanupApi.cleanupDetail(this.id);
+      } catch (e) {
+        this.error = e.message || "加载失败，请重试";
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     async loadAffected() {
-      showLoading()
+      showLoading();
       try {
-        const list = await cleanupApi.affectedRegulations(this.id)
-        this.affected = Array.isArray(list) ? list : []
+        const list = await cleanupApi.affectedRegulations(this.id);
+        this.affected = Array.isArray(list) ? list : [];
       } finally {
-        hideLoading()
+        hideLoading();
       }
     },
 
     async onSuggest() {
-      showLoading('AI 生成建议中…')
+      showLoading("AI 生成建议中…");
       try {
-        await cleanupApi.suggestCleanup(this.id)
-        uni.showToast({ title: '已生成建议', icon: 'success' })
+        await cleanupApi.suggestCleanup(this.id);
+        uni.showToast({ title: "已生成建议", icon: "success" });
         // 顺便加载报告
-        const rep = await cleanupApi.cleanupReport(this.id)
-        this.reportContent = (rep && (rep.summary || rep.content)) || '已生成清理建议'
+        const rep = await cleanupApi.cleanupReport(this.id);
+        this.reportContent =
+          (rep && (rep.summary || rep.content)) || "已生成清理建议";
       } finally {
-        hideLoading()
+        hideLoading();
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-.cleanup-detail { padding: 24rpx 24rpx 200rpx; }
-.row1 { display: flex; align-items: flex-start; justify-content: space-between; gap: 16rpx; }
-.title { font-size: 32rpx; font-weight: 700; color: #1f2937; flex: 1; }
+.cleanup-detail {
+  padding: 24rpx 24rpx 200rpx;
+}
+.row1 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1f2937;
+  flex: 1;
+}
 .tag {
   font-size: 22rpx;
   padding: 4rpx 14rpx;
   border-radius: 8rpx;
   flex-shrink: 0;
 }
-.tag-pending { background: #f4f4f5; color: #909399; }
-.tag-running { background: #ecf5fc; color: #1e5a96; }
-.tag-done    { background: #e8f7e6; color: #67c23a; }
+.tag-pending {
+  background: #f4f4f5;
+  color: #64748b;
+}
+.tag-running {
+  background: #ecf5fc;
+  color: #1e5a96;
+}
+.tag-done {
+  background: #e8f7e6;
+  color: #39734c;
+}
 
-.row2 { display: flex; flex-wrap: wrap; gap: 12rpx; align-items: center; margin-top: 12rpx; }
+.row2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  align-items: center;
+  margin-top: 12rpx;
+}
 .type-tag {
   font-size: 22rpx;
   color: #fff;
   padding: 4rpx 14rpx;
   border-radius: 8rpx;
 }
-.text-secondary { color: #909399; }
-.fz-12 { font-size: 24rpx; }
+.text-secondary {
+  color: #64748b;
+}
+.fz-12 {
+  font-size: 24rpx;
+}
 .meta {
   margin-top: 12rpx;
   display: flex;
@@ -140,7 +214,9 @@ export default {
   font-size: 24rpx;
   color: #1f2937;
 }
-.meta-key { color: #909399; }
+.meta-key {
+  color: #64748b;
+}
 
 .action-bar {
   position: fixed;
@@ -154,16 +230,26 @@ export default {
   gap: 16rpx;
   z-index: 9;
 }
-.btn-secondary, .btn-primary {
+.btn-secondary,
+.btn-primary {
   flex: 1;
   border-radius: 16rpx;
   height: 80rpx;
   line-height: 80rpx;
   font-size: 28rpx;
 }
-.btn-secondary { background: #f5f7fa; color: #1e5a96; }
-.btn-primary   { background: linear-gradient(90deg, #e6a23c, #f7b977); color: #fff; }
-.btn-secondary::after, .btn-primary::after { border: none; }
+.btn-secondary {
+  background: #f5f7fa;
+  color: #1e5a96;
+}
+.btn-primary {
+  background: linear-gradient(90deg, #9b621f, #f7b977);
+  color: #fff;
+}
+.btn-secondary::after,
+.btn-primary::after {
+  border: none;
+}
 
 .card-title {
   font-size: 30rpx;
@@ -173,11 +259,11 @@ export default {
   margin-bottom: 16rpx;
 }
 .card-title::before {
-  content: '';
+  content: "";
   display: inline-block;
   width: 8rpx;
   height: 28rpx;
-  background: #e6a23c;
+  background: #9b621f;
   margin-right: 12rpx;
   border-radius: 4rpx;
 }
@@ -188,17 +274,31 @@ export default {
   justify-content: space-between;
   padding: 16rpx 8rpx;
   border-bottom: 1rpx solid #f3f4f6;
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
 }
-.aff-name { font-size: 26rpx; color: #1f2937; }
+.aff-name {
+  font-size: 26rpx;
+  color: #1f2937;
+}
 .reg-tag {
   font-size: 22rpx;
   padding: 4rpx 14rpx;
   border-radius: 8rpx;
 }
-.reg-effective { background: #e8f7e6; color: #67c23a; }
-.reg-revising  { background: #fdf6ec; color: #e6a23c; }
-.reg-obsolete  { background: #fef0f0; color: #f56c6c; }
+.reg-effective {
+  background: #e8f7e6;
+  color: #39734c;
+}
+.reg-revising {
+  background: #fdf6ec;
+  color: #9b621f;
+}
+.reg-obsolete {
+  background: #fef0f0;
+  color: #a44342;
+}
 
 .report {
   background: #f9fafb;
