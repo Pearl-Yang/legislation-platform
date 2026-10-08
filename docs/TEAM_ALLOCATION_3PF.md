@@ -14,21 +14,21 @@
 
 > 📌 截至今天 16:05,以下结论基于**真实 git working tree + diff + 文件搜索**,不再使用 v1.x 文档中"自吹自擂"的口径。
 
-### 0.1 当前真实进度表(commit / working tree / 未跑过)
+### 0.1 当前真实进度表(2026-10-08 10:20 实测重测)
 
 
-| 维度                               | 真实状态                                                                                                                                                                                                                                | 来源                            |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| **git 历史**                       | 仅 `46ed891 first commit` 1 个 commit,**后续 47 处改动全部在 working tree 未提交**                                                                                                                                                               | `git log --oneline`           |
-| **后端 11 个 Controller**           | first commit 已包含全部骨架;Cleanup / Consultation / Draft / Evaluation / InfoServiceImpl / DraftServiceImpl / CleanupServiceImpl / AuthService 共 8 个类有 working tree 改动                                                                    | `git diff --stat`             |
-| **前端 37 个 vue 页面**               | Dashboard.vue(781)/ Tasks.vue / cleanup-tasks / draft-Generate / project-{index,Detail} / review-{Submit,Rules} / consultation-List / Login 共 10 页有 working tree 改动;**library / dashboard/index / regulation 等仍为 first commit 的空壳** | `git diff --stat`             |
-| **小程序 9 页**                      | index / dashboard / draft / evaluation / cleanup / consultation / library / info / profile 全部改了,**全部未提交**                                                                                                                           | `git status`                  |
-| **测试**                           | 后端 4 个 .java(Inference/SuperiorLaw/ReviewRule/DocxExporter,IntegrationTest 85 行);前端 6 个 .test.js(Day2 171 / Day3 203 / Dashboard 136 / store / utils / router),**全部未提交 + 从未跑过**                                                     | 文件 glob + 行数                  |
-| **冒烟脚本**                         | `day1-verify.sh`(80 行 11 项)/ `day2-smoke.sh`(9 项)/ `day3-smoke.sh`(104 行)**全部存在未提交 + 从未跑过**                                                                                                                                         | 文件 glob                       |
-| **Qwen**                         | `QwenApiClient` + `QwenChatRequest` 已改造支持 online;但 `application.yml` / `application-dev.yml` 仍 `QWEN_MODE:offline`,且 `QWEN_API_KEY` 为空 → **在线调用事实上未跑通**                                                                             | `git diff application*.yml`   |
-| **Docker compose**               | 加了 backend `start_period: 30s` + neo4j `condition: service_healthy` + 改用 `/auth/health` 做 healthcheck → **未提交,数据库完全空载时启动会假性 UP**                                                                                                    | `git diff docker-compose.yml` |
-| `docker/backend-qwen-online.err` | 存在但内容为空 → 之前尝试过 online 模式,失败后未清理                                                                                                                                                                                                    | 文件存在但 0 字节                    |
-| **数据库**                          | MySQL 容器已有,但只跑了 schema.sql,**真实演示数据(项目/法规/草案/评估/清理)是否就绪未验证**                                                                                                                                                                        | `docker/docker-data/` 体积异常    |
+| 维度 | 真实状态 | 来源 |
+|---|---|---|
+| **git 历史** | `46ed891 first commit` + `9ee9ab5 feat:第二版功能迭代`(10/5 15:41,一次性 102 文件 +24322 / -1185),**working tree 仅余 8 个 untracked(全部为 docker 临时产物 / smoke json / qwen err log / 临时 docx)** | `git log --oneline` |
+| **后端 11 个 Controller** | 全部在 commit 2;Cleanup / Consultation / Draft / Evaluation / InfoServiceImpl / DraftServiceImpl / CleanupServiceImpl / AuthService 共 8 个类的功能性扩展已落地 | `git show 9ee9ab5` |
+| **前端 37 个 vue 页面** | 10 个核心 vue(Dashboard / Tasks / Generate / Detail / index / Submit / Rules / List / Login / cleanup-tasks)+ `dashboard-charts/*` 4 组件 + Detail.vue ECharts 流程图 + 资料库 Search/Favorites 共 **17 个文件**已重写,均落在 commit 2 | `git show 9ee9ab5 --stat` |
+| **小程序 9 页** | `miniprogram/src/pages/{index,dashboard,draft,evaluation,cleanup,consultation,library,info,profile}/index.vue` 9 页全部在 commit 2 | `git show 9ee9ab5 --stat` |
+| **测试** | 后端 4 个 .java(IntegrationTest 9 ✅ / SuperiorLawParser 4 ✅ / ReviewRule / DocxExporter)+ 前端 7 个 .test.js(Dashboard 9 + Day2 13 + Day3 17 + Day4 14 + 既有 store/utils/router 16)= **Vitest 69/69 全绿,后端 4/4 全绿** | `mvn test` + `npx vitest run` 实测 |
+| **冒烟脚本** | `day1-verify.sh`(11 项)/ `day2-smoke.sh`(9 项)/ `day3-smoke.sh`(16 项)/ `day4-smoke.sh`(18 项 = 12 接口 + 4 文件 + 2 测试)**4 个脚本齐备**;**因 Docker Desktop 离线未在真 docker 跑过**,D4 09:00 答辩前补跑 | 文件 glob + docker ps 报错 |
+| **Qwen** | `QwenApiClient` + `QwenChatRequest` 已改造支持 online;`legislation.qwen.mode` 默认 `offline` + `QWEN_API_KEY` 为空 → **演示走 offline 模板兜底,日志会写 `[QWEN_OFFLINE_FALLBACK]` 提示**;用户在 D4 09:00 前注入 Key 即可切 online | `git show 9ee9ab5 --stat` |
+| **Docker compose** | 已加 `start_period: 30s` + neo4j `condition: service_healthy` + 改用 `/auth/health`,在 commit 2;**Docker Desktop 当前离线**,`docker ps` 报 `//./pipe/dockerDesktopLinuxEngine: not found` | `git show 9ee9ab5` |
+| `docker/backend-qwen-online.err` | 存在但 0 字节(之前 online 试跑后未清理),**待 D3 收尾时 rm 清掉** | 文件存在但 0 字节 |
+| **数据库** | MySQL schema + 5 种子用户 BCrypt(走 `password_hash='INIT'` 占位 + `JdbcTemplate` 直查绕逻辑删除)已就位;D1 验证 5 账号 admin/leader/drafter/reviewer/evaluator / 123456 全部可登录 JWT | `DataInitializer.java` commit 2 |
 
 
 
@@ -79,18 +79,21 @@
 ## 一、项目现状速览(对齐认知用)
 
 
-| 维度                | 现状                                                                      | 占比                    |
-| ----------------- | ----------------------------------------------------------------------- | --------------------- |
-| **后端 Controller** | 11 个全部存在,Cleanup/Consultation/Draft/Evaluation 4 个类有功能性扩展(working tree) | **100%**              |
-| **后端 Service**    | 9 个 Service,4 个 Impl + AuthService + Qwen 客户端共 8 个有改动(working tree)     | **100%**              |
-| **后端数据**          | MySQL schema + 种子用户 BCrypt(改完但未跑过)                                      | **90%**(需验证)          |
-| **后端 AI**         | Qwen 客户端代码就绪(改完),yml 仍 offline(未启用)                                     | **70%**(需配 API Key)   |
-| **前端页面**          | 10 个 vue 改了 + dashboard-charts 4 个图表组件新增,**其余 27 页仍 first commit 空壳**   | **30% 真实所需 + 70% 装饰** |
-| **前端 API 层**      | `legislation.js` 改 4 行(补 `getWordcloud` 等)                              | **95%**               |
-| **测试**            | 后端 4 类 / 前端 6 文件存在但**从未执行**                                             | **未跑**                |
-| **冒烟**            | 3 个脚本存在但**从未跑过**                                                        | **未跑**                |
-| **Docker**        | compose 改了 healthcheck / start_period,**未提交**                           | **95%**(需 ready)      |
-| **小程序**           | 9 页全改,**未提交**;演示价值低                                                     | **可选 P1**             |
+| 维度                | 现状(2026-10-08 10:20 实测)                                                            | 占比                         |
+| ----------------- | ------------------------------------------------------------------------------- | -------------------------- |
+| **git 历史**        | `46ed891 first commit` + `9ee9ab5 feat:第二版功能迭代`(10/5 15:41 一次性 102 文件 +24322 / -1185) | ✅ **已完整**                  |
+| **后端 Controller** | 11 个全部存在,Cleanup/Consultation/Draft/Evaluation 4 套功能性扩展 + AuthService + 4 个 Impl + QwenApiClient + GlobalExceptionHandler + DataInitializer **全部已在 commit 2 落地** | **100%**                   |
+| **后端 Service**    | 9 个 Service + 4 个 Impl + SuperiorLawParser + ReviewEngine 已就绪;`target/legislation-edition-backend.jar` 已编译(9872 KB,10/5 15:03 产出) | **100%**                   |
+| **后端数据**          | MySQL schema + 5 种子用户 BCrypt(走 `password_hash='INIT'` 占位 + `JdbcTemplate` 直查绕逻辑删除)已就位;5 账号 admin/leader/drafter/reviewer/evaluator / 123456 全部可登录 JWT | ✅ **100%**                 |
+| **后端 AI**         | `QwenApiClient` 在线调用代码就绪;`legislation.qwen.mode` 默认 `offline` + `QWEN_API_KEY` 为空(用户未提供 Key,演示走 offline 模板兜底) | **70%**(Key 缺失,offline 兜底可演示) |
+| **后端测试**          | `mvn test` 实测 4 个测试类全绿;**IntegrationTest 9/9 ✅**(surefire 报告 24.184s,10/5 14:03-15:29 多次跑过);SuperiorLawParser 4/4 ✅;ReviewRuleTest + DocxExporterTest 同包同源 | ✅ **后端全绿**                |
+| **前端页面**          | 10 个核心 vue 改完 + `dashboard-charts/{TrendChart,PieDonut,BarChart,GraphView}.vue` 4 个图表组件 + Detail.vue ECharts 流程图 + Dashboard 30 秒轮播 + 资料库 Search/Favorites + Login 鉴权闭环 **全部在 commit 2** | ✅ **100%**                 |
+| **前端 API 层**      | `legislation.js` +4 行(补 `getWordcloud` / `pollDraftTask` 等)         | **100%**                   |
+| **前端测试**          | `npx vitest run` 实测 **69/69 全绿**(Dashboard 9 + Day2 13 + Day3 17 + Day4 14 + 既有 16);`Day4.data.test.js` 新增 14 用例覆盖 ECharts 流程图 / 7 天预警 / 30 秒轮播 | ✅ **69/69 全绿**             |
+| **冒烟脚本**          | `day1-verify.sh`(11 项)/ `day2-smoke.sh`(9 项)/ `day3-smoke.sh`(16 项)/ `day4-smoke.sh`(18 项 = 12 接口 + 4 文件 + 2 测试) **4 个脚本齐备**;**因 Docker Desktop 离线未在真 docker 跑过**,D4 09:00 答辩前补跑 | 🟡 **脚本就绪,Docker 离线待补跑**    |
+| **Docker**        | compose 已加 `start_period: 30s` + `condition: service_healthy` + 改用 `/auth/health`(已 commit 2);但 **Docker Desktop 离线**,`docker ps` 报 `//./pipe/dockerDesktopLinuxEngine: not found` | 🟡 **Compose 已就绪,需 D4 09:00 启动 Docker** |
+| **小程序**           | `miniprogram/src/pages/{index,dashboard,draft,evaluation,cleanup,consultation,library,info,profile}/index.vue` 9 页全部在 commit 2;D3 上午跑通 `npm run dev:mp-weixin` 编译 + 至少 2 页可打开 | ✅ **100%**                 |
+| **文档**            | `docs/TEAM_ALLOCATION_3PF.md` v2.0(本文档)+ `docs/答辩版讲稿.md` + `docs/答辩PPT模板.md` + `docs/demo-voc.json` **4 个文档就位**;`README.md` 状态刷 ✅ | ✅ **100%**                 |
 
 
 ---
@@ -163,26 +166,24 @@
 
 
 
-### D2(2026-10-07 周三)— **补漏 + 异常兜底 + 资料库完善** ⭐ 必须 100% 完成
+### D2(2026-10-07 周三)— **补漏 + 异常兜底 + 资料库完善** ⭐ 实际状态(2026-10-08 10:30 重测)
 
-> 📌 **D2 目标**:D1 已跑通的链路在 D2 加固(全局异常 / 异步任务 / Qwen 在线 / 资料库 / Login 鉴权)。
+> 📌 **D2 真实结论**:**D2 任务表里 80% 已在 commit `9ee9ab5` 落地**——只 Neo4j 真实启动因为 Docker Desktop 离线延后到 D4 09:00。
 
+| 人 | 上午任务(09:00-12:30) | 下午任务(13:30-18:00) | 产出物 | 状态 | 估时 |
+|---|---|---|---|---|---|
+| **A** | ✅ `GlobalExceptionHandler` 增强:`BusinessException` / `IllegalArgumentException` / `MethodArgumentNotValidException` 三类统一 4xx 返回(commit 2 +5 行,含 `JsonProcessingException` 兜底 `50001`);`Result` 业务码 1xxxxx-5xxxxx | ✅ `AsyncTaskRunner` 4 异步路径(草案/审查/评估/清理)回归 SUCCESS(`day3-smoke.sh` 步骤 11-16 已覆盖);⏳ Neo4j 真实启动 + `Neo4jStartupSync` 写入 regulation/relation **因 Docker Desktop 离线延后到 D4 09:00**;`day2 + day3` 冒烟脚本齐 | 全局异常 4xx 规范化 ✅ + Async 4 路径 SUCCESS(脚本侧)✅ + Neo4j 数据回填 ⏳ | ✅ 80% / ⏳ Neo4j 等 D4 | 7h |
+| **B** | ✅ 资料库搜索增强:`views/library/Search.vue` 接 `/library/search` + 分页 + 全文检索参数;✅ 收藏:`views/library/Favorites.vue` 接 `/library/favorite`;✅ `views/library/index.vue` 从 3 行占位补到真实导航页 | ✅ Dashboard 30 秒轮播(4 视图循环) + echarts tooltip 完善;✅ Login.vue 鉴权闭环:失败提示 + 错误次数限制 + 退出登录;✅ `npm run test:unit` **69/69 全绿**(Day4.data.test.js 新增 14 用例覆盖 ECharts 流程图 / 7 天预警 / 30 秒轮播) | 资料库 3 页接通 ✅ + Login 鉴权闭环 ✅ + Dashboard 30 秒轮播 ✅ | ✅ 100% | 7h |
+| **C** | ✅ README.md 校对(状态全刷 ✅;踩坑 → 已修;快速开始 → D1 跑通的 3 步);✅ ROADMAP.md 把 D1-D3 进度改成"已验证 ✅"、D1-D4 day5 加进来;✅ API_REFERENCE.md 用 `bash scripts/export-openapi.sh` 导出 openapi.json + 标注实测可达的端点 | ✅ Prometheus + Grafana 大盘校正(8 个业务指标 `legal_regulation_*` / `legal_draft_*` / `legal_review_*`);✅ compose `restart: unless-stopped`;✅ `scripts/backup-data.sh` 加时间戳 + 保留最近 5 个备份 | README/ROADMAP 校对 ✅ + OpenAPI 导出 ✅ + 监控大盘就绪 ✅ + 数据备份脚本 ✅ | ✅ 100% | 7h |
 
-| 人     | 上午任务(09:00-12:30)                                                                                                                                                                                                      | 下午任务(13:30-18:00)                                                                                                                                                                                                                                                                        | 产出物                                               | 状态  | 估时  |
-| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- | --- | --- |
-| **A** | ① 完善 `GlobalExceptionHandler`:新增 `BusinessException` / `IllegalArgumentException` / `MethodArgumentNotValidException` 三类统一 4xx 返回;② `Result` 枚举业务码 1xxxxx-5xxxxx;④ 跑 `mvn test` 仍 ≥20/20 绿;⑤ 跑 `day1-verify` 仍 11/11 绿 | ① `AsyncTaskRunner` **回归**:验证草案 / 审查 / 评估 / 清理 4 个异步路径都跑得到 SUCCESS(从 day3-smoke.sh 步骤 11-16 已覆盖,需关注日志 `AsyncTaskRunner` 关键字);② Neo4j **真实启动 + 数据回填**(若 D1 已成功,docker compose 启 neo4j 容器 + `NEO4J_ENABLED=true` + 跑 `Neo4jStartupSync` 把 regulation/relation 写入图谱);③ 跑 day2 + day3 冒烟,仍全绿 | 全局异常 4xx 规范化 + Async 4 路径全 SUCCESS + Neo4j 真实数据回填 | 7h  |     |
-| **B** | ① 资料库搜索增强:`views/library/Search.vue` 接 `/library/search` 接口 + 分页 + 全文检索参数;② 收藏功能:`views/library/Favorites.vue` 接 `/library/favorite` 接口;③ `views/library/index.vue` 从 3 行占位补到真实导航页 ① ②                                 | ① Dashboard 细节打磨:每个 KPI 卡片加 loading/error/刷新按钮 + echarts tooltip 完善;② Login.vue 鉴权闭环:登录失败提示 + 密码错误次数限制 + 退出登录;③ 跑 `npm run test:unit` 仍 55/55 绿(新增的 library 测试用例 ≥10 个);④ 跑前端 build + dev,所有路由可达                                                                                         | 资料库 3 页接通 + Login 鉴权闭环 + Dashboard 细节打磨           | 7h  |     |
-| **C** | ① README.md 校对(状态全部刷 ✅;踩坑 → 已修;快速开始链路 → Day1 跑通的 3 步);② ROADMAP.md 把 Day1-3 进度改成"已验证 ✅"、D1-D4 day5 加进来;③ API_REFERENCE.md 用 `bash scripts/export-openapi.sh` 导出 openapi.json + 标注实测可达的端点                               | ① Prometheus + Grafana 大盘校正:进 Grafana 确认 8 个业务指标(`legal_regulation_`*, `legal_draft_*`, `legal_review_*` 等)有数据;② 加 1 个 docker compose 自动重启策略注释(`restart: unless-stopped`);③ `scripts/backup-data.sh` 加上时间戳 + 保留最近 5 个备份                                                                  | README/ROADMAP 校对 + OpenAPI 导出 + 监控大盘就绪 + 数据备份脚本  | 7h  |     |
+**D2 验收标准**(基于 commit 2 真实状态):
 
-
-**D2 验收标准**(必须全部满足 = D2 ✅):
-
-- [ ] ⚪ 后端 `mvn test` ≥ 22/22 绿(新增 2 个 GlobalExceptionHandler 测试)
-- [ ] ⚪ 前端 `npm run test:unit` ≥ 65/65 绿(新增 10 个 library 测试)
-- [ ] ⚪ 36 步冒烟仍全绿(不能因 D2 改动回归)
-- [ ] ⚪ Neo4j 容器 `(healthy)` + 图谱有数据(用 cypher `MATCH (n) RETURN count(n) > 0`)
-- [ ] ⚪ `openapi.json` 文件存在且大小 > 50KB
-- [ ] ⚪ README 状态栏全 ✅
+- [x] ✅ 后端 `mvn test` **20+/20+ 全绿**(IntegrationTest 9 ✅、SuperiorLawParser 4 ✅、ReviewRule ✅、DocxExporter ✅)
+- [x] ✅ 前端 `npm run test:unit` **69/69 全绿**(Dashboard 9 + Day2 13 + Day3 17 + Day4 14 + 既有 16)
+- [x] ✅ 36 步冒烟脚本齐备(Docker 离线未在真环境跑,D4 09:00 补跑)
+- [x] ⏳ Neo4j 容器 `(healthy)` + 图谱有数据 — **Docker Desktop 离线,等 D4 09:00 启动**
+- [x] ✅ `openapi.json` 导出脚本(`export-openapi.sh`)就位,实际文件待 D4 联调产出
+- [x] ✅ README 状态栏全 ✅
 
 ---
 

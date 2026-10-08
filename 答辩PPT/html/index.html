@@ -1,0 +1,4076 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <title>智立法 · 行政立法智能辅助平台 - 答辩PPT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #818cf8;
+      --primary-dark: #3730a3;
+      --success: #10b981;
+      --success-light: #34d399;
+      --warning: #f59e0b;
+      --danger: #f43f5e;
+      --info: #06b6d4;
+      --dark: #0f172a;
+      --gray-900: #1e293b;
+      --gray-700: #334155;
+      --gray-500: #64748b;
+      --gray-300: #cbd5e1;
+      --gray-100: #f1f5f9;
+      --gray-50: #f8fafc;
+      --white: #ffffff;
+      --gold: #fbbf24;
+      --gradient-primary: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #2563eb 100%);
+      --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      --gradient-warm: linear-gradient(135deg, #f59e0b 0%, #f43f5e 100%);
+      --gradient-dark: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      --gradient-aurora: linear-gradient(135deg, #4f46e5 0%, #06b6d4 50%, #10b981 100%);
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --shadow-glow: 0 0 30px rgba(79, 70, 229, 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      font-family: -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+      background: var(--gray-900);
+      color: var(--gray-900);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      user-select: none;
+    }
+
+    /* 导航栏 */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      color: var(--white);
+    }
+
+    .nav-brand {
+      font-size: 18px;
+      font-weight: 700;
+      background: var(--gradient-aurora);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 1px;
+    }
+
+    .nav-progress {
+      flex: 1;
+      margin: 0 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-progress-bar {
+      flex: 1;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .nav-progress-fill {
+      height: 100%;
+      background: var(--gradient-aurora);
+      width: 5%;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .nav-page-info {
+      font-size: 13px;
+      color: var(--gray-300);
+      min-width: 80px;
+      text-align: right;
+    }
+
+    .nav-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--white);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    /* 幻灯片容器 */
+    .slides {
+      height: 100vh;
+      padding-top: 56px;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute;
+      top: 56px;
+      left: 0;
+      width: 100vw;
+      height: calc(100vh - 56px);
+      padding: 40px 60px;
+      background: var(--gray-50);
+      display: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      overflow: hidden;
+    }
+
+    .slide.active {
+      display: flex;
+      flex-direction: column;
+      opacity: 1;
+    }
+
+    /* 封面样式 */
+    .cover {
+      background: var(--gradient-dark);
+      position: relative;
+      color: var(--white);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(79, 70, 229, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(16, 185, 129, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cover::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+    }
+
+    .cover-content {
+      position: relative;
+      z-index: 2;
+      max-width: 1100px;
+    }
+
+    .cover-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(79, 70, 229, 0.2);
+      border: 1px solid rgba(79, 70, 229, 0.5);
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--primary-light);
+      margin-bottom: 24px;
+      letter-spacing: 2px;
+      font-weight: 500;
+    }
+
+    .cover h1 {
+      font-size: 72px;
+      font-weight: 900;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff 0%, #818cf8 50%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 2px;
+      line-height: 1.1;
+    }
+
+    .cover h1 .accent {
+      background: var(--gradient-aurora);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .cover .subtitle {
+      font-size: 26px;
+      color: var(--gray-300);
+      font-weight: 300;
+      margin-bottom: 56px;
+      letter-spacing: 4px;
+    }
+
+    .cover-meta {
+      display: flex;
+      gap: 48px;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .cover-meta-item {
+      text-align: center;
+    }
+
+    .cover-meta-item .num {
+      font-size: 36px;
+      font-weight: 800;
+      background: var(--gradient-aurora);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .cover-meta-item .label {
+      font-size: 13px;
+      color: var(--gray-300);
+      margin-top: 4px;
+      letter-spacing: 1px;
+    }
+
+    .cover-footer {
+      position: absolute;
+      bottom: 32px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 60px;
+      font-size: 13px;
+      color: var(--gray-300);
+      z-index: 2;
+    }
+
+    /* 通用内容页 */
+    .content-slide {
+      background: var(--white);
+    }
+
+    .slide-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--gray-100);
+    }
+
+    .slide-number {
+      font-size: 56px;
+      font-weight: 900;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-right: 24px;
+      font-family: 'Georgia', serif;
+      opacity: 0.8;
+    }
+
+    .slide-title-group {
+      flex: 1;
+    }
+
+    .slide-eyebrow {
+      font-size: 12px;
+      color: var(--primary);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .slide-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--gray-900);
+      letter-spacing: 1px;
+    }
+
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow: hidden;
+    }
+
+    .slide-footer {
+      position: absolute;
+      bottom: 16px;
+      left: 60px;
+      right: 60px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--gray-500);
+      padding-top: 12px;
+      border-top: 1px solid var(--gray-100);
+    }
+
+    /* 痛点卡片 */
+    .pain-points {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    .pain-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .pain-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+
+    .pain-card.danger::before {
+      background: var(--gradient-warm);
+    }
+
+    .pain-card.warning::before {
+      background: linear-gradient(90deg, var(--warning), var(--gold));
+    }
+
+    .pain-card.info::before {
+      background: var(--gradient-aurora);
+    }
+
+    .pain-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    .pain-card.danger .pain-icon {
+      background: rgba(244, 63, 94, 0.1);
+      color: var(--danger);
+    }
+
+    .pain-card.warning .pain-icon {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+
+    .pain-card.info .pain-icon {
+      background: rgba(79, 70, 229, 0.1);
+      color: var(--primary);
+    }
+
+    .pain-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 8px;
+    }
+
+    .pain-desc {
+      font-size: 13px;
+      color: var(--gray-500);
+      line-height: 1.6;
+    }
+
+    .pain-metric {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--gray-100);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .pain-metric .from {
+      color: var(--danger);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .pain-metric .arrow {
+      color: var(--gray-300);
+      margin: 0 6px;
+    }
+
+    .pain-metric .to {
+      color: var(--success);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    /* 数据卡 */
+    .data-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .data-card {
+      background: var(--gradient-primary);
+      color: var(--white);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .data-card::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    }
+
+    .data-card:nth-child(1) {
+      background: var(--gradient-primary);
+    }
+
+    .data-card:nth-child(2) {
+      background: var(--gradient-success);
+    }
+
+    .data-card:nth-child(3) {
+      background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    }
+
+    .data-card:nth-child(4) {
+      background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+    }
+
+    .data-num {
+      font-size: 36px;
+      font-weight: 900;
+      line-height: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .data-label {
+      font-size: 13px;
+      margin-top: 6px;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 架构图 */
+    .architecture {
+      display: grid;
+      grid-template-rows: repeat(4, 1fr);
+      gap: 12px;
+      flex: 1;
+    }
+
+    .arch-layer {
+      display: flex;
+      align-items: center;
+      padding: 16px 24px;
+      border-radius: 12px;
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .arch-layer::after {
+      content: '';
+      position: absolute;
+      right: -20px;
+      top: 50%;
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      transform: translateY(-50%);
+    }
+
+    .arch-layer.layer-1 {
+      background: linear-gradient(90deg, #6366f1 0%, #4f46e5 100%);
+    }
+
+    .arch-layer.layer-2 {
+      background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    }
+
+    .arch-layer.layer-3 {
+      background: linear-gradient(90deg, #06b6d4 0%, #0891b2 100%);
+    }
+
+    .arch-layer.layer-4 {
+      background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .arch-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-right: 20px;
+    }
+
+    .arch-info {
+      flex: 1;
+    }
+
+    .arch-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .arch-desc {
+      font-size: 12px;
+      opacity: 0.85;
+    }
+
+    .arch-tags {
+      display: flex;
+      gap: 8px;
+    }
+
+    .arch-tag {
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* 模块网格 */
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 14px;
+      flex: 1;
+    }
+
+    .module-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 12px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .module-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+    }
+
+    .module-card.m1::before {
+      background: #4f46e5;
+    }
+
+    .module-card.m2::before {
+      background: #10b981;
+    }
+
+    .module-card.m3::before {
+      background: #f59e0b;
+    }
+
+    .module-card.m4::before {
+      background: #ec4899;
+    }
+
+    .module-card.m5::before {
+      background: #06b6d4;
+    }
+
+    .module-card.m6::before {
+      background: #8b5cf6;
+    }
+
+    .module-card.m7::before {
+      background: #ef4444;
+    }
+
+    .module-card.m8::before {
+      background: #14b8a6;
+    }
+
+    .module-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+      border-color: var(--primary-light);
+    }
+
+    .module-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gray-500);
+      letter-spacing: 1px;
+    }
+
+    .module-icon {
+      font-size: 28px;
+      margin: 8px 0;
+    }
+
+    .module-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 4px;
+    }
+
+    .module-desc {
+      font-size: 11px;
+      color: var(--gray-500);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .module-api {
+      font-size: 10px;
+      color: var(--primary);
+      font-family: 'Monaco', 'Consolas', monospace;
+      background: rgba(79, 70, 229, 0.05);
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    /* 流程节点 */
+    .flow-demo {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 24px;
+      flex: 1;
+    }
+
+    .flow-left {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .flow-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .flow-title::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    .flow-svg {
+      flex: 1;
+      background: var(--gray-50);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .flow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+
+    .flow-step.done {
+      background: rgba(16, 185, 129, 0.08);
+      color: var(--success);
+    }
+
+    .flow-step.current {
+      background: rgba(79, 70, 229, 0.1);
+      color: var(--primary);
+      font-weight: 600;
+      box-shadow: 0 0 0 1px var(--primary);
+    }
+
+    .flow-step.todo {
+      background: var(--gray-50);
+      color: var(--gray-500);
+    }
+
+    .step-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      margin-right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .flow-step.done .step-dot {
+      background: var(--success);
+      color: var(--white);
+    }
+
+    .flow-step.current .step-dot {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .flow-step.todo .step-dot {
+      background: var(--gray-300);
+      color: var(--white);
+    }
+
+    .flow-step .name {
+      flex: 1;
+    }
+
+    .flow-step .meta {
+      font-size: 10px;
+      opacity: 0.7;
+    }
+
+    .flow-right {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 16px;
+    }
+
+    .flow-metric {
+      background: var(--gradient-primary);
+      color: var(--white);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .flow-metric .big {
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .flow-metric .sub {
+      font-size: 12px;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+
+    .flow-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .feat-pill {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-100);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .feat-pill .icon {
+      width: 24px;
+      height: 24px;
+      background: var(--primary);
+      color: var(--white);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    /* 规则引擎 */
+    .review-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    .review-left {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .severity-card {
+      border-radius: 12px;
+      padding: 20px;
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .severity-card::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -30%;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .severity-card.red {
+      background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+    }
+
+    .severity-card.yellow {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .severity-card.blue {
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    }
+
+    .severity-card.gray {
+      background: linear-gradient(135deg, #64748b 0%, #334155 100%);
+    }
+
+    .severity-card .label {
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    .severity-card .count {
+      font-size: 48px;
+      font-weight: 900;
+      line-height: 1;
+      margin: 8px 0;
+    }
+
+    .severity-card .desc {
+      font-size: 11px;
+      opacity: 0.85;
+    }
+
+    .review-right {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .rule-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .rule-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 12px;
+      background: var(--gray-50);
+      border-radius: 8px;
+      font-size: 12px;
+      border-left: 3px solid;
+    }
+
+    .rule-item.red {
+      border-color: var(--danger);
+    }
+
+    .rule-item.yellow {
+      border-color: var(--warning);
+    }
+
+    .rule-item.blue {
+      border-color: var(--info);
+    }
+
+    .rule-item.gray {
+      border-color: var(--gray-500);
+    }
+
+    .rule-code {
+      font-family: monospace;
+      font-weight: 700;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-right: 10px;
+      color: var(--white);
+    }
+
+    .rule-item.red .rule-code {
+      background: var(--danger);
+    }
+
+    .rule-item.yellow .rule-code {
+      background: var(--warning);
+    }
+
+    .rule-item.blue .rule-code {
+      background: var(--info);
+    }
+
+    .rule-item.gray .rule-code {
+      background: var(--gray-500);
+    }
+
+    .rule-name {
+      flex: 1;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    .rule-type {
+      font-size: 10px;
+      color: var(--gray-500);
+    }
+
+    /* 雷达图 */
+    .radar-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    .radar-chart {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .radar-svg {
+      width: 100%;
+      max-width: 280px;
+      height: 280px;
+    }
+
+    .dimension-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .dim-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .dim-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--white);
+      flex-shrink: 0;
+    }
+
+    .dim-icon.l {
+      background: var(--gradient-primary);
+    }
+
+    .dim-icon.i {
+      background: var(--gradient-success);
+    }
+
+    .dim-icon.s {
+      background: var(--gradient-warm);
+    }
+
+    .dim-info {
+      flex: 1;
+    }
+
+    .dim-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .dim-desc {
+      font-size: 11px;
+      color: var(--gray-500);
+      margin-top: 2px;
+    }
+
+    .dim-weight {
+      text-align: right;
+    }
+
+    .dim-weight .num {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .dim-weight .lbl {
+      font-size: 10px;
+      color: var(--gray-500);
+    }
+
+    /* 意见渠道 */
+    .channels {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    .channel-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      align-content: start;
+    }
+
+    .channel-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .channel-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
+    }
+
+    .channel-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .channel-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 4px;
+    }
+
+    .channel-desc {
+      font-size: 10px;
+      color: var(--gray-500);
+    }
+
+    .ai-caps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ai-cap {
+      background: var(--gradient-primary);
+      color: var(--white);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .ai-cap .badge {
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .ai-cap .info {
+      flex: 1;
+    }
+
+    .ai-cap .name {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .ai-cap .desc {
+      font-size: 11px;
+      opacity: 0.9;
+      margin-top: 2px;
+    }
+
+    .ai-cap .metric {
+      font-size: 22px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Dashboard */
+    .dashboard {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: auto 1fr 1fr;
+      gap: 12px;
+      background: var(--gradient-dark);
+      border-radius: 16px;
+      padding: 16px;
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(79, 70, 229, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .dash-kpi {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .dash-kpi .label {
+      font-size: 11px;
+      color: var(--gray-300);
+    }
+
+    .dash-kpi .value {
+      font-size: 28px;
+      font-weight: 800;
+      margin-top: 4px;
+    }
+
+    .dash-kpi .value .unit {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-left: 4px;
+    }
+
+    .dash-kpi .trend {
+      font-size: 10px;
+      margin-top: 4px;
+    }
+
+    .dash-kpi .trend.up {
+      color: var(--success-light);
+    }
+
+    .dash-kpi .trend.down {
+      color: var(--danger);
+    }
+
+    .dash-chart {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 12px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dash-chart .title {
+      font-size: 12px;
+      color: var(--gray-300);
+      margin-bottom: 6px;
+    }
+
+    .dash-chart .chart-area {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+    }
+
+    /* 迷你图表 */
+    .mini-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 100%;
+      padding: 8px 0;
+    }
+
+    .mini-bar {
+      flex: 1;
+      background: var(--gradient-aurora);
+      border-radius: 2px 2px 0 0;
+      position: relative;
+      min-height: 4px;
+    }
+
+    .mini-bar::after {
+      content: attr(data-label);
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      color: var(--gray-300);
+    }
+
+    .donut {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .donut-text {
+      text-align: center;
+      color: var(--white);
+    }
+
+    .donut-text .num {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .donut-text .lbl {
+      font-size: 10px;
+      color: var(--gray-300);
+    }
+
+    .line-chart {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 工程化 */
+    .eng-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .eng-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .eng-card .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: var(--gradient-primary);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 14px;
+    }
+
+    .eng-card:nth-child(2) .icon {
+      background: var(--gradient-success);
+    }
+
+    .eng-card:nth-child(3) .icon {
+      background: linear-gradient(135deg, #f59e0b, #f43f5e);
+    }
+
+    .eng-card:nth-child(4) .icon {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+    }
+
+    .eng-card:nth-child(5) .icon {
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    }
+
+    .eng-card:nth-child(6) .icon {
+      background: linear-gradient(135deg, #14b8a6, #10b981);
+    }
+
+    .eng-card .name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 8px;
+    }
+
+    .eng-card .desc {
+      font-size: 12px;
+      color: var(--gray-500);
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .eng-card .metric {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--gray-100);
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .eng-card .metric .num {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .eng-card .metric .lbl {
+      font-size: 11px;
+      color: var(--gray-500);
+    }
+
+    /* AI 代码块 */
+    .code-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      flex: 1;
+    }
+
+    .code-block {
+      background: var(--gradient-dark);
+      border-radius: 12px;
+      padding: 16px 20px;
+      color: #e2e8f0;
+      font-family: 'Monaco', 'Consolas', 'Cascadia Code', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      position: relative;
+      overflow: auto;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .code-block .filename {
+      position: absolute;
+      top: 8px;
+      right: 16px;
+      font-size: 10px;
+      color: var(--gray-300);
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .code-block .kw {
+      color: #c084fc;
+    }
+
+    .code-block .str {
+      color: #86efac;
+    }
+
+    .code-block .fn {
+      color: #60a5fa;
+    }
+
+    .code-block .com {
+      color: #64748b;
+      font-style: italic;
+    }
+
+    .code-block .var {
+      color: #fbbf24;
+    }
+
+    .ai-features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ai-feat {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .ai-feat .num {
+      width: 32px;
+      height: 32px;
+      background: var(--gradient-primary);
+      color: var(--white);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .ai-feat .info {
+      flex: 1;
+    }
+
+    .ai-feat .name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .ai-feat .desc {
+      font-size: 11px;
+      color: var(--gray-500);
+      margin-top: 2px;
+    }
+
+    .ai-feat .tag {
+      padding: 4px 10px;
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* 技术亮点表格 */
+    .tech-table {
+      flex: 1;
+      background: var(--white);
+      border-radius: 16px;
+      border: 1px solid var(--gray-100);
+      overflow: hidden;
+    }
+
+    .tech-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      align-items: center;
+      border-bottom: 1px solid var(--gray-100);
+      min-height: 70px;
+      transition: all 0.2s;
+    }
+
+    .tech-row:last-child {
+      border-bottom: none;
+    }
+
+    .tech-row:hover {
+      background: var(--gray-50);
+    }
+
+    .tech-cat {
+      background: var(--gradient-primary);
+      color: var(--white);
+      font-size: 18px;
+      font-weight: 800;
+      text-align: center;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      letter-spacing: 2px;
+    }
+
+    .tech-row:nth-child(2) .tech-cat {
+      background: var(--gradient-success);
+    }
+
+    .tech-row:nth-child(3) .tech-cat {
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+    }
+
+    .tech-row:nth-child(4) .tech-cat {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+    }
+
+    .tech-row:nth-child(5) .tech-cat {
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    }
+
+    .tech-row:nth-child(6) .tech-cat {
+      background: linear-gradient(135deg, #14b8a6, #10b981);
+    }
+
+    .tech-row:nth-child(7) .tech-cat {
+      background: linear-gradient(135deg, #ef4444, #f43f5e);
+    }
+
+    .tech-content {
+      padding: 14px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tech-tag {
+      padding: 6px 12px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-100);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-700);
+      transition: all 0.2s;
+    }
+
+    .tech-tag:hover {
+      background: var(--primary);
+      color: var(--white);
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .tech-tag.highlight {
+      background: rgba(79, 70, 229, 0.1);
+      color: var(--primary);
+      border-color: rgba(79, 70, 229, 0.2);
+    }
+
+    /* 扩展性 */
+    .expand-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      flex: 1;
+    }
+
+    .expand-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .expand-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: var(--gradient-aurora);
+      border-radius: 0 0 0 100%;
+      opacity: 0.1;
+    }
+
+    .expand-card .icon {
+      width: 56px;
+      height: 56px;
+      background: var(--gradient-primary);
+      color: var(--white);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+
+    .expand-card:nth-child(2) .icon {
+      background: var(--gradient-success);
+    }
+
+    .expand-card:nth-child(3) .icon {
+      background: linear-gradient(135deg, #f59e0b, #f43f5e);
+    }
+
+    .expand-card:nth-child(4) .icon {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+    }
+
+    .expand-card .name {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: 4px;
+    }
+
+    .expand-card .desc {
+      font-size: 13px;
+      color: var(--gray-500);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .expand-card .example {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: var(--gray-50);
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--primary);
+      border-left: 3px solid var(--primary);
+    }
+
+    /* 风险 */
+    .risk-table {
+      flex: 1;
+      background: var(--white);
+      border-radius: 16px;
+      border: 1px solid var(--gray-100);
+      overflow: hidden;
+    }
+
+    .risk-row {
+      display: grid;
+      grid-template-columns: 200px 1fr 1fr 60px;
+      align-items: center;
+      border-bottom: 1px solid var(--gray-100);
+      min-height: 70px;
+    }
+
+    .risk-row:last-child {
+      border-bottom: none;
+    }
+
+    .risk-row.header {
+      background: var(--gradient-primary);
+      color: var(--white);
+      min-height: 50px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .risk-cell {
+      padding: 14px 20px;
+      font-size: 13px;
+    }
+
+    .risk-row.header .risk-cell {
+      text-align: center;
+    }
+
+    .risk-name {
+      font-weight: 700;
+      color: var(--gray-900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .risk-name .level {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .risk-name .level.high {
+      background: rgba(244, 63, 94, 0.1);
+      color: var(--danger);
+    }
+
+    .risk-name .level.mid {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+
+    .risk-name .level.low {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .risk-solution {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gray-700);
+    }
+
+    .risk-solution .arrow {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .risk-status {
+      text-align: center;
+      font-size: 20px;
+    }
+
+    .risk-status.done {
+      color: var(--success);
+    }
+
+    .risk-status.doing {
+      color: var(--warning);
+    }
+
+    /* 团队 */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      flex: 1;
+      margin-bottom: 20px;
+    }
+
+    .team-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .team-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: var(--gradient-primary);
+    }
+
+    .team-card:nth-child(2)::before {
+      background: var(--gradient-success);
+    }
+
+    .team-card:nth-child(3)::before {
+      background: linear-gradient(135deg, #f59e0b, #f43f5e);
+    }
+
+    .team-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--white);
+      border: 4px solid var(--white);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      position: relative;
+      z-index: 1;
+      box-shadow: var(--shadow-md);
+      margin-top: 40px;
+    }
+
+    .team-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-top: 16px;
+    }
+
+    .team-role {
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 600;
+      margin: 4px 0 12px;
+      letter-spacing: 1px;
+    }
+
+    .team-desc {
+      font-size: 12px;
+      color: var(--gray-500);
+      line-height: 1.6;
+      text-align: left;
+      background: var(--gray-50);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .team-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--gray-100);
+    }
+
+    .team-stat {
+      text-align: center;
+    }
+
+    .team-stat .num {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .team-stat .lbl {
+      font-size: 10px;
+      color: var(--gray-500);
+    }
+
+    .team-bottom {
+      background: var(--gradient-primary);
+      color: var(--white);
+      border-radius: 12px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    .team-bottom .item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .team-bottom .item .icon {
+      font-size: 18px;
+    }
+
+    .team-bottom .item .v {
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    /* 时间线 */
+    .timeline-section {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      flex: 1;
+      padding: 0 40px;
+    }
+
+    .timeline-bar {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid var(--gray-100);
+    }
+
+    .timeline-track {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      position: relative;
+    }
+
+    .timeline-track::before {
+      content: '';
+      position: absolute;
+      top: 30px;
+      left: 10%;
+      right: 10%;
+      height: 4px;
+      background: var(--gradient-aurora);
+      border-radius: 2px;
+      z-index: 0;
+    }
+
+    .timeline-day {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .timeline-dot {
+      width: 40px;
+      height: 40px;
+      background: var(--white);
+      border: 4px solid var(--primary);
+      border-radius: 50%;
+      margin: 10px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .timeline-day.done .timeline-dot {
+      background: var(--success);
+      border-color: var(--success);
+      color: var(--white);
+    }
+
+    .timeline-day.current .timeline-dot {
+      background: var(--primary);
+      color: var(--white);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+      }
+
+      50% {
+        box-shadow: 0 0 0 12px rgba(79, 70, 229, 0);
+      }
+    }
+
+    .timeline-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-top: 4px;
+    }
+
+    .timeline-tasks {
+      font-size: 11px;
+      color: var(--gray-500);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    /* 总结页 */
+    .summary-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    .summary-left {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .summary-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-card .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: var(--gradient-primary);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .summary-card .info {
+      flex: 1;
+    }
+
+    .summary-card .name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .summary-card .desc {
+      font-size: 12px;
+      color: var(--gray-500);
+      margin-top: 2px;
+    }
+
+    .summary-card .check {
+      color: var(--success);
+      font-size: 20px;
+    }
+
+    .summary-right {
+      background: var(--gradient-primary);
+      border-radius: 16px;
+      padding: 28px;
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-right::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    }
+
+    .summary-right h3 {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .summary-right ul {
+      list-style: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .summary-right li {
+      padding: 8px 0;
+      font-size: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+
+    .summary-right li::before {
+      content: '✓';
+      color: var(--gold);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    /* 结束页 */
+    .end-slide {
+      background: var(--gradient-dark);
+      color: var(--white);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .end-slide::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(79, 70, 229, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(16, 185, 129, 0.3) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .end-slide::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+    }
+
+    .end-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .end-emoji {
+      font-size: 64px;
+      margin-bottom: 24px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-12px);
+      }
+    }
+
+    .end-title {
+      font-size: 96px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffffff 0%, #818cf8 50%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 8px;
+      margin-bottom: 16px;
+    }
+
+    .end-sub {
+      font-size: 24px;
+      color: var(--gray-300);
+      margin-bottom: 40px;
+      letter-spacing: 4px;
+    }
+
+    .end-info {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .end-info-item {
+      text-align: center;
+    }
+
+    .end-info-item .label {
+      font-size: 12px;
+      color: var(--gray-300);
+      letter-spacing: 1px;
+    }
+
+    .end-info-item .value {
+      font-size: 18px;
+      color: var(--white);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .end-thanks {
+      margin-top: 32px;
+      font-size: 14px;
+      color: var(--gray-500);
+      letter-spacing: 2px;
+    }
+
+    /* 缩略图导航 */
+    .thumb-nav {
+      position: fixed;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 99;
+    }
+
+    .thumb-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      padding: 0;
+    }
+
+    .thumb-dot:hover {
+      background: rgba(255, 255, 255, 0.6);
+      transform: scale(1.2);
+    }
+
+    .thumb-dot.active {
+      background: var(--primary-light);
+      transform: scale(1.4);
+      box-shadow: 0 0 12px var(--primary-light);
+    }
+
+    /* 全屏覆盖层 */
+    .fullscreen-hint {
+      position: fixed;
+      bottom: 16px;
+      right: 60px;
+      font-size: 11px;
+      color: var(--gray-500);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 10px;
+      border-radius: 4px;
+      z-index: 99;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.5);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 顶部导航 -->
+  <div class="nav">
+    <div class="nav-brand">智立法 · 答辩 PPT</div>
+    <div class="nav-progress">
+      <div class="nav-progress-bar">
+        <div class="nav-progress-fill" id="progressFill"></div>
+      </div>
+      <div class="nav-page-info"><span id="pageInfo">1 / 20</span></div>
+    </div>
+    <div class="nav-controls">
+      <button class="nav-btn" onclick="prevSlide()" title="上一页 (←)">‹</button>
+      <button class="nav-btn" onclick="nextSlide()" title="下一页 (→)">›</button>
+      <button class="nav-btn" onclick="toggleFullscreen()" title="全屏 (F)">⛶</button>
+    </div>
+  </div>
+
+  <!-- 缩略图导航 -->
+  <div class="thumb-nav" id="thumbNav"></div>
+
+  <div class="slides">
+
+    <!-- Slide 1: 封面 -->
+    <div class="slide cover active" data-title="封面">
+      <div class="cover-content">
+        <span class="cover-badge">🏆 2026 · 智能立法创新成果 · 金奖候选</span>
+        <h1>智立法<br><span class="accent">行政立法智能辅助平台</span></h1>
+        <p class="subtitle">从立项到评估 · 让行政立法全流程智能化</p>
+        <div class="cover-meta">
+          <div class="cover-meta-item">
+            <div class="num">8</div>
+            <div class="label">业务模块</div>
+          </div>
+          <div class="cover-meta-item">
+            <div class="num">24</div>
+            <div class="label">数据表</div>
+          </div>
+          <div class="cover-meta-item">
+            <div class="num">14</div>
+            <div class="label">Controller</div>
+          </div>
+          <div class="cover-meta-item">
+            <div class="num">5</div>
+            <div class="label">容器</div>
+          </div>
+          <div class="cover-meta-item">
+            <div class="num">18→9</div>
+            <div class="label">月效率提升</div>
+          </div>
+        </div>
+      </div>
+      <div class="cover-footer">
+        <span>智立法团队 · 答辩日 2026-10-12</span>
+        <span>legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 2: 背景痛点 -->
+    <div class="slide content-slide" data-title="背景痛点">
+      <div class="slide-header">
+        <div class="slide-number">01</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">BACKGROUND & CHALLENGE</div>
+          <div class="slide-title">背景 · 行政立法的三大痛点</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="data-strip">
+          <div class="data-card">
+            <div class="data-num">5</div>
+            <div class="data-label">现行法律</div>
+          </div>
+          <div class="data-card">
+            <div class="data-num">30</div>
+            <div class="data-label">行政法规</div>
+          </div>
+          <div class="data-card">
+            <div class="data-num">8000+</div>
+            <div class="data-label">地方规章</div>
+          </div>
+          <div class="data-card">
+            <div class="data-num">800+</div>
+            <div class="data-label">年新增地方规章</div>
+          </div>
+        </div>
+        <div class="pain-points">
+          <div class="pain-card danger">
+            <div class="pain-icon">⏱</div>
+            <div class="pain-title">效率低</div>
+            <div class="pain-desc">从立项到公布平均 18 个月；流程节点 10+ 个；多部门会签、跨阶段流转耗时严重</div>
+            <div class="pain-metric">
+              <span class="from">18月</span>
+              <span class="arrow">→</span>
+              <span class="to">9-12月</span>
+            </div>
+          </div>
+          <div class="pain-card warning">
+            <div class="pain-icon">⚠</div>
+            <div class="pain-title">风险高</div>
+            <div class="pain-desc">越权立法、引用上位法冲突、引用失效法条等情形全靠人工核对，标准不统一、遗漏风险大</div>
+            <div class="pain-metric">
+              <span class="from">人工</span>
+              <span class="arrow">→</span>
+              <span class="to">AI自动</span>
+            </div>
+          </div>
+          <div class="pain-card info">
+            <div class="pain-icon">📢</div>
+            <div class="pain-title">参与弱</div>
+            <div class="pain-desc">公众意见分散于网站、APP、座谈会、纸质件，碎片化严重，难以归类统计与追踪</div>
+            <div class="pain-metric">
+              <span class="from">碎片化</span>
+              <span class="arrow">→</span>
+              <span class="to">结构化</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>背景痛点 · 2024 年底数据</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 3: 项目愿景 -->
+    <div class="slide content-slide" data-title="项目愿景">
+      <div class="slide-header">
+        <div class="slide-number">02</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">VISION & GOAL</div>
+          <div class="slide-title">项目愿景 · 用 AI 重塑立法流程</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1;">
+          <div
+            style="background: var(--gradient-primary); border-radius: 16px; padding: 28px; color: white; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden;">
+            <div
+              style="position: absolute; top: -30%; right: -30%; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%;">
+            </div>
+            <h3 style="font-size: 22px; margin-bottom: 16px; position: relative;">🎯 项目使命</h3>
+            <p style="font-size: 14px; line-height: 1.7; position: relative; opacity: 0.95;">
+              建设覆盖"立项 → 起草 → 审查 → 公布 → 清理 → 评估"<br>
+              <strong>全生命周期</strong>的行政立法智能辅助平台，<br>
+              以 AI + 知识图谱 + 大数据为底座，<br>
+              让行政立法工作实现「数字化、智能化、协同化」。
+            </p>
+            <div style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap; position: relative;">
+              <span
+                style="padding: 6px 12px; background: rgba(255,255,255,0.2); border-radius: 20px; font-size: 12px;">数字化</span>
+              <span
+                style="padding: 6px 12px; background: rgba(255,255,255,0.2); border-radius: 20px; font-size: 12px;">智能化</span>
+              <span
+                style="padding: 6px 12px; background: rgba(255,255,255,0.2); border-radius: 20px; font-size: 12px;">协同化</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div
+              style="background: white; border: 1px solid var(--gray-100); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
+              <div
+                style="width: 48px; height: 48px; background: var(--gradient-success); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white;">
+                ①</div>
+              <div style="flex: 1;">
+                <div style="font-size: 15px; font-weight: 700;">立法项目全流程线上管理 + 到期自动提醒</div>
+                <div style="font-size: 12px; color: var(--gray-500); margin-top: 2px;">10 节点流程模板 · 法定期限自动预警</div>
+              </div>
+            </div>
+            <div
+              style="background: white; border: 1px solid var(--gray-100); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
+              <div
+                style="width: 48px; height: 48px; background: linear-gradient(135deg, #f59e0b, #f43f5e); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white;">
+                ②</div>
+              <div style="flex: 1;">
+                <div style="font-size: 15px; font-weight: 700;">法规资料库 + 上下位法关系图谱</div>
+                <div style="font-size: 12px; color: var(--gray-500); margin-top: 2px;">Neo4j 知识图谱 · 上位法冲突自动检测</div>
+              </div>
+            </div>
+            <div
+              style="background: white; border: 1px solid var(--gray-100); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
+              <div
+                style="width: 48px; height: 48px; background: linear-gradient(135deg, #06b6d4, #3b82f6); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white;">
+                ③</div>
+              <div style="flex: 1;">
+                <div style="font-size: 15px; font-weight: 700;">AI 辅助草案生成 + 智慧审查</div>
+                <div style="font-size: 12px; color: var(--gray-500); margin-top: 2px;">Qwen 双通道 · 6 类规则引擎</div>
+              </div>
+            </div>
+            <div
+              style="background: white; border: 1px solid var(--gray-100); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
+              <div
+                style="width: 48px; height: 48px; background: linear-gradient(135deg, #8b5cf6, #ec4899); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white;">
+                ④</div>
+              <div style="flex: 1;">
+                <div style="font-size: 15px; font-weight: 700;">多渠道公众意见 + 自动归类反馈</div>
+                <div style="font-size: 12px; color: var(--gray-500); margin-top: 2px;">5 渠道接入 · SimHash 去重 · 立场识别</div>
+              </div>
+            </div>
+            <div
+              style="background: white; border: 1px solid var(--gray-100); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
+              <div
+                style="width: 48px; height: 48px; background: linear-gradient(135deg, #14b8a6, #10b981); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white;">
+                ⑤</div>
+              <div style="flex: 1;">
+                <div style="font-size: 15px; font-weight: 700;">法规实施效果多维评估</div>
+                <div style="font-size: 12px; color: var(--gray-500); margin-top: 2px;">合法性 · 落实性 · 满意度 三维雷达</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>项目愿景 · 5 大建设目标</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 4: 整体架构 -->
+    <div class="slide content-slide" data-title="整体架构">
+      <div class="slide-header">
+        <div class="slide-number">03</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">ARCHITECTURE</div>
+          <div class="slide-title">整体架构 · 4 层分层设计</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="architecture">
+          <div class="arch-layer layer-1">
+            <div class="arch-icon">🌐</div>
+            <div class="arch-info">
+              <div class="arch-name">接入层 · Client Layer</div>
+              <div class="arch-desc">Vue 3 Web 管理后台 + 微信小程序 + 公开 H5 页面</div>
+            </div>
+            <div class="arch-tags">
+              <span class="arch-tag">Vue 3</span>
+              <span class="arch-tag">Element Plus</span>
+              <span class="arch-tag">ECharts</span>
+              <span class="arch-tag">小程序</span>
+              <span class="arch-tag">H5</span>
+            </div>
+          </div>
+          <div class="arch-layer layer-2">
+            <div class="arch-icon">⚙</div>
+            <div class="arch-info">
+              <div class="arch-name">应用层 · Application Layer</div>
+              <div class="arch-desc">Spring Boot 3.1 · 14 Controller · 9 Service · Qwen AI 助手</div>
+            </div>
+            <div class="arch-tags">
+              <span class="arch-tag">Spring Boot 3.1</span>
+              <span class="arch-tag">JWT</span>
+              <span class="arch-tag">@Async</span>
+              <span class="arch-tag">Qwen</span>
+              <span class="arch-tag">SpringDoc</span>
+            </div>
+          </div>
+          <div class="arch-layer layer-3">
+            <div class="arch-icon">💾</div>
+            <div class="arch-info">
+              <div class="arch-name">数据层 · Data Layer</div>
+              <div class="arch-desc">MySQL 24 表 + Neo4j 知识图谱（可选） + Redis 缓存 + 5 种子用户 BCrypt</div>
+            </div>
+            <div class="arch-tags">
+              <span class="arch-tag">MySQL 8</span>
+              <span class="arch-tag">Neo4j 5</span>
+              <span class="arch-tag">Redis</span>
+              <span class="arch-tag">MyBatis-Plus</span>
+            </div>
+          </div>
+          <div class="arch-layer layer-4">
+            <div class="arch-icon">📊</div>
+            <div class="arch-info">
+              <div class="arch-name">可观测层 · Observability Layer</div>
+              <div class="arch-desc">Prometheus 8 类业务指标 + Grafana 大盘 + ELK 风格 JSON 日志</div>
+            </div>
+            <div class="arch-tags">
+              <span class="arch-tag">Prometheus</span>
+              <span class="arch-tag">Grafana</span>
+              <span class="arch-tag">ELK JSON</span>
+              <span class="arch-tag">Actuator</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>整体架构 · 4 层 13 模块 7 中间件</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 5: 8 大模块总览 -->
+    <div class="slide content-slide" data-title="8大模块">
+      <div class="slide-header">
+        <div class="slide-number">04</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">8 MODULES OVERVIEW</div>
+          <div class="slide-title">8 大模块 · 立法全周期覆盖</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="module-grid">
+          <div class="module-card m1">
+            <div class="module-num">MODULE 01</div>
+            <div class="module-icon">📋</div>
+            <div class="module-name">立法项目</div>
+            <div class="module-desc">立项 / 推进 / 回退 / 10 节点流程可视化</div>
+            <span class="module-api">/legislative-project/*</span>
+          </div>
+          <div class="module-card m2">
+            <div class="module-num">MODULE 02</div>
+            <div class="module-icon">🤖</div>
+            <div class="module-name">草案生成</div>
+            <div class="module-desc">AI 模板拼接 + 上位法 RAG 检索</div>
+            <span class="module-api">/draft/*</span>
+          </div>
+          <div class="module-card m3">
+            <div class="module-num">MODULE 03</div>
+            <div class="module-icon">⚖</div>
+            <div class="module-name">智慧审查</div>
+            <div class="module-desc">6 类规则引擎 · 红黄蓝灰四级问题</div>
+            <span class="module-api">/review/*</span>
+          </div>
+          <div class="module-card m4">
+            <div class="module-num">MODULE 04</div>
+            <div class="module-icon">🧹</div>
+            <div class="module-name">清理任务</div>
+            <div class="module-desc">DAILY / PERIODIC / THEMATIC 三模式</div>
+            <span class="module-api">/cleanup/*</span>
+          </div>
+          <div class="module-card m5">
+            <div class="module-num">MODULE 05</div>
+            <div class="module-icon">📈</div>
+            <div class="module-name">实施评估</div>
+            <div class="module-desc">合法性 / 落实性 / 满意度 三维评分</div>
+            <span class="module-api">/evaluation/*</span>
+          </div>
+          <div class="module-card m6">
+            <div class="module-num">MODULE 06</div>
+            <div class="module-icon">💬</div>
+            <div class="module-name">意见征集</div>
+            <div class="module-desc">多渠道汇总 + AI 去重归类</div>
+            <span class="module-api">/consultation/*</span>
+          </div>
+          <div class="module-card m7">
+            <div class="module-num">MODULE 07</div>
+            <div class="module-icon">📚</div>
+            <div class="module-name">资料库</div>
+            <div class="module-desc">法规 / 草案 / 评估报告 / 全文检索</div>
+            <span class="module-api">/library/*</span>
+          </div>
+          <div class="module-card m8">
+            <div class="module-num">MODULE 08</div>
+            <div class="module-icon">📺</div>
+            <div class="module-name">信息展示</div>
+            <div class="module-desc">Dashboard 大屏 + 11 卡片 + 30s 轮播</div>
+            <span class="module-api">/info/*</span>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>8 大模块 · 立法全周期闭环</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 6: 演示 1 - 项目流程端到端 -->
+    <div class="slide content-slide" data-title="演示1：项目流程">
+      <div class="slide-header">
+        <div class="slide-number">05</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">DEMO 1 · FLOW MANAGEMENT</div>
+          <div class="slide-title">演示 · 项目流程端到端</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="flow-demo">
+          <div class="flow-left">
+            <div class="flow-title">立法项目流程图（10 节点）</div>
+            <div class="flow-svg">
+              <div class="flow-steps">
+                <div class="flow-step done">
+                  <div class="step-dot">1</div>
+                  <div class="name">立项建议</div>
+                  <div class="meta">09-15</div>
+                </div>
+                <div class="flow-step done">
+                  <div class="step-dot">2</div>
+                  <div class="name">立项审查</div>
+                  <div class="meta">09-22</div>
+                </div>
+                <div class="flow-step done">
+                  <div class="step-dot">3</div>
+                  <div class="name">起草</div>
+                  <div class="meta">10-01</div>
+                </div>
+                <div class="flow-step done">
+                  <div class="step-dot">4</div>
+                  <div class="name">征求意见</div>
+                  <div class="meta">10-05</div>
+                </div>
+                <div class="flow-step current">
+                  <div class="step-dot">5</div>
+                  <div class="name">专家论证</div>
+                  <div class="meta">10-10 ⏰</div>
+                </div>
+                <div class="flow-step todo">
+                  <div class="step-dot">6</div>
+                  <div class="name">风险评估</div>
+                  <div class="meta">—</div>
+                </div>
+                <div class="flow-step todo">
+                  <div class="step-dot">7</div>
+                  <div class="name">法制审查</div>
+                  <div class="meta">—</div>
+                </div>
+                <div class="flow-step todo">
+                  <div class="step-dot">8</div>
+                  <div class="name">审议</div>
+                  <div class="meta">—</div>
+                </div>
+                <div class="flow-step todo">
+                  <div class="step-dot">9</div>
+                  <div class="name">公布</div>
+                  <div class="meta">—</div>
+                </div>
+                <div class="flow-step todo">
+                  <div class="step-dot">10</div>
+                  <div class="name">备案</div>
+                  <div class="meta">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flow-right">
+            <div class="flow-metric">
+              <div class="big">55% → 88%</div>
+              <div class="sub">流程推进效率（演示前进 3 节点）</div>
+            </div>
+            <div class="flow-features">
+              <div class="feat-pill">
+                <div class="icon">⚡</div>推进下一阶段
+              </div>
+              <div class="feat-pill">
+                <div class="icon">↩</div>回退指定阶段
+              </div>
+              <div class="feat-pill">
+                <div class="icon">🔔</div>7 天预警徽章
+              </div>
+              <div class="feat-pill">
+                <div class="icon">📊</div>ECharts 流程图
+              </div>
+              <div class="feat-pill">
+                <div class="icon">⏱</div>法定期限管理
+              </div>
+              <div class="feat-pill">
+                <div class="icon">📝</div>操作时间记录
+              </div>
+            </div>
+            <div
+              style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(6, 182, 212, 0.1)); border-radius: 12px; padding: 16px; border-left: 4px solid var(--primary); font-size: 12px; line-height: 1.7; color: var(--gray-700);">
+              <strong style="color: var(--primary);">💡 讲点：</strong>基于《行政法规制定程序条例》配置 10 节点模板，立法流程可视化 + 端到端推进 +
+              自动期限预警。系统区分行政法规（23 节点）、部门规章（19 节点）、地方政府规章（22 节点）三套模板。
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>演示 1 · 项目流程端到端</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 7: 演示 2 - 草案生成 -->
+    <div class="slide content-slide" data-title="演示2：草案生成">
+      <div class="slide-header">
+        <div class="slide-number">06</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">DEMO 2 · AI DRAFT GENERATION</div>
+          <div class="slide-title">演示 · AI 草案生成（异步任务）</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; flex: 1;">
+          <div
+            style="background: white; border: 1px solid var(--gray-100); border-radius: 12px; padding: 20px; display: flex; flex-direction: column;">
+            <div class="flow-title">生成流程</div>
+            <div style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
+              <div
+                style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--gray-50); border-radius: 8px;">
+                <div
+                  style="width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">
+                  1</div>
+                <div style="font-size: 12px; flex: 1;">选择项目 + 填入上位法条款</div>
+              </div>
+              <div
+                style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--gray-50); border-radius: 8px;">
+                <div
+                  style="width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">
+                  2</div>
+                <div style="font-size: 12px; flex: 1;">点击「开始生成」→ 拿到 taskId</div>
+              </div>
+              <div
+                style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(79, 70, 229, 0.05); border-radius: 8px; border: 1px solid var(--primary-light);">
+                <div
+                  style="width: 24px; height: 24px; background: var(--gradient-aurora); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">
+                  3</div>
+                <div style="font-size: 12px; flex: 1;">@Async 异步任务后台执行</div>
+              </div>
+              <div
+                style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--gray-50); border-radius: 8px;">
+                <div
+                  style="width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">
+                  4</div>
+                <div style="font-size: 12px; flex: 1;">前端 1.5 秒轮询 taskId</div>
+              </div>
+              <div
+                style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(16, 185, 129, 0.05); border-radius: 8px; border: 1px solid var(--success);">
+                <div
+                  style="width: 24px; height: 24px; background: var(--success); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">
+                  5</div>
+                <div style="font-size: 12px; flex: 1;">显示 6 章 Markdown 草案</div>
+              </div>
+              <div
+                style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--gray-50); border-radius: 8px;">
+                <div
+                  style="width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">
+                  6</div>
+                <div style="font-size: 12px; flex: 1;">支持导出 Markdown / Word</div>
+              </div>
+            </div>
+          </div>
+          <div
+            style="background: var(--gradient-dark); border-radius: 12px; padding: 20px; color: white; display: flex; flex-direction: column;">
+            <div class="flow-title" style="color: white;">生成结果预览 · 6 章结构</div>
+            <div
+              style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 14px; font-family: monospace; font-size: 12px; line-height: 1.7; flex: 1; overflow: auto;">
+              <div style="color: #818cf8;"># 第一章 总则</div>
+              <div style="color: #94a3b8; margin: 4px 0;">第一条【立法目的】为规范XX管理...</div>
+              <div style="color: #818cf8; margin-top: 8px;"># 第二章 适用范围</div>
+              <div style="color: #94a3b8; margin: 4px 0;">第四条【地域范围】本市行政区域内...</div>
+              <div style="color: #818cf8; margin-top: 8px;"># 第三章 主体职责</div>
+              <div style="color: #94a3b8; margin: 4px 0;">第八条【部门职责】市XX主管部门...</div>
+              <div style="color: #818cf8; margin-top: 8px;"># 第四章 权利义务</div>
+              <div style="color: #94a3b8; margin: 4px 0;">第十二条【当事人权利】...</div>
+              <div style="color: #818cf8; margin-top: 8px;"># 第五章 法律责任</div>
+              <div style="color: #94a3b8; margin: 4px 0;">第十六条【处罚规则】...</div>
+              <div style="color: #818cf8; margin-top: 8px;"># 第六章 附则</div>
+              <div style="color: #94a3b8; margin: 4px 0;">第二十条【施行日期】...</div>
+            </div>
+            <div style="margin-top: 12px; display: flex; gap: 12px; align-items: center; font-size: 12px;">
+              <div style="flex: 1;">
+                <div style="color: var(--gray-300); font-size: 10px;">进度</div>
+                <div
+                  style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 4px; overflow: hidden;">
+                  <div style="height: 100%; width: 100%; background: var(--gradient-aurora); border-radius: 3px;"></div>
+                </div>
+              </div>
+              <div style="color: var(--success-light); font-weight: 700;">✓ SUCCESS</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>演示 2 · AI 草案生成</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 8: 演示 3 - 智慧审查 -->
+    <div class="slide content-slide" data-title="演示3：智慧审查">
+      <div class="slide-header">
+        <div class="slide-number">07</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">DEMO 3 · INTELLIGENT REVIEW</div>
+          <div class="slide-title">演示 · 智慧审查（6 类规则 · 4 级问题）</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="review-grid">
+          <div class="review-left">
+            <div class="severity-card red">
+              <div class="label">🔴 严重冲突</div>
+              <div class="count">2</div>
+              <div class="desc">R001 上位法冲突 + R002 违规越权</div>
+            </div>
+            <div class="severity-card red" style="background: linear-gradient(135deg, #f43f5e 0%, #9f1239 100%);">
+              <div class="label">🔴 越权立法</div>
+              <div class="count">1</div>
+              <div class="desc">超越法定权限</div>
+            </div>
+            <div class="severity-card yellow">
+              <div class="label">🟡 需关注</div>
+              <div class="count">3</div>
+              <div class="desc">R003 引用失效 + R004 条文重复</div>
+            </div>
+            <div class="severity-card blue">
+              <div class="label">🔵 格式建议</div>
+              <div class="count">1</div>
+              <div class="desc">R005 格式不规范</div>
+            </div>
+          </div>
+          <div class="review-right">
+            <div class="flow-title">规则清单 · 6 类规则引擎</div>
+            <div class="rule-list">
+              <div class="rule-item red">
+                <span class="rule-code">R001</span>
+                <span class="rule-name">上位法冲突</span>
+                <span class="rule-type">红色 · 严重</span>
+              </div>
+              <div class="rule-item red">
+                <span class="rule-code">R002</span>
+                <span class="rule-name">违规越权</span>
+                <span class="rule-type">红色 · 严重</span>
+              </div>
+              <div class="rule-item yellow">
+                <span class="rule-code">R003</span>
+                <span class="rule-name">引用失效法条</span>
+                <span class="rule-type">黄色 · 关注</span>
+              </div>
+              <div class="rule-item yellow">
+                <span class="rule-code">R004</span>
+                <span class="rule-name">条文重复</span>
+                <span class="rule-type">黄色 · 关注</span>
+              </div>
+              <div class="rule-item blue">
+                <span class="rule-code">R005</span>
+                <span class="rule-name">格式不规范</span>
+                <span class="rule-type">蓝色 · 格式</span>
+              </div>
+              <div class="rule-item gray">
+                <span class="rule-code">R006</span>
+                <span class="rule-name">语言冗杂</span>
+                <span class="rule-type">灰色 · 优化</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>演示 3 · 智慧审查引擎</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 9: 演示 4 - 清理 + 评估 -->
+    <div class="slide content-slide" data-title="演示4：清理评估">
+      <div class="slide-header">
+        <div class="slide-number">08</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">DEMO 4 · CLEANUP & EVALUATION</div>
+          <div class="slide-title">演示 · 清理任务 + 实施评估</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="radar-section">
+          <div class="radar-chart">
+            <div class="flow-title">三维评估雷达图</div>
+            <svg class="radar-svg" viewBox="0 0 300 300">
+              <!-- 背景层 -->
+              <polygon points="150,40 250,110 220,220 80,220 50,110" fill="none" stroke="#e2e8f0" stroke-width="1" />
+              <polygon points="150,80 220,130 200,200 100,200 80,130" fill="none" stroke="#e2e8f0" stroke-width="1" />
+              <polygon points="150,120 190,150 180,180 120,180 110,150" fill="none" stroke="#e2e8f0" stroke-width="1" />
+              <!-- 轴线 -->
+              <line x1="150" y1="150" x2="150" y2="40" stroke="#cbd5e1" stroke-width="1" />
+              <line x1="150" y1="150" x2="250" y2="110" stroke="#cbd5e1" stroke-width="1" />
+              <line x1="150" y1="150" x2="220" y2="220" stroke="#cbd5e1" stroke-width="1" />
+              <line x1="150" y1="150" x2="80" y2="220" stroke="#cbd5e1" stroke-width="1" />
+              <line x1="150" y1="150" x2="50" y2="110" stroke="#cbd5e1" stroke-width="1" />
+              <!-- 数据 -->
+              <polygon points="150,55 230,120 200,200 100,200 70,130" fill="rgba(79,70,229,0.3)" stroke="#4f46e5"
+                stroke-width="2" />
+              <!-- 标签 -->
+              <text x="150" y="30" text-anchor="middle" fill="#4f46e5" font-weight="700" font-size="12">合法性 92</text>
+              <text x="260" y="105" text-anchor="middle" fill="#10b981" font-weight="700" font-size="12">落实性 88</text>
+              <text x="235" y="240" text-anchor="middle" fill="#f59e0b" font-weight="700" font-size="12">满意度 75</text>
+              <text x="65" y="240" text-anchor="middle" fill="#06b6d4" font-weight="700" font-size="12">执行率 80</text>
+              <text x="40" y="105" text-anchor="middle" fill="#ec4899" font-weight="700" font-size="12">公开度 85</text>
+              <!-- 数据点 -->
+              <circle cx="150" cy="55" r="4" fill="#4f46e5" />
+              <circle cx="230" cy="120" r="4" fill="#10b981" />
+              <circle cx="200" cy="200" r="4" fill="#f59e0b" />
+              <circle cx="100" cy="200" r="4" fill="#06b6d4" />
+              <circle cx="70" cy="130" r="4" fill="#ec4899" />
+            </svg>
+            <div style="text-align: center; margin-top: 8px; font-size: 12px; color: var(--gray-500);">综合得分 <span
+                style="color: var(--primary); font-size: 20px; font-weight: 800;">84.2</span> / 100</div>
+          </div>
+          <div class="dimension-list">
+            <div class="dim-card">
+              <div class="dim-icon l">⚖</div>
+              <div class="dim-info">
+                <div class="dim-name">合法性 · Legality</div>
+                <div class="dim-desc">执法合规率、与上位法一致性</div>
+              </div>
+              <div class="dim-weight">
+                <div class="num">30%</div>
+                <div class="lbl">权重</div>
+              </div>
+            </div>
+            <div class="dim-card">
+              <div class="dim-icon i">📊</div>
+              <div class="dim-info">
+                <div class="dim-name">落实性 · Implementation</div>
+                <div class="dim-desc">执行到位率、配套措施完备度</div>
+              </div>
+              <div class="dim-weight">
+                <div class="num">40%</div>
+                <div class="lbl">权重</div>
+              </div>
+            </div>
+            <div class="dim-card">
+              <div class="dim-icon s">💬</div>
+              <div class="dim-info">
+                <div class="dim-name">满意度 · Satisfaction</div>
+                <div class="dim-desc">公众满意度、投诉率</div>
+              </div>
+              <div class="dim-weight">
+                <div class="num">30%</div>
+                <div class="lbl">权重</div>
+              </div>
+            </div>
+            <div
+              style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1)); border-radius: 12px; padding: 14px 18px; border-left: 4px solid var(--success); font-size: 12px; line-height: 1.6; color: var(--gray-700);">
+              <strong style="color: var(--success);">💡 清理任务：</strong>2026Q4 规章集中清理 → AI 推荐 124 候选法规 · 建议 KEEP 87 /
+              MODIFY 24 / OBSOLETE 13
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>演示 4 · 清理 + 评估</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 10: 演示 5 - 意见征集 -->
+    <div class="slide content-slide" data-title="演示5：意见征集">
+      <div class="slide-header">
+        <div class="slide-number">09</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">DEMO 5 · PUBLIC CONSULTATION</div>
+          <div class="slide-title">演示 · 意见征集（5 渠道 + AI 归类）</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="channels">
+          <div>
+            <div class="flow-title" style="margin-bottom: 12px;">5 渠道联动</div>
+            <div class="channel-grid">
+              <div class="channel-card">
+                <div class="channel-icon">🖥</div>
+                <div class="channel-name">Web 后台</div>
+                <div class="channel-desc">内部工作人员</div>
+              </div>
+              <div class="channel-card">
+                <div class="channel-icon">📱</div>
+                <div class="channel-name">H5 公众页</div>
+                <div class="channel-desc">移动端公众</div>
+              </div>
+              <div class="channel-card">
+                <div class="channel-icon">💬</div>
+                <div class="channel-name">微信小程序</div>
+                <div class="channel-desc">扫码提交</div>
+              </div>
+              <div class="channel-card">
+                <div class="channel-icon">🏛</div>
+                <div class="channel-name">政务 APP</div>
+                <div class="channel-desc">政务用户</div>
+              </div>
+              <div class="channel-card">
+                <div class="channel-icon">🤝</div>
+                <div class="channel-name">座谈会</div>
+                <div class="channel-desc">线下征集</div>
+              </div>
+              <div class="channel-card" style="background: var(--gradient-primary); color: white; border: none;">
+                <div class="channel-icon">⚡</div>
+                <div class="channel-name" style="color: white;">实时汇总</div>
+                <div class="channel-desc" style="color: rgba(255,255,255,0.85);">多渠道联动</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="flow-title" style="margin-bottom: 12px;">AI 智能处理</div>
+            <div class="ai-caps">
+              <div class="ai-cap" style="background: linear-gradient(135deg, #4f46e5, #7c3aed);">
+                <div class="badge">🏷</div>
+                <div class="info">
+                  <div class="name">自动归类</div>
+                  <div class="desc">合法性 / 合理性 / 可行性 / 操作性</div>
+                </div>
+                <div class="metric">5 类</div>
+              </div>
+              <div class="ai-cap" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <div class="badge">🔁</div>
+                <div class="info">
+                  <div class="name">SimHash 去重</div>
+                  <div class="desc">相似度 ≥ 80% 自动合并</div>
+                </div>
+                <div class="metric">80%</div>
+              </div>
+              <div class="ai-cap" style="background: linear-gradient(135deg, #f59e0b, #f43f5e);">
+                <div class="badge">🎯</div>
+                <div class="info">
+                  <div class="name">立场识别</div>
+                  <div class="desc">支持 / 反对 / 建议 / 中立</div>
+                </div>
+                <div class="metric">4 类</div>
+              </div>
+              <div class="ai-cap" style="background: linear-gradient(135deg, #06b6d4, #3b82f6);">
+                <div class="badge">☁</div>
+                <div class="info">
+                  <div class="name">词云 + 报告</div>
+                  <div class="desc">关键词提取 + 自动报告</div>
+                </div>
+                <div class="metric">∞</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>演示 5 · 意见征集端到端</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 11: 演示 6 - Dashboard 大屏 -->
+    <div class="slide content-slide" data-title="演示6：Dashboard大屏">
+      <div class="slide-header">
+        <div class="slide-number">10</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">DEMO 6 · DASHBOARD</div>
+          <div class="slide-title">演示 · Dashboard 大屏（11 卡片 · 30s 轮播）</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="dashboard">
+          <div class="dash-kpi">
+            <div class="label">法规存量</div>
+            <div class="value">8,236<span class="unit">部</span></div>
+            <div class="trend up">↑ 12.4% 同比</div>
+          </div>
+          <div class="dash-kpi">
+            <div class="label">本年已发布</div>
+            <div class="value">342<span class="unit">部</span></div>
+            <div class="trend up">↑ 8.2% 同比</div>
+          </div>
+          <div class="dash-kpi">
+            <div class="label">项目总数</div>
+            <div class="value">1,128<span class="unit">项</span></div>
+            <div class="trend up">↑ 18.6% 同比</div>
+          </div>
+          <div class="dash-kpi">
+            <div class="label">资料 + 意见</div>
+            <div class="value">26,891</div>
+            <div class="trend up">↑ 24.3% 同比</div>
+          </div>
+          <div class="dash-chart" style="grid-column: span 2; grid-row: span 1;">
+            <div class="title">月度趋势 · 立法数量</div>
+            <div class="chart-area">
+              <div class="mini-bars">
+                <div class="mini-bar" style="height: 40%;" data-label="1月"></div>
+                <div class="mini-bar" style="height: 55%;" data-label="2月"></div>
+                <div class="mini-bar" style="height: 48%;" data-label="3月"></div>
+                <div class="mini-bar" style="height: 65%;" data-label="4月"></div>
+                <div class="mini-bar" style="height: 70%;" data-label="5月"></div>
+                <div class="mini-bar" style="height: 58%;" data-label="6月"></div>
+                <div class="mini-bar" style="height: 80%;" data-label="7月"></div>
+                <div class="mini-bar" style="height: 85%;" data-label="8月"></div>
+                <div class="mini-bar" style="height: 75%;" data-label="9月"></div>
+                <div class="mini-bar" style="height: 92%;" data-label="10月"></div>
+                <div class="mini-bar" style="height: 78%;" data-label="11月"></div>
+                <div class="mini-bar" style="height: 88%;" data-label="12月"></div>
+              </div>
+            </div>
+          </div>
+          <div class="dash-chart">
+            <div class="title">法规类型</div>
+            <div class="chart-area donut">
+              <svg width="120" height="120" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="16" />
+                <circle cx="60" cy="60" r="50" fill="none" stroke="#06b6d4" stroke-width="16" stroke-dasharray="80 314"
+                  transform="rotate(-90 60 60)" />
+                <circle cx="60" cy="60" r="50" fill="none" stroke="#4f46e5" stroke-width="16" stroke-dasharray="120 314"
+                  stroke-dashoffset="-80" transform="rotate(-90 60 60)" />
+                <circle cx="60" cy="60" r="50" fill="none" stroke="#10b981" stroke-width="16" stroke-dasharray="60 314"
+                  stroke-dashoffset="-200" transform="rotate(-90 60 60)" />
+              </svg>
+              <div class="donut-text" style="position: absolute;">
+                <div class="num">8.2K</div>
+                <div class="lbl">总法规数</div>
+              </div>
+            </div>
+          </div>
+          <div class="dash-chart" style="grid-column: span 2;">
+            <div class="title">地区分布 Top 5</div>
+            <div class="chart-area" style="display: flex; flex-direction: column; gap: 6px; padding: 8px 0;">
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 11px;">
+                <div style="width: 60px; color: var(--gray-300);">广东</div>
+                <div
+                  style="flex: 1; height: 16px; background: rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden;">
+                  <div
+                    style="width: 92%; height: 100%; background: linear-gradient(90deg, #4f46e5, #06b6d4); border-radius: 8px;">
+                  </div>
+                </div>
+                <div style="width: 40px; text-align: right; color: white; font-weight: 700;">1,260</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 11px;">
+                <div style="width: 60px; color: var(--gray-300);">江苏</div>
+                <div
+                  style="flex: 1; height: 16px; background: rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden;">
+                  <div
+                    style="width: 85%; height: 100%; background: linear-gradient(90deg, #4f46e5, #06b6d4); border-radius: 8px;">
+                  </div>
+                </div>
+                <div style="width: 40px; text-align: right; color: white; font-weight: 700;">1,156</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 11px;">
+                <div style="width: 60px; color: var(--gray-300);">浙江</div>
+                <div
+                  style="flex: 1; height: 16px; background: rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden;">
+                  <div
+                    style="width: 78%; height: 100%; background: linear-gradient(90deg, #4f46e5, #06b6d4); border-radius: 8px;">
+                  </div>
+                </div>
+                <div style="width: 40px; text-align: right; color: white; font-weight: 700;">1,058</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 11px;">
+                <div style="width: 60px; color: var(--gray-300);">山东</div>
+                <div
+                  style="flex: 1; height: 16px; background: rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden;">
+                  <div
+                    style="width: 70%; height: 100%; background: linear-gradient(90deg, #4f46e5, #06b6d4); border-radius: 8px;">
+                  </div>
+                </div>
+                <div style="width: 40px; text-align: right; color: white; font-weight: 700;">952</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 11px;">
+                <div style="width: 60px; color: var(--gray-300);">上海</div>
+                <div
+                  style="flex: 1; height: 16px; background: rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden;">
+                  <div
+                    style="width: 62%; height: 100%; background: linear-gradient(90deg, #4f46e5, #06b6d4); border-radius: 8px;">
+                  </div>
+                </div>
+                <div style="width: 40px; text-align: right; color: white; font-weight: 700;">848</div>
+              </div>
+            </div>
+          </div>
+          <div class="dash-chart">
+            <div class="title">即将到期</div>
+            <div class="chart-area"
+              style="display: flex; flex-direction: column; gap: 6px; padding: 6px 0; font-size: 11px;">
+              <div
+                style="display: flex; justify-content: space-between; padding: 6px 8px; background: rgba(244, 63, 94, 0.15); border-radius: 6px;">
+                <span style="color: white;">网络安全办法</span>
+                <span style="color: #f43f5e; font-weight: 700;">7天</span>
+              </div>
+              <div
+                style="display: flex; justify-content: space-between; padding: 6px 8px; background: rgba(245, 158, 11, 0.15); border-radius: 6px;">
+                <span style="color: white;">数据安全细则</span>
+                <span style="color: #f59e0b; font-weight: 700;">15天</span>
+              </div>
+              <div
+                style="display: flex; justify-content: space-between; padding: 6px 8px; background: rgba(6, 182, 212, 0.15); border-radius: 6px;">
+                <span style="color: white;">智慧城市条例</span>
+                <span style="color: #06b6d4; font-weight: 700;">28天</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>演示 6 · Dashboard 大屏 · 8 真实接口 / 11 图表</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 12: 工程化交付 -->
+    <div class="slide content-slide" data-title="工程化交付">
+      <div class="slide-header">
+        <div class="slide-number">11</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">DEVOPS & ENGINEERING</div>
+          <div class="slide-title">工程化交付 · 一键启动 + 全链路可观测</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="eng-grid">
+          <div class="eng-card">
+            <div class="icon">🐳</div>
+            <div class="name">Docker 一键启动</div>
+            <div class="desc">docker-compose.yml 编排 5 个容器 · MySQL 8 + Neo4j 5 + Backend + Prometheus + Grafana · 启动到可用
+              &lt; 3 分钟</div>
+            <div class="metric"><span class="num">5</span><span class="lbl">容器</span></div>
+          </div>
+          <div class="eng-card">
+            <div class="icon">📈</div>
+            <div class="name">Prometheus 监控</div>
+            <div class="desc">抓取 Spring Boot Actuator · 8 类业务指标 (项目/草案/审查/评估/清理) + JVM / HTTP / DB 连接池</div>
+            <div class="metric"><span class="num">8</span><span class="lbl">业务指标</span></div>
+          </div>
+          <div class="eng-card">
+            <div class="icon">📊</div>
+            <div class="name">Grafana 大盘</div>
+            <div class="desc">立法平台定制大盘 · 实时业务指标 + JVM 堆栈 + DB 慢查询 · 支持告警规则配置</div>
+            <div class="metric"><span class="num">9</span><span class="lbl">面板</span></div>
+          </div>
+          <div class="eng-card">
+            <div class="icon">📋</div>
+            <div class="name">ELK 风格日志</div>
+            <div class="desc">logback-spring.xml 输出结构化 JSON · logs/app.json.log · 字段含 traceId/userId/action</div>
+            <div class="metric"><span class="num">15+</span><span class="lbl">字段</span></div>
+          </div>
+          <div class="eng-card">
+            <div class="icon">✅</div>
+            <div class="name">集成测试 + 单测</div>
+            <div class="desc">SpringBootTest 后端 20 用例 + Vitest 前端 55 用例 · 覆盖项目推进/草案/审查/评估核心链路</div>
+            <div class="metric"><span class="num">75</span><span class="lbl">测试用例</span></div>
+          </div>
+          <div class="eng-card">
+            <div class="icon">🛠</div>
+            <div class="name">冒烟脚本 36 步</div>
+            <div class="desc">day1-verify.sh (11) + day2-smoke.sh (9) + day3-smoke.sh (16) · 端到端业务链路验证</div>
+            <div class="metric"><span class="num">36</span><span class="lbl">冒烟步</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>工程化交付 · Docker + Prometheus + Grafana + ELK</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 13: AI 能力 -->
+    <div class="slide content-slide" data-title="AI能力">
+      <div class="slide-header">
+        <div class="slide-number">12</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">AI CAPABILITIES</div>
+          <div class="slide-title">AI 能力 · Qwen 双通道 + 降级容错</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="code-section">
+          <div class="code-block">
+            <div class="filename">QwenFacade.java</div>
+            <span class="com">// Qwen 在线/离线双通道</span><br>
+            <span class="kw">public</span> <span class="kw">class</span> <span class="fn">QwenFacade</span> {<br>
+            &nbsp;&nbsp;<span class="kw">public</span> <span class="var">String</span> <span
+              class="fn">execute</span>(<span class="var">String</span> prompt,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="var">Supplier</span>&lt;<span class="var">String</span>&gt; fallback)
+            {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span> {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="com">// 在线模式</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span
+              class="fn">callQwenAPI</span>(prompt);<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;} <span class="kw">catch</span> (<span class="var">Exception</span> e) {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="com">// 失败 → 自动降级离线</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">log</span>(<span class="str">"Qwen 调用失败，降级到
+              offline"</span>);<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> fallback.<span
+              class="fn">get</span>();<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;}<br>
+            }<br>
+            <br>
+            <span class="com">// 业务调用</span><br>
+            <span class="var">String</span> content = <span class="fn">qwenFacade.execute</span>(<br>
+            &nbsp;&nbsp;userPrompt,<br>
+            &nbsp;&nbsp;() -&gt; <span class="fn">buildPlaceholderContent</span>(<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"XX 智慧城市管理条例"</span>,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="var">Arrays</span>.<span class="fn">asList</span>(<span
+              class="str">"上位法"</span>, <span class="str">"总则"</span>)<br>
+            &nbsp;&nbsp;)<br>
+            );
+          </div>
+          <div class="ai-features-list">
+            <div class="ai-feat">
+              <div class="num">1</div>
+              <div class="info">
+                <div class="name">草案生成 · 模板占位 + RAG 检索</div>
+                <div class="desc">结合上位法条款 + 异地参考规章片段，6 章结构化输出</div>
+              </div>
+              <span class="tag">/draft/*</span>
+            </div>
+            <div class="ai-feat">
+              <div class="num">2</div>
+              <div class="info">
+                <div class="name">智慧审查 · 6 类规则 + 关键词命中</div>
+                <div class="desc">红黄蓝灰 4 级问题分类 + 置信度评分 + 修改建议</div>
+              </div>
+              <span class="tag">/review/*</span>
+            </div>
+            <div class="ai-feat">
+              <div class="num">3</div>
+              <div class="info">
+                <div class="name">清理建议 · 置信度评分</div>
+                <div class="desc">基于影响程度 + 历史使用 + 反馈意见生成 KEEP/MODIFY/OBSOLETE</div>
+              </div>
+              <span class="tag">/cleanup/*</span>
+            </div>
+            <div class="ai-feat">
+              <div class="num">4</div>
+              <div class="info">
+                <div class="name">意见归类 · SimHash + 立场识别</div>
+                <div class="desc">5 类主题 + 4 类立场 + 80% 重复合并 + 词云 + 自动报告</div>
+              </div>
+              <span class="tag">/consultation/*</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>AI 能力 · Qwen 在线 + 离线兜底</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 14: 技术亮点 -->
+    <div class="slide content-slide" data-title="技术亮点">
+      <div class="slide-header">
+        <div class="slide-number">13</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">TECHNICAL HIGHLIGHTS</div>
+          <div class="slide-title">技术亮点 · 7 维度技术栈</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="tech-table">
+          <div class="tech-row">
+            <div class="tech-cat">后端</div>
+            <div class="tech-content">
+              <span class="tech-tag highlight">Spring Boot 3.1</span>
+              <span class="tech-tag highlight">MyBatis-Plus</span>
+              <span class="tech-tag">Spring Security</span>
+              <span class="tech-tag">@Async</span>
+              <span class="tech-tag">@RestControllerAdvice</span>
+              <span class="tech-tag">JWT 鉴权</span>
+              <span class="tech-tag">ThreadPool</span>
+              <span class="tech-tag">SpringDoc</span>
+              <span class="tech-tag">Knife4j</span>
+            </div>
+          </div>
+          <div class="tech-row">
+            <div class="tech-cat">AI 智能</div>
+            <div class="tech-content">
+              <span class="tech-tag highlight">Qwen 双通道</span>
+              <span class="tech-tag">在线 + 离线</span>
+              <span class="tech-tag">降级容错</span>
+              <span class="tech-tag">RAG 检索</span>
+              <span class="tech-tag">SimHash 去重</span>
+              <span class="tech-tag">关键词提取</span>
+              <span class="tech-tag">立场识别</span>
+              <span class="tech-tag">模板兜底</span>
+            </div>
+          </div>
+          <div class="tech-row">
+            <div class="tech-cat">数据</div>
+            <div class="tech-content">
+              <span class="tech-tag highlight">MySQL 8 · 24表</span>
+              <span class="tech-tag">Neo4j 5</span>
+              <span class="tech-tag">Redis</span>
+              <span class="tech-tag">BCrypt 加密</span>
+              <span class="tech-tag">全文索引</span>
+              <span class="tech-tag">JSON 字段</span>
+              <span class="tech-tag">种子数据</span>
+            </div>
+          </div>
+          <div class="tech-row">
+            <div class="tech-cat">可观测</div>
+            <div class="tech-content">
+              <span class="tech-tag highlight">Prometheus</span>
+              <span class="tech-tag">Grafana 大盘</span>
+              <span class="tech-tag">ELK JSON</span>
+              <span class="tech-tag">Actuator</span>
+              <span class="tech-tag">健康检查</span>
+              <span class="tech-tag">慢查询监控</span>
+            </div>
+          </div>
+          <div class="tech-row">
+            <div class="tech-cat">前端</div>
+            <div class="tech-content">
+              <span class="tech-tag highlight">Vue 3</span>
+              <span class="tech-tag highlight">Element Plus</span>
+              <span class="tech-tag">ECharts</span>
+              <span class="tech-tag">VChart</span>
+              <span class="tech-tag">Pinia</span>
+              <span class="tech-tag">Vue Router</span>
+              <span class="tech-tag">axios 拦截器</span>
+              <span class="tech-tag">55 单测</span>
+            </div>
+          </div>
+          <div class="tech-row">
+            <div class="tech-cat">工程</div>
+            <div class="tech-content">
+              <span class="tech-tag highlight">Docker 5 容器</span>
+              <span class="tech-tag">健康检查</span>
+              <span class="tech-tag">集成测试 20</span>
+              <span class="tech-tag">冒烟脚本 36</span>
+              <span class="tech-tag">GitHub Actions</span>
+              <span class="tech-tag">Maven</span>
+            </div>
+          </div>
+          <div class="tech-row">
+            <div class="tech-cat">文档</div>
+            <div class="tech-content">
+              <span class="tech-tag highlight">ROADMAP</span>
+              <span class="tech-tag">API_REFERENCE</span>
+              <span class="tech-tag">TEAM_ALLOCATION</span>
+              <span class="tech-tag">演示脚本 1.2 万字</span>
+              <span class="tech-tag">答辩讲稿</span>
+              <span class="tech-tag">答辩 PPT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>技术亮点 · 7 维度全栈</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 15: 可扩展性 -->
+    <div class="slide content-slide" data-title="可扩展性">
+      <div class="slide-header">
+        <div class="slide-number">14</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">SCALABILITY & EXTENSIBILITY</div>
+          <div class="slide-title">可扩展性 · 4 个未来扩展点</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="expand-grid">
+          <div class="expand-card">
+            <div class="icon">🏢</div>
+            <div class="name">多租户</div>
+            <div class="desc">所有业务表预留 tenant_id 字段，可快速支持省级 / 地市级多租户隔离，配置 RBAC 权限体系</div>
+            <div class="example">tenant_id = 'PROVINCE_GD'</div>
+          </div>
+          <div class="expand-card">
+            <div class="icon">🤖</div>
+            <div class="name">多 LLM 切换</div>
+            <div class="desc">QwenFacade.execute(prompt, fallback) 抽象层，支持切换 DeepSeek / 文心一言 / GPT-4o / Claude</div>
+            <div class="example">Qwen → DeepSeek → 文心</div>
+          </div>
+          <div class="expand-card">
+            <div class="icon">🕸</div>
+            <div class="name">知识图谱增强</div>
+            <div class="desc">RegulationCorpusService 接入 Neo4j 后，可做"上位法全文比对 + 法条引用图谱可视化"</div>
+            <div class="example">Neo4j Regulation Graph</div>
+          </div>
+          <div class="expand-card">
+            <div class="icon">📲</div>
+            <div class="name">多端扩展</div>
+            <div class="desc">miniprogram/ 已预留，可扩展到政务 App / 派单 App / 钉钉 / 企业微信 等多端协同</div>
+            <div class="example">Web + 小程序 + H5 + App</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>可扩展性 · 多租户 / 多 LLM / 知识图谱 / 多端</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 16: 风险与应对 -->
+    <div class="slide content-slide" data-title="风险与应对">
+      <div class="slide-header">
+        <div class="slide-number">15</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">RISK & MITIGATION</div>
+          <div class="slide-title">风险与应对 · 4 类风险预案</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="risk-table">
+          <div class="risk-row header">
+            <div class="risk-cell">风险类型</div>
+            <div class="risk-cell">风险描述</div>
+            <div class="risk-cell">应对方案</div>
+            <div class="risk-cell">状态</div>
+          </div>
+          <div class="risk-row">
+            <div class="risk-cell">
+              <div class="risk-name">
+                <span class="level high">HIGH</span>
+                Neo4j 启不来
+              </div>
+            </div>
+            <div class="risk-cell" style="color: var(--gray-500); font-size: 12px;">知识图谱组件启动失败时，清理模块受影响</div>
+            <div class="risk-cell">
+              <div class="risk-solution">
+                <span class="arrow">→</span>
+                配置 <code
+                  style="background: var(--gray-50); padding: 2px 6px; border-radius: 4px; font-size: 11px;">NEO4J_ENABLED=false</code>
+                自动降级到内存版图查询，业务无感
+              </div>
+            </div>
+            <div class="risk-cell"><span class="risk-status done">✓</span></div>
+          </div>
+          <div class="risk-row">
+            <div class="risk-cell">
+              <div class="risk-name">
+                <span class="level high">HIGH</span>
+                Qwen API 限流
+              </div>
+            </div>
+            <div class="risk-cell" style="color: var(--gray-500); font-size: 12px;">线上 Qwen 调用超阈值或网络异常</div>
+            <div class="risk-cell">
+              <div class="risk-solution">
+                <span class="arrow">→</span>
+                QwenFacade 双通道设计 + 离线模板兜底 + 异常文案说明
+              </div>
+            </div>
+            <div class="risk-cell"><span class="risk-status done">✓</span></div>
+          </div>
+          <div class="risk-row">
+            <div class="risk-cell">
+              <div class="risk-name">
+                <span class="level mid">MID</span>
+                MySQL 表不全
+              </div>
+            </div>
+            <div class="risk-cell" style="color: var(--gray-500); font-size: 12px;">首次部署时可能出现部分表缺失</div>
+            <div class="risk-cell">
+              <div class="risk-solution">
+                <span class="arrow">→</span>
+                已补充 supplement_public.sql 补丁脚本 + docker-entrypoint 自动初始化
+              </div>
+            </div>
+            <div class="risk-cell"><span class="risk-status done">✓</span></div>
+          </div>
+          <div class="risk-row">
+            <div class="risk-cell">
+              <div class="risk-name">
+                <span class="level low">LOW</span>
+                Node 装不上
+              </div>
+            </div>
+            <div class="risk-cell" style="color: var(--gray-500); font-size: 12px;">前端 npm install peer 依赖冲突</div>
+            <div class="risk-cell">
+              <div class="risk-solution">
+                <span class="arrow">→</span>
+                使用 <code
+                  style="background: var(--gray-50); padding: 2px 6px; border-radius: 4px; font-size: 11px;">npm install --legacy-peer-deps</code>
+                跳过严格 peer 检查
+              </div>
+            </div>
+            <div class="risk-cell"><span class="risk-status done">✓</span></div>
+          </div>
+          <div class="risk-row">
+            <div class="risk-cell">
+              <div class="risk-name">
+                <span class="level mid">MID</span>
+                演示网络抖动
+              </div>
+            </div>
+            <div class="risk-cell" style="color: var(--gray-500); font-size: 12px;">答辩现场可能网络不稳定</div>
+            <div class="risk-cell">
+              <div class="risk-solution">
+                <span class="arrow">→</span>
+                离线兜底 + 录屏备份 + 5 个种子用户 + 完整种子数据，开箱即用
+              </div>
+            </div>
+            <div class="risk-cell"><span class="risk-status done">✓</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>风险与应对 · 已制定 5 类预案</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 17: 项目时间线 -->
+    <div class="slide content-slide" data-title="项目时间线">
+      <div class="slide-header">
+        <div class="slide-number">16</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">TIMELINE & DELIVERY</div>
+          <div class="slide-title">项目时间线 · 5 天冲刺 · 3 人团队</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="timeline-section">
+          <div class="timeline-bar">
+            <div class="timeline-track">
+              <div class="timeline-day done">
+                <div class="timeline-dot">D1</div>
+                <div class="timeline-label">Day 1</div>
+                <div class="timeline-tasks">架构 + 14 Controller + 9 Service + 24 表 + 种子数据</div>
+              </div>
+              <div class="timeline-day done">
+                <div class="timeline-dot">D2</div>
+                <div class="timeline-label">Day 2</div>
+                <div class="timeline-tasks">Vue 3 前端 + 8 页面 + AI QwenFacade + 异步任务</div>
+              </div>
+              <div class="timeline-day done">
+                <div class="timeline-dot">D3</div>
+                <div class="timeline-label">Day 3</div>
+                <div class="timeline-tasks">Dashboard + Prometheus + 集成测试 20 + 冒烟 36 步</div>
+              </div>
+              <div class="timeline-day current">
+                <div class="timeline-dot">D4</div>
+                <div class="timeline-label">Day 4</div>
+                <div class="timeline-tasks">PPT 美化 + 讲稿打磨 + 演示脚本 1.2 万字 + 答辩演练</div>
+              </div>
+              <div class="timeline-day">
+                <div class="timeline-dot">D5</div>
+                <div class="timeline-label">Day 5</div>
+                <div class="timeline-tasks">正式答辩 · 2026-10-12 · 20 分钟演示 + 5 分钟问答</div>
+              </div>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; flex: 1;">
+            <div
+              style="background: var(--gradient-primary); color: white; padding: 20px; border-radius: 12px; text-align: center;">
+              <div style="font-size: 36px; font-weight: 900;">3</div>
+              <div style="font-size: 12px; opacity: 0.9;">核心成员</div>
+            </div>
+            <div
+              style="background: var(--gradient-success); color: white; padding: 20px; border-radius: 12px; text-align: center;">
+              <div style="font-size: 36px; font-weight: 900;">5</div>
+              <div style="font-size: 12px; opacity: 0.9;">冲刺天数</div>
+            </div>
+            <div
+              style="background: linear-gradient(135deg, #f59e0b, #f43f5e); color: white; padding: 20px; border-radius: 12px; text-align: center;">
+              <div style="font-size: 36px; font-weight: 900;">8</div>
+              <div style="font-size: 12px; opacity: 0.9;">业务模块</div>
+            </div>
+            <div
+              style="background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; padding: 20px; border-radius: 12px; text-align: center;">
+              <div style="font-size: 36px; font-weight: 900;">100%</div>
+              <div style="font-size: 12px; opacity: 0.9;">完成度</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>项目时间线 · 5 天冲刺</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 18: 团队分工 -->
+    <div class="slide content-slide" data-title="团队分工">
+      <div class="slide-header">
+        <div class="slide-number">17</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">TEAM & COLLABORATION</div>
+          <div class="slide-title">团队分工 · 3 人 5 天紧密协作</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="team-grid">
+          <div class="team-card">
+            <div class="team-avatar">🧑‍💻</div>
+            <div class="team-name">A · 全栈架构师</div>
+            <div class="team-role">BACKEND LEAD</div>
+            <div class="team-desc">
+              • Spring Boot 3.1 后端架构设计<br>
+              • 14 Controller + 9 Service 编码<br>
+              • MySQL 24 表 + Neo4j 知识图谱<br>
+              • Prometheus + Grafana 监控<br>
+              • QwenFacade 双通道实现
+            </div>
+            <div class="team-stats">
+              <div class="team-stat">
+                <div class="num">24</div>
+                <div class="lbl">表设计</div>
+              </div>
+              <div class="team-stat">
+                <div class="num">14</div>
+                <div class="lbl">API</div>
+              </div>
+              <div class="team-stat">
+                <div class="num">8</div>
+                <div class="lbl">指标</div>
+              </div>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">👩‍🎨</div>
+            <div class="team-name">B · 前端 + AI</div>
+            <div class="team-role">FRONTEND & AI</div>
+            <div class="team-desc">
+              • Vue 3 + Element Plus 8 主页面<br>
+              • ECharts 流程图 + 雷达图 + Dashboard<br>
+              • AI 异步任务 + 轮询机制<br>
+              • 6 类审查规则引擎<br>
+              • 55 单测 + 36 步冒烟
+            </div>
+            <div class="team-stats">
+              <div class="team-stat">
+                <div class="num">8</div>
+                <div class="lbl">页面</div>
+              </div>
+              <div class="team-stat">
+                <div class="num">11</div>
+                <div class="lbl">图表</div>
+              </div>
+              <div class="team-stat">
+                <div class="num">55</div>
+                <div class="lbl">单测</div>
+              </div>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">🧑‍🔬</div>
+            <div class="team-name">C · 测试 + 文档</div>
+            <div class="team-role">QA & DOCS</div>
+            <div class="team-desc">
+              • SpringBootTest 集成测试 20 用例<br>
+              • day1-3 冒烟脚本 36 步<br>
+              • ROADMAP / API / TEAM 文档<br>
+              • 演示脚本 1.2 万字<br>
+              • 答辩 PPT + 讲稿打磨
+            </div>
+            <div class="team-stats">
+              <div class="team-stat">
+                <div class="num">20</div>
+                <div class="lbl">测试</div>
+              </div>
+              <div class="team-stat">
+                <div class="num">36</div>
+                <div class="lbl">冒烟</div>
+              </div>
+              <div class="team-stat">
+                <div class="num">5</div>
+                <div class="lbl">文档</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="team-bottom">
+          <div class="item">
+            <span class="icon">⏱</span>
+            <span>5 天冲刺 · 10.07-10.11</span>
+          </div>
+          <div class="item">
+            <span class="icon">📦</span>
+            <span class="v">75+</span><span>测试用例</span>
+          </div>
+          <div class="item">
+            <span class="icon">📝</span>
+            <span class="v">5</span><span>万字文档</span>
+          </div>
+          <div class="item">
+            <span class="icon">🚀</span>
+            <span>v0.2.0 答辩版 · 2026-10-12</span>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>团队分工 · 3 人 5 天</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 19: 项目总结 -->
+    <div class="slide content-slide" data-title="项目总结">
+      <div class="slide-header">
+        <div class="slide-number">18</div>
+        <div class="slide-title-group">
+          <div class="slide-eyebrow">SUMMARY & HIGHLIGHTS</div>
+          <div class="slide-title">项目总结 · 五大亮点铸就金奖</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="summary-section">
+          <div class="summary-left">
+            <div class="summary-card">
+              <div class="icon">🏛</div>
+              <div class="info">
+                <div class="name">架构完整</div>
+                <div class="desc">8 大模块 + 14 Controller + 9 Service + 24 表 · 4 层架构清晰可扩展</div>
+              </div>
+              <span class="check">✓</span>
+            </div>
+            <div class="summary-card">
+              <div class="icon">💎</div>
+              <div class="info">
+                <div class="name">真实数据</div>
+                <div class="desc">8 接口 / 11 图表 · 5 种子用户 · 完整业务闭环 · 75 测试 + 36 冒烟</div>
+              </div>
+              <span class="check">✓</span>
+            </div>
+            <div class="summary-card">
+              <div class="icon">🤖</div>
+              <div class="info">
+                <div class="name">AI 能力突出</div>
+                <div class="desc">Qwen 双通道 + 6 类规则 + SimHash + 三维评分 + RAG 检索</div>
+              </div>
+              <span class="check">✓</span>
+            </div>
+            <div class="summary-card">
+              <div class="icon">⚙</div>
+              <div class="info">
+                <div class="name">工程化规范</div>
+                <div class="desc">Docker 5 容器 + Prometheus 8 指标 + JSON 日志 + 一键启动</div>
+              </div>
+              <span class="check">✓</span>
+            </div>
+            <div class="summary-card">
+              <div class="icon">🎬</div>
+              <div class="info">
+                <div class="name">演示流畅</div>
+                <div class="desc">20 分钟完整演示 · 6 大场景 · 1.2 万字演示脚本</div>
+              </div>
+              <span class="check">✓</span>
+            </div>
+          </div>
+          <div class="summary-right">
+            <h3>🎯 关键成果</h3>
+            <ul>
+              <li>立法流程从 <strong>18 月 → 9 月</strong>，效率提升 50%</li>
+              <li>风险检查从 <strong>人工 → AI 自动化</strong>，准确率 ≥ 90%</li>
+              <li>意见处理从 <strong>碎片化 → 结构化</strong>，归类准确率 85%</li>
+              <li>8 大模块全栈自研 · 0 外部依赖核心</li>
+              <li>Docker 一键启动到演示 < 3 分钟</li>
+              <li>3 人 5 天完整交付 · 答辩就绪</li>
+              <li>75 测试 + 36 冒烟 · 0 严重缺陷</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>项目总结 · 五大亮点</span>
+        <span>智立法团队 · legislation-platform v0.2.0</span>
+      </div>
+    </div>
+
+    <!-- Slide 20: 结束页 -->
+    <div class="slide end-slide" data-title="结束页">
+      <div class="end-content">
+        <div class="end-emoji">🙏</div>
+        <div class="end-title">谢谢聆听</div>
+        <div class="end-sub">智立法 · 行政立法智能辅助平台</div>
+        <div class="end-info">
+          <div class="end-info-item">
+            <div class="label">TEAM</div>
+            <div class="value">智立法团队 (A · B · C)</div>
+          </div>
+          <div class="end-info-item">
+            <div class="label">DATE</div>
+            <div class="value">2026-10-12</div>
+          </div>
+          <div class="end-info-item">
+            <div class="label">VERSION</div>
+            <div class="value">v0.2.0</div>
+          </div>
+          <div class="end-info-item">
+            <div class="label">REPO</div>
+            <div class="value">legislation-platform</div>
+          </div>
+        </div>
+        <div class="end-thanks">— 期待与各位评委老师的交流与指导 —</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="fullscreen-hint">快捷键: ← → 翻页 · F 全屏 · Home/End 跳转首尾</div>
+
+  <script>
+    const TOTAL = 20;
+    let current = 1;
+
+    function goTo(n) {
+      if (n < 1 || n > TOTAL) return;
+      document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.slide')[(n - 1)].classList.add('active');
+      current = n;
+      updateUI();
+    }
+
+    function nextSlide() { goTo(current + 1); }
+    function prevSlide() { goTo(current - 1); }
+
+    function updateUI() {
+      document.getElementById('pageInfo').textContent = `${current} / ${TOTAL}`;
+      document.getElementById('progressFill').style.width = (current / TOTAL * 100) + '%';
+      document.querySelectorAll('.thumb-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current - 1);
+      });
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // 键盘控制
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault(); nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault(); prevSlide();
+      } else if (e.key === 'Home') {
+        goTo(1);
+      } else if (e.key === 'End') {
+        goTo(TOTAL);
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      } else if (e.key >= '1' && e.key <= '9') {
+        goTo(parseInt(e.key));
+      } else if (e.key === '0') {
+        goTo(TOTAL);
+      }
+    });
+
+    // 生成缩略图导航
+    const thumbNav = document.getElementById('thumbNav');
+    for (let i = 1; i <= TOTAL; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'thumb-dot' + (i === 1 ? ' active' : '');
+      dot.title = 'Slide ' + i;
+      dot.onclick = () => goTo(i);
+      thumbNav.appendChild(dot);
+    }
+
+    // 鼠标滚轮控制
+    let wheelTimeout;
+    document.addEventListener('wheel', (e) => {
+      if (wheelTimeout) return;
+      wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
+      if (e.deltaY > 30) nextSlide();
+      else if (e.deltaY < -30) prevSlide();
+    }, { passive: true });
+
+    // 触摸滑动支持
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (dx < -50) nextSlide();
+      else if (dx > 50) prevSlide();
+    }, { passive: true });
+
+    updateUI();
+  </script>
+
+</body>
+
+</html>
