@@ -4,15 +4,20 @@
     <view class="card hero">
       <view class="hero-title">
         <text>{{ project.projectName }}</text>
-        <view class="type-badge" :style="{ background: typeColor(project.projectType) }">
+        <view
+          class="type-badge"
+          :style="{ background: typeColor(project.projectType) }"
+        >
           {{ typeLabel(project.projectType) }}
         </view>
       </view>
-      <view class="hero-desc">{{ project.description || '暂无项目说明' }}</view>
+      <view class="hero-desc">{{ project.description || "暂无项目说明" }}</view>
       <view class="hero-meta">
         <view class="meta-item">
           <text class="mi-label">状态</text>
-          <text :style="{ color: statusColor(project.status) }">{{ statusLabel(project.status) }}</text>
+          <text :style="{ color: statusColor(project.status) }">{{
+            statusLabel(project.status)
+          }}</text>
         </view>
         <view class="meta-item" v-if="project.publishDate">
           <text class="mi-label">发布日期</text>
@@ -37,25 +42,27 @@
       </view>
       <stage-bar :stages="stages" @tap="onStageTap" />
       <view v-if="currentStage" class="cur-stage">
-          当前：<text class="text-primary fw-600">{{ currentStage.stageName }}</text>
-        </view>
+        当前：<text class="text-primary fw-600">{{
+          currentStage.stageName
+        }}</text>
+      </view>
     </view>
 
     <!-- 期限预警 -->
     <view class="card" v-if="deadlines && deadlines.length">
       <view class="card-header">
-        <view class="card-title">⏰ 即将到期</view>
+        <view class="card-title"
+          ><app-icon name="clock" :size="32" /> 即将到期</view
+        >
         <text class="fz-12 text-secondary">{{ deadlines.length }} 项</text>
       </view>
-      <view
-        v-for="d in deadlines"
-        :key="d.id || d.deadlineDate"
-        class="dl-row"
-      >
-        <view class="dl-name">{{ d.stageName || d.nodeName || '阶段' }}</view>
+      <view v-for="d in deadlines" :key="d.id || d.deadlineDate" class="dl-row">
+        <view class="dl-name">{{ d.stageName || d.nodeName || "阶段" }}</view>
         <view class="dl-date">{{ d.deadlineDate }}</view>
         <view :class="['dl-tag', d.urgent ? 'tag-warn' : 'tag-info']">
-          {{ d.daysLeft >= 0 ? d.daysLeft + ' 天' : '逾期 ' + (-d.daysLeft) + ' 天' }}
+          {{
+            d.daysLeft >= 0 ? d.daysLeft + " 天" : "逾期 " + -d.daysLeft + " 天"
+          }}
         </view>
       </view>
     </view>
@@ -67,19 +74,27 @@
       </view>
       <view class="op-grid">
         <view class="op-btn" @click="onAdvance">
-          <view class="op-icon" style="background:#67c23a">↑</view>
+          <view class="op-icon" style="background: #39734c"
+            ><app-icon name="arrow-right" :size="36" tone="white"
+          /></view>
           <text>推进下一阶段</text>
         </view>
         <view class="op-btn" @click="onRollback">
-          <view class="op-icon" style="background:#f56c6c">↓</view>
+          <view class="op-icon" style="background: #a44342"
+            ><app-icon name="history" :size="36" tone="white"
+          /></view>
           <text>回退</text>
         </view>
         <view class="op-btn" @click="goDrafts">
-          <view class="op-icon" style="background:#8e44ad">稿</view>
+          <view class="op-icon" style="background: #8e44ad"
+            ><app-icon name="file-pen-line" :size="36" tone="white"
+          /></view>
           <text>查看草案</text>
         </view>
         <view class="op-btn" @click="goCleanup">
-          <view class="op-icon" style="background:#e6a23c">清</view>
+          <view class="op-icon" style="background: #9b621f"
+            ><app-icon name="brush-cleaning" :size="36" tone="white"
+          /></view>
           <text>清理建议</text>
         </view>
       </view>
@@ -112,22 +127,34 @@
     </view>
   </view>
 
-  <empty v-else-if="!loading" text="项目不存在" desc="可能已被删除" />
-  <loading-block v-else text="加载中…" />
+  <data-state
+    v-else
+    :loading="loading"
+    :error="error"
+    :empty="!loading && !error"
+    title="暂无详情"
+    description="记录可能已移除，请返回列表查看"
+    @retry="reload"
+  />
 </template>
 
 <script>
-import StageBar from '@/components/StageBar.vue'
-import Empty from '@/components/Empty.vue'
-import LoadingBlock from '@/components/LoadingBlock.vue'
+import DataState from "@/components/DataState.vue";
+import StageBar from "@/components/StageBar.vue";
+import Empty from "@/components/Empty.vue";
+import LoadingBlock from "@/components/LoadingBlock.vue";
 import {
-  PROJECT_TYPE, PROJECT_STATUS, STAGE_STATUS,
-  relativeTime, showLoading, hideLoading
-} from '@/utils/index.js'
-import { projectApi } from '@/api/index.js'
+  PROJECT_TYPE,
+  PROJECT_STATUS,
+  STAGE_STATUS,
+  relativeTime,
+  showLoading,
+  hideLoading,
+} from "@/utils/index.js";
+import { projectApi } from "@/api/index.js";
 
 export default {
-  components: { StageBar, Empty, LoadingBlock },
+  components: { DataState, StageBar, Empty, LoadingBlock },
   data() {
     return {
       id: null,
@@ -136,99 +163,136 @@ export default {
       currentStage: null,
       progress: null,
       deadlines: [],
-      loading: true
-    }
+      error: "",
+      loading: true,
+    };
   },
   onLoad(opts) {
-    this.id = Number(opts.id) || 1
+    this.id = Number(opts.id) || null;
   },
-  onShow() { this.reload() },
+  onShow() {
+    this.reload();
+  },
   methods: {
-    typeLabel(t)  { return (PROJECT_TYPE[t] || { label: t }).label },
-    typeColor(t)  { return (PROJECT_TYPE[t] || { color: '#1e5a96' }).color },
-    statusLabel(s){ return (PROJECT_STATUS[s] || { label: s }).label },
-    statusColor(s){ return (PROJECT_STATUS[s] || { color: '#1e5a96' }).color },
+    typeLabel(t) {
+      return (PROJECT_TYPE[t] || { label: t }).label;
+    },
+    typeColor(t) {
+      return (PROJECT_TYPE[t] || { color: "#1e5a96" }).color;
+    },
+    statusLabel(s) {
+      return (PROJECT_STATUS[s] || { label: s }).label;
+    },
+    statusColor(s) {
+      return (PROJECT_STATUS[s] || { color: "#1e5a96" }).color;
+    },
     dotCls(s) {
       switch (s) {
-        case 'DONE':        return 'dot-done'
-        case 'IN_PROGRESS': return 'dot-doing'
-        case 'RETURNED':    return 'dot-returned'
-        case 'SKIPPED':     return 'dot-skipped'
-        default:            return 'dot-pending'
+        case "DONE":
+          return "dot-done";
+        case "IN_PROGRESS":
+          return "dot-doing";
+        case "RETURNED":
+          return "dot-returned";
+        case "SKIPPED":
+          return "dot-skipped";
+        default:
+          return "dot-pending";
       }
     },
     relativeTime,
 
     async reload() {
-      this.loading = true
+      this.error = "";
+      this.loading = true;
       try {
-        const [detail, progress, stages, cur, deadlines] = await Promise.allSettled([
-          projectApi.projectDetail(this.id),
-          projectApi.projectProgress(this.id),
-          projectApi.listStages(this.id),
-          projectApi.currentStage(this.id),
-          projectApi.projectDeadlines(this.id)
-        ])
-        if (detail.status === 'fulfilled') {
-          this.project = detail.value
+        const [detail, progress, stages, cur, deadlines] =
+          await Promise.allSettled([
+            projectApi.projectDetail(this.id),
+            projectApi.projectProgress(this.id),
+            projectApi.listStages(this.id),
+            projectApi.currentStage(this.id),
+            projectApi.projectDeadlines(this.id),
+          ]);
+        if (detail.status === "rejected") throw detail.reason;
+        if (detail.status === "fulfilled") {
+          this.project = detail.value;
         }
-        if (progress.status === 'fulfilled') {
-          this.progress = progress.value?.progress ?? null
+        if (progress.status === "fulfilled") {
+          this.progress = progress.value?.progress ?? null;
         }
-        if (stages.status === 'fulfilled') {
-          this.stages = Array.isArray(stages.value) ? stages.value : []
+        if (stages.status === "fulfilled") {
+          this.stages = Array.isArray(stages.value) ? stages.value : [];
         }
-        if (cur.status === 'fulfilled') {
-          this.currentStage = cur.value || null
+        if (cur.status === "fulfilled") {
+          this.currentStage = cur.value || null;
         }
-        if (deadlines.status === 'fulfilled') {
-          this.deadlines = Array.isArray(deadlines.value) ? deadlines.value : []
+        if (deadlines.status === "fulfilled") {
+          this.deadlines = Array.isArray(deadlines.value)
+            ? deadlines.value
+            : [];
         }
+      } catch (e) {
+        this.error = e.message || "加载失败，请重试";
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     onStageTap(stage) {
-      uni.showToast({ title: stage.stageName, icon: 'none' })
+      uni.showToast({ title: stage.stageName, icon: "none" });
     },
 
     async onAdvance() {
-      if (!this.project) return
-      const { confirm } = await new Promise((r) => uni.showModal({
-        title: '推进阶段',
-        content: `将推进「${this.project.projectName}」到下一阶段？`,
-        success: ({ confirm }) => r({ confirm })
-      }))
-      if (!confirm) return
-      showLoading()
+      if (!this.project) return;
+      const { confirm } = await new Promise((r) =>
+        uni.showModal({
+          title: "推进阶段",
+          content: `将推进「${this.project.projectName}」到下一阶段？`,
+          success: ({ confirm }) => r({ confirm }),
+        }),
+      );
+      if (!confirm) return;
+      showLoading();
       try {
-        await projectApi.advanceProject(this.id, '小程序端推进')
-        uni.showToast({ title: '已推进', icon: 'success' })
-        this.reload()
+        await projectApi.advanceProject(this.id, "小程序端推进");
+        uni.showToast({ title: "已推进", icon: "success" });
+        this.reload();
       } finally {
-        hideLoading()
+        hideLoading();
       }
     },
 
     async onRollback() {
-      if (!this.project || !this.stages.length) return
+      if (!this.project || !this.stages.length) return;
       // 简化：弹一个输入框选择目标顺序号
-      uni.showToast({ title: '请在 Web 端操作回退（带原因）', icon: 'none' })
+      uni.showToast({ title: "请在 Web 端操作回退（带原因）", icon: "none" });
     },
 
-    goDrafts()   { uni.navigateTo({ url: `/pages/draft/index?projectId=${this.id}` }) },
-    goCleanup()  { uni.navigateTo({ url: `/pages/cleanup/index?projectId=${this.id}` }) }
-  }
-}
+    goDrafts() {
+      uni.navigateTo({ url: `/pages/draft/index?projectId=${this.id}` });
+    },
+    goCleanup() {
+      uni.navigateTo({ url: `/pages/cleanup/index?projectId=${this.id}` });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-.project-detail { padding: 24rpx 24rpx 240rpx; }
+.project-detail {
+  padding: 24rpx 24rpx 240rpx;
+}
 
 // Hero
-.hero { padding: 32rpx; }
-.hero-title { display: flex; align-items: flex-start; gap: 16rpx; }
+.hero {
+  padding: 32rpx;
+}
+.hero-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+}
 .hero-title text {
   font-size: 36rpx;
   font-weight: 700;
@@ -255,8 +319,14 @@ export default {
   gap: 24rpx;
   font-size: 24rpx;
 }
-.meta-item { display: flex; gap: 8rpx; align-items: center; }
-.mi-label  { color: #909399; }
+.meta-item {
+  display: flex;
+  gap: 8rpx;
+  align-items: center;
+}
+.mi-label {
+  color: #64748b;
+}
 
 .progress-bar {
   position: relative;
@@ -268,7 +338,7 @@ export default {
 }
 .pb-fill {
   height: 100%;
-  background: linear-gradient(90deg, #1e5a96, #67c23a);
+  background: linear-gradient(90deg, #1e5a96, #39734c);
 }
 .pb-text {
   position: absolute;
@@ -286,11 +356,21 @@ export default {
   border-radius: 12rpx;
   font-size: 26rpx;
 }
-.text-primary { color: #1e5a96; }
-.text-secondary { color: #909399; }
-.fz-12 { font-size: 24rpx; }
-.fw-600 { font-weight: 600; }
-.ml-12 { margin-left: 12rpx; }
+.text-primary {
+  color: #1e5a96;
+}
+.text-secondary {
+  color: #64748b;
+}
+.fz-12 {
+  font-size: 24rpx;
+}
+.fw-600 {
+  font-weight: 600;
+}
+.ml-12 {
+  margin-left: 12rpx;
+}
 
 // 期限
 .dl-row {
@@ -299,17 +379,32 @@ export default {
   gap: 16rpx;
   padding: 16rpx 0;
   border-bottom: 1rpx solid #f3f4f6;
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
 }
-.dl-name { flex: 1; font-size: 26rpx; color: #1f2937; }
-.dl-date { font-size: 24rpx; color: #6b7280; }
+.dl-name {
+  flex: 1;
+  font-size: 26rpx;
+  color: #1f2937;
+}
+.dl-date {
+  font-size: 24rpx;
+  color: #6b7280;
+}
 .dl-tag {
   font-size: 22rpx;
   padding: 4rpx 14rpx;
   border-radius: 8rpx;
 }
-.tag-info  { background: #ecf5fc; color: #1e5a96; }
-.tag-warn  { background: #fdf6ec; color: #e6a23c; }
+.tag-info {
+  background: #ecf5fc;
+  color: #1e5a96;
+}
+.tag-warn {
+  background: #fdf6ec;
+  color: #9b621f;
+}
 
 // 操作
 .op-grid {
@@ -347,8 +442,13 @@ export default {
   gap: 16rpx;
   padding: 16rpx 8rpx;
   border-bottom: 1rpx solid #f3f4f6;
-  &:last-child { border-bottom: none; }
-  &.row-active { background: #f0f7ff; border-radius: 12rpx; }
+  &:last-child {
+    border-bottom: none;
+  }
+  &.row-active {
+    background: #f0f7ff;
+    border-radius: 12rpx;
+  }
 }
 .sr-no {
   width: 36rpx;
@@ -362,9 +462,18 @@ export default {
   color: #6b7280;
   flex-shrink: 0;
 }
-.sr-body  { flex: 1; min-width: 0; }
-.sr-name  { font-size: 28rpx; color: #1f2937; }
-.sr-meta  { font-size: 22rpx; margin-top: 4rpx; }
+.sr-body {
+  flex: 1;
+  min-width: 0;
+}
+.sr-name {
+  font-size: 28rpx;
+  color: #1f2937;
+}
+.sr-meta {
+  font-size: 22rpx;
+  margin-top: 4rpx;
+}
 .sr-remark {
   font-size: 22rpx;
   color: #6b7280;
@@ -381,9 +490,19 @@ export default {
   margin-top: 10rpx;
   flex-shrink: 0;
 }
-.dot-pending  { background: #d1d5db; }
-.dot-done     { background: #67c23a; }
-.dot-doing    { background: #1e5a96; }
-.dot-returned { background: #f56c6c; }
-.dot-skipped  { background: #909399; }
+.dot-pending {
+  background: #d1d5db;
+}
+.dot-done {
+  background: #39734c;
+}
+.dot-doing {
+  background: #1e5a96;
+}
+.dot-returned {
+  background: #a44342;
+}
+.dot-skipped {
+  background: #64748b;
+}
 </style>

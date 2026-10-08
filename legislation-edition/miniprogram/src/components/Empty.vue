@@ -1,6 +1,8 @@
 <template>
   <view class="empty">
-    <view class="empty-icon">{{ icon }}</view>
+    <view class="empty-icon"
+      ><app-icon :name="icon" :size="80" tone="muted"
+    /></view>
     <view class="empty-text">{{ text }}</view>
     <view v-if="desc" class="empty-desc">{{ desc }}</view>
     <slot />
@@ -9,13 +11,13 @@
 
 <script>
 export default {
-  name: 'Empty',
+  name: "Empty",
   props: {
-    icon:  { type: String, default: '📭' },
-    text:  { type: String, default: '暂无数据' },
-    desc:  { type: String, default: '' }
-  }
-}
+    icon: { type: String, default: "inbox" },
+    text: { type: String, default: "暂无数据" },
+    desc: { type: String, default: "" },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -25,9 +27,20 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 96rpx 32rpx;
-  color: #909399;
+  color: #526277;
 }
-.empty-icon { font-size: 96rpx; margin-bottom: 24rpx; opacity: 0.7; }
-.empty-text { font-size: 30rpx; color: #6b7280; }
-.empty-desc { font-size: 24rpx; color: #909399; margin-top: 8rpx; }
+.empty-icon {
+  font-size: 96rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.7;
+}
+.empty-text {
+  font-size: 30rpx;
+  color: #526277;
+}
+.empty-desc {
+  font-size: 24rpx;
+  color: #526277;
+  margin-top: 8rpx;
+}
 </style>

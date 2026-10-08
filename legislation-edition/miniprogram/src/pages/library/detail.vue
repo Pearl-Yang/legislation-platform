@@ -3,39 +3,58 @@
     <view class="card">
       <view class="row1">
         <text class="title">{{ m.title }}</text>
-        <view :class="['tag', `tag-${(m.materialType||'').toLowerCase()}`]">
+        <view :class="['tag', `tag-${(m.materialType || '').toLowerCase()}`]">
           {{ typeLabel(m.materialType) }}
         </view>
       </view>
       <view class="meta">
-        <text class="text-secondary fz-12" v-if="m.issuingAuthority">{{ m.issuingAuthority }}</text>
-        <text class="text-secondary fz-12 ml-12" v-if="m.issueDate">{{ m.issueDate }}</text>
-        <text class="text-secondary fz-12 ml-12" v-if="m.viewCount">👁 {{ m.viewCount }}</text>
-        <text class="text-secondary fz-12 ml-12" v-if="m.referenceCount">🔗 引用 {{ m.referenceCount }}</text>
+        <text class="text-secondary fz-12" v-if="m.issuingAuthority">{{
+          m.issuingAuthority
+        }}</text>
+        <text class="text-secondary fz-12 ml-12" v-if="m.issueDate">{{
+          m.issueDate
+        }}</text>
+        <text class="text-secondary fz-12 ml-12" v-if="m.viewCount"
+          >浏览 {{ m.viewCount }}</text
+        >
+        <text class="text-secondary fz-12 ml-12" v-if="m.referenceCount">
+          引用 {{ m.referenceCount }}</text
+        >
       </view>
     </view>
 
     <view class="card">
-      <view class="card-title">📝 摘要</view>
-      <view class="content">{{ m.digest || '暂无摘要' }}</view>
+      <view class="card-title"> 摘要</view>
+      <view class="content">{{ m.digest || "暂无摘要" }}</view>
     </view>
 
     <view class="card" v-if="m.fullText">
-      <view class="card-title">📖 全文</view>
+      <view class="card-title"> 全文</view>
       <view class="content">{{ m.fullText }}</view>
     </view>
 
     <view class="action-bar">
-      <view class="op" @click="toggleFav">
-        <text class="op-icon">{{ faved ? '★' : '☆' }}</text>
-        <text>{{ faved ? '已收藏' : '收藏' }}</text>
-      </view>
+      <button
+        class="op"
+        :disabled="favoriteBusy"
+        :loading="favoriteBusy"
+        @click="toggleFav"
+      >
+        <app-icon
+          name="bookmark"
+          :size="36"
+          :tone="faved ? 'accent' : 'muted'"
+        />
+        <text>{{
+          !favoriteReady ? "重试收藏状态" : faved ? "已收藏" : "收藏"
+        }}</text>
+      </button>
       <view class="op" @click="addNote">
-        <text class="op-icon">✎</text>
+        <app-icon name="pencil-line" :size="36" />
         <text>批注</text>
       </view>
       <view class="op" @click="copyDigest">
-        <text class="op-icon">⧉</text>
+        <app-icon name="copy" :size="36" />
         <text>复制</text>
       </view>
     </view>
@@ -43,131 +62,245 @@
     <!-- 批注弹层 -->
     <view v-if="showNote" class="modal-mask" @click.self="showNote = false">
       <view class="modal">
-        <view class="modal-title">✎ 添加批注</view>
-        <textarea v-model="noteContent" class="textarea" placeholder="请输入批注内容…" maxlength="500" />
+        <view class="modal-title"
+          ><app-icon name="pencil-line" :size="32" /> 添加批注</view
+        >
+        <textarea
+          v-model="noteContent"
+          class="textarea"
+          placeholder="请输入批注内容…"
+          maxlength="500"
+        />
+        <view v-if="noteError" class="note-error">{{ noteError }}</view>
         <view class="modal-actions">
-          <view class="modal-btn cancel"  @click="showNote = false">取消</view>
-          <view class="modal-btn confirm" @click="confirmNote">提交</view>
+          <view class="modal-btn cancel" @click="showNote = false">取消</view>
+          <button
+            class="modal-btn confirm"
+            :disabled="noteBusy"
+            :loading="noteBusy"
+            @click="confirmNote"
+          >
+            保存批注
+          </button>
         </view>
       </view>
     </view>
 
     <!-- 批注列表 -->
     <view class="card" v-if="notes.length">
-      <view class="card-title">📚 我的批注</view>
+      <view class="card-title"
+        ><app-icon name="history" :size="32" /> 我的批注</view
+      >
       <view v-for="n in notes" :key="n.id" class="note-row">
         <view class="note-text">{{ n.noteContent }}</view>
         <view class="note-meta">{{ relativeTime(n.createdAt) }}</view>
       </view>
     </view>
   </view>
-  <empty v-else-if="!loading" text="资料不存在" />
-  <loading-block v-else text="加载中…" />
+  <data-state
+    v-else
+    :loading="loading"
+    :error="error"
+    :empty="!loading && !error"
+    title="暂无详情"
+    description="记录可能已移除，请返回列表查看"
+    @retry="reload"
+  />
 </template>
 
 <script>
-import Empty from '@/components/Empty.vue'
-import LoadingBlock from '@/components/LoadingBlock.vue'
-import { MATERIAL_TYPE, relativeTime, copy, showLoading, hideLoading } from '@/utils/index.js'
-import { libraryApi } from '@/api/index.js'
+import DataState from "@/components/DataState.vue";
+import Empty from "@/components/Empty.vue";
+import LoadingBlock from "@/components/LoadingBlock.vue";
+import {
+  MATERIAL_TYPE,
+  relativeTime,
+  copy,
+  showLoading,
+  hideLoading,
+} from "@/utils/index.js";
+import { libraryApi } from "@/api/index.js";
 
 export default {
-  components: { Empty, LoadingBlock },
+  components: { DataState, Empty, LoadingBlock },
   data() {
     return {
-      id: null, m: null, notes: [],
+      id: null,
+      m: null,
+      notes: [],
       faved: false,
+      favoriteReady: false,
+      favoriteBusy: false,
+      noteBusy: false,
+      noteError: "",
+      error: "",
       loading: true,
       showNote: false,
-      noteContent: ''
-    }
+      noteContent: "",
+    };
   },
-  onLoad(opts) { this.id = Number(opts.id) || null },
-  onShow() { this.reload() },
+  onLoad(opts) {
+    this.id = Number(opts.id) || null;
+  },
+  onShow() {
+    this.reload();
+  },
   methods: {
-    typeLabel(m) { return MATERIAL_TYPE[m] || m },
+    typeLabel(m) {
+      return MATERIAL_TYPE[m] || m;
+    },
     relativeTime,
 
     async reload() {
-      this.loading = true
+      this.error = "";
+      this.loading = true;
       try {
-        const [d, n] = await Promise.allSettled([
+        const [d, n, favorites] = await Promise.allSettled([
           libraryApi.materialDetail(this.id),
-          libraryApi.listNotes(this.id)
-        ])
-        if (d.status === 'fulfilled') this.m = d.value
-        if (n.status === 'fulfilled') this.notes = Array.isArray(n.value) ? n.value : []
+          libraryApi.listNotes(this.id),
+          libraryApi.myFavorites(),
+        ]);
+        this.favoriteReady = favorites.status === "fulfilled";
+        if (this.favoriteReady) {
+          const list = Array.isArray(favorites.value)
+            ? favorites.value
+            : favorites.value?.records || [];
+          this.faved = list.some(
+            (item) => Number(item.id ?? item.materialId) === this.id,
+          );
+        }
+        if (d.status === "rejected") throw d.reason;
+        if (d.status === "fulfilled") this.m = d.value;
+        if (n.status === "fulfilled")
+          this.notes = Array.isArray(n.value) ? n.value : [];
+      } catch (e) {
+        this.error = e.message || "加载失败，请重试";
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     async toggleFav() {
+      if (this.favoriteBusy) return;
+      if (!this.favoriteReady) {
+        await this.reload();
+        return;
+      }
+      this.favoriteBusy = true;
       try {
         if (this.faved) {
-          await libraryApi.unFavorite(this.id)
-          this.faved = false
-          uni.showToast({ title: '已取消收藏', icon: 'none' })
+          await libraryApi.unFavorite(this.id);
+          this.faved = false;
+          uni.showToast({ title: "已取消收藏", icon: "none" });
         } else {
-          await libraryApi.favorite(this.id)
-          this.faved = true
-          uni.showToast({ title: '已收藏', icon: 'success' })
+          await libraryApi.favorite(this.id);
+          this.faved = true;
+          uni.showToast({ title: "已收藏", icon: "success" });
         }
-      } catch (e) { /* 静默 */ }
+      } catch (e) {
+        /* request displays the failure */
+      } finally {
+        this.favoriteBusy = false;
+      }
     },
 
     addNote() {
-      this.noteContent = ''
-      this.showNote = true
+      this.noteContent = "";
+      this.showNote = true;
     },
 
     async confirmNote() {
+      if (this.noteBusy) return;
+      this.noteError = "";
       if (!this.noteContent.trim()) {
-        uni.showToast({ title: '请输入批注内容', icon: 'none' })
-        return
+        uni.showToast({ title: "请输入批注内容", icon: "none" });
+        return;
       }
-      this.showNote = false
-      showLoading()
+      this.noteBusy = true;
+      showLoading();
       try {
         await libraryApi.addNote(this.id, {
           content: this.noteContent,
-          highlightedText: ''
-        })
-        uni.showToast({ title: '批注已保存', icon: 'success' })
-        this.reload()
+          highlightedText: "",
+        });
+        uni.showToast({ title: "批注已保存", icon: "success" });
+        this.showNote = false;
+        this.reload();
+      } catch (e) {
+        this.noteError = e.message || "保存失败，请重试";
       } finally {
-        hideLoading()
+        this.noteBusy = false;
+        hideLoading();
       }
     },
 
     copyDigest() {
-      copy(this.m?.digest || this.m?.title || '')
-    }
-  }
-}
+      copy(this.m?.digest || this.m?.title || "");
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-.library-detail { padding: 24rpx 24rpx 200rpx; }
+.library-detail {
+  padding: 24rpx 24rpx 200rpx;
+}
 
-.row1 { display: flex; align-items: flex-start; justify-content: space-between; gap: 16rpx; }
-.title { font-size: 32rpx; font-weight: 700; color: #1f2937; flex: 1; line-height: 1.4; }
+.row1 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1f2937;
+  flex: 1;
+  line-height: 1.4;
+}
 .tag {
   font-size: 22rpx;
   padding: 4rpx 14rpx;
   border-radius: 8rpx;
   flex-shrink: 0;
 }
-.tag-regulation      { background: #ecf5fc; color: #1e5a96; }
-.tag-draft           { background: #f5e9fa; color: #8e44ad; }
-.tag-report          { background: #e8f7e6; color: #67c23a; }
-.tag-expert_opinion  { background: #fdf6ec; color: #e6a23c; }
-.tag-case            { background: #fef0f0; color: #f56c6c; }
+.tag-regulation {
+  background: #ecf5fc;
+  color: #1e5a96;
+}
+.tag-draft {
+  background: #f5e9fa;
+  color: #8e44ad;
+}
+.tag-report {
+  background: #e8f7e6;
+  color: #39734c;
+}
+.tag-expert_opinion {
+  background: #fdf6ec;
+  color: #9b621f;
+}
+.tag-case {
+  background: #fef0f0;
+  color: #a44342;
+}
 
-.text-secondary { color: #909399; }
-.fz-12 { font-size: 24rpx; }
-.ml-12 { margin-left: 12rpx; }
-.meta { margin-top: 12rpx; display: flex; flex-wrap: wrap; gap: 8rpx; }
+.text-secondary {
+  color: #64748b;
+}
+.fz-12 {
+  font-size: 24rpx;
+}
+.ml-12 {
+  margin-left: 12rpx;
+}
+.meta {
+  margin-top: 12rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
 
 .card-title {
   font-size: 30rpx;
@@ -177,11 +310,11 @@ export default {
   margin-bottom: 16rpx;
 }
 .card-title::before {
-  content: '';
+  content: "";
   display: inline-block;
   width: 8rpx;
   height: 28rpx;
-  background: #409eff;
+  background: #2b66a0;
   margin-right: 12rpx;
   border-radius: 4rpx;
 }
@@ -214,12 +347,15 @@ export default {
   font-size: 22rpx;
   color: #6b7280;
 }
-.op-icon { font-size: 36rpx; color: #1e5a96; }
+.op-icon {
+  font-size: 36rpx;
+  color: #1e5a96;
+}
 
 .modal-mask {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: flex-end;
   z-index: 99;
@@ -231,7 +367,11 @@ export default {
   border-top-right-radius: 24rpx;
   padding: 32rpx 24rpx;
 }
-.modal-title { font-size: 32rpx; font-weight: 600; margin-bottom: 16rpx; }
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
 .textarea {
   width: 100%;
   min-height: 200rpx;
@@ -241,7 +381,11 @@ export default {
   font-size: 26rpx;
   box-sizing: border-box;
 }
-.modal-actions { display: flex; gap: 16rpx; margin-top: 24rpx; }
+.modal-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
 .modal-btn {
   flex: 1;
   text-align: center;
@@ -249,14 +393,46 @@ export default {
   border-radius: 16rpx;
   font-size: 28rpx;
 }
-.modal-btn.cancel { background: #f5f7fa; color: #6b7280; }
-.modal-btn.confirm { background: linear-gradient(90deg, #409eff, #95d4e7); color: #fff; }
+.modal-btn.cancel {
+  background: #f5f7fa;
+  color: #6b7280;
+}
+.modal-btn.confirm {
+  background: #235a91;
+  color: #fff;
+}
 
 .note-row {
   padding: 16rpx 0;
   border-bottom: 1rpx solid #f3f4f6;
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
 }
-.note-text { font-size: 26rpx; color: #1f2937; line-height: 1.6; }
-.note-meta { font-size: 22rpx; color: #909399; margin-top: 4rpx; }
+.note-text {
+  font-size: 26rpx;
+  color: #1f2937;
+  line-height: 1.6;
+}
+.note-meta {
+  font-size: 22rpx;
+  color: #64748b;
+  margin-top: 4rpx;
+}
+.op {
+  background: transparent;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+}
+.op::after,
+.modal-btn::after {
+  border: none;
+}
+.note-error {
+  color: #a44342;
+  font-size: 26rpx;
+  margin-top: 12rpx;
+}
 </style>
