@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import com.legal.legislation.metrics.BusinessMetrics;
+
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map;
@@ -45,18 +47,23 @@ public class QwenApiClient implements QwenClient {
     @Value("${legislation.qwen.model:qwen-plus}")
     private String defaultModel;
 
+    /** 业务指标:成功/失败/超时的 Qwen 调用计数 + 延迟直方图 */
+    private final BusinessMetrics metrics;
+
     @Override
     public boolean isOnline() { return true; }
 
     @Override
     public String chat(QwenChatRequest request) {
         if (apiKey == null || apiKey.isBlank()) {
-            log.warn("[Qwen] apiKey 未配置,跳过在线调用");
+            log.warn("[Qwen] apiKey 未配置,跳过在线调用 → 业务侧将走 OfflineQwenClient 回退");
+            metrics.getRegistry().counter("legislation.qwen.call.total", "result", "no_key").increment();
             return null;
         }
         if (request.getModel() == null) request.setModel(defaultModel);
         // 强制非流式 — 我们后端用整段 JSON 解析,不接 SSE
         request.setStream(Boolean.FALSE);
+        long t0 = System.nanoTime();
         try {
             WebClient client = WebClient.builder()
                 .baseUrl(baseUrl)
@@ -75,17 +82,28 @@ public class QwenApiClient implements QwenClient {
                 .bodyToMono(QwenChatResponse.class)
                 .timeout(Duration.ofSeconds(30))
                 .block();
+            metrics.recordQwenLatency(System.nanoTime() - t0);
             if (resp != null && resp.getChoices() != null && !resp.getChoices().isEmpty()) {
                 String content = resp.getChoices().get(0).getMessage().getContent();
-                if (content == null) return null;
+                if (content == null || content.isBlank()) {
+                    metrics.getRegistry().counter("legislation.qwen.call.total", "result", "empty").increment();
+                    return null;
+                }
+                metrics.getRegistry().counter("legislation.qwen.call.total", "result", "success").increment();
+                log.info("[Qwen] online OK model={} len={}", request.getModel(), content.length());
                 return content;
             }
+            metrics.getRegistry().counter("legislation.qwen.call.total", "result", "empty").increment();
             return null;
         } catch (WebClientResponseException wex) {
             // HTTP 4xx/5xx — 把 DashScope 真实错误体写日志,不要吞
+            metrics.recordQwenLatency(System.nanoTime() - t0);
+            metrics.getRegistry().counter("legislation.qwen.call.total", "result", "http_" + wex.getStatusCode().value()).increment();
             log.error("[Qwen] HTTP {} body={}", wex.getStatusCode(), wex.getResponseBodyAsString());
             return null;
         } catch (Exception ex) {
+            metrics.recordQwenLatency(System.nanoTime() - t0);
+            metrics.getRegistry().counter("legislation.qwen.call.total", "result", "exception").increment();
             log.error("[Qwen] 异常", ex);
             return null;
         }

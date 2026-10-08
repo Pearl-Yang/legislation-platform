@@ -67,7 +67,8 @@ legislation:
     allowed-origins: "*"
   qwen:
     mode: ${QWEN_MODE:offline}        # online(走 dashscope) | offline(本地规则)
-    apiKey: ${QWEN_API_KEY:}
+    # 兼容两种环境变量名:DASHSCOPE_API_KEY(标准命名) / QWEN_API_KEY(简写)
+    apiKey: ${QWEN_API_KEY:${DASHSCOPE_API_KEY:}}
     baseUrl: ${QWEN_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode}
     model: ${QWEN_MODEL:qwen-plus}
 

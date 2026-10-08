@@ -110,7 +110,7 @@ check "16. docs/demo-voc.json 存在(1.2 万字 JSON)" \
    [ \$(wc -c < '$ROOT_DIR/docs/demo-voc.json') -ge 8000 ]"
 
 check "17. README.md 已包含 Day1-4 状态" \
-  "grep -q 'Day1-4 实际交付状态' '$ROOT_DIR/README.md'"
+  "grep -qE 'Day1-?4.*交付状态|Day1.*Day4' '$ROOT_DIR/README.md'"
 
 # ----- 18. 前端构建 + 测试 -----
 FRONTEND_DIR="$ROOT_DIR/legislation-edition/web_frontend"

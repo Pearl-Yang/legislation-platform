@@ -80,7 +80,12 @@ services:
       NEO4J_USER: ${NEO4J_USER:-neo4j}
       NEO4J_PASSWORD: ${NEO4J_PASSWORD:-legislation@2026}
       JWT_SECRET: ${JWT_SECRET:-legislationIntelligencePlatformSecretKey2026PaddedForHmac256}
-      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
+      # ===== Qwen / DashScope 在线 AI =====
+      QWEN_MODE: ${QWEN_MODE:-offline}     # online | offline
+      QWEN_API_KEY: ${QWEN_API_KEY:-${DASHSCOPE_API_KEY:-}}
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-${QWEN_API_KEY:-}}
+      QWEN_BASE_URL: ${QWEN_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode}
+      QWEN_MODEL: ${QWEN_MODEL:-qwen-plus}
       AI_DRAFT_ENABLED: ${AI_DRAFT_ENABLED:-false}
     ports:
       - "8083:8083"
@@ -107,7 +112,6 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention.time=30d'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.template=/usr/share/prometheus/consoles'
     ports:
       - "9090:9090"
     volumes:
