@@ -228,13 +228,13 @@ public class ConsultationServiceImpl implements ConsultationService {
         List<Opinion> opinions = opinionMapper.selectList(qw);
 
         // 用 HanLP / HanLP-Tokenizer 简单切词过于重,这里用 stop words + 双字/三字滑窗
-        java.util.Set<String> STOP = java.util.Set.of(
+        java.util.Set<String> STOP = new java.util.HashSet<>(java.util.Arrays.asList(
             "的", "了", "在", "是", "我", "有", "和", "就", "不", "人", "都", "一", "也", "很", "到",
             "说", "要", "去", "你", "会", "着", "没有", "看", "好", "这", "那", "把", "它", "自己",
             "为", "但是", "因为", "所以", "如果", "或者", "以及", "可以", "应该", "应当", "需要", "建议",
             "我们", "你们", "他们", "这个", "那个", "什么", "怎么", "现在", "以前", "以后", "一次",
             "一种", "一定", "这样", "那样", "可能", "得到", "包括", "进行", "通过"
-        );
+        ));
         java.util.Map<String, Integer> freq = new HashMap<>();
         for (Opinion o : opinions) {
             if (o.getContent() == null) continue;
