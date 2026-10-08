@@ -351,11 +351,12 @@ CREATE INDEX idx_library_type       ON library_material(material_type);
 CREATE INDEX idx_deadline_at        ON legislative_deadline(deadline_at);
 CREATE INDEX idx_tag_material       ON material_tag(material_id);
 
--- 种子数据(集成测试用)
+-- 种子数据(集成测试用) — password_hash 用 'INIT' 占位,启动后由 DataInitializer 用 BCrypt(123456) 回填
+-- (这样不用在 SQL 里写死 BCrypt hash,且 dev / openapi / prod profile 一致:重启即生效)
 INSERT INTO sys_user (id, username, display_name, password_hash, role, is_active)
 VALUES
-    (1, 'admin', '系统管理员', '$2a$10$NV0H8qg1kTFEEMxRGMrSkO3KBkLxxmIK7C9.NlpCjjGVRnpbqONHK', 'ADMIN', 1),
-    (2, 'user1', '立法专员',   '$2a$10$NvH8qFK5J8LqKpR8D5YYj.kVwqAkT2PJ9SjN3KhL2vN3kFvWpYfPm', 'USER',  1);
+    (1, 'admin', '系统管理员', 'INIT', 'ADMIN', 1),
+    (2, 'user1', '立法专员',   'INIT', 'USER',  1);
 
 INSERT INTO legislative_project (id, project_name, project_type, description, status, created_by)
 VALUES

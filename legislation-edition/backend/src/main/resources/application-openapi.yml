@@ -41,6 +41,10 @@ spring:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
+    # H2 内存库每次启动都是干净的,但 V1/V2 SQL 调整后 checksum 会变;
+    # openapi profile 仅用于跑测试 + 生成 OpenAPI 文档,允许 Flyway 跳过 checksum 校验。
+    # dev/prod profile 不该用本配置,真生产需要打开 validate-on-migrate。
+    validate-on-migrate: false
 
   # 不启用 Quartz / Redis / Neo4j
   autoconfigure:

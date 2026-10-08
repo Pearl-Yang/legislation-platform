@@ -53,6 +53,43 @@ class IntegrationTest {
     }
 
     @Test
+    void auth_login_adminCorrectPassword_returnsJwtToken() throws Exception {
+        // V1__init_schema.sql 已注入 admin / INIT 等价 123456,DataInitializer 自动回填 BCrypt
+        // 第一次正确登录会让 AuthService 的"密码为空/INIT 占位则按密码回填"分支被触发,这是预期行为
+        mvc.perform(post("/auth/login")
+                .contentType("application/json")
+                .content("{\"username\":\"admin\",\"password\":\"123456\"}"))
+           .andExpect(jsonPath("$.code").value(200))
+           .andExpect(jsonPath("$.data.token").exists())
+           .andExpect(jsonPath("$.data.token").isString())
+           .andExpect(jsonPath("$.data.username").value("admin"))
+           .andExpect(jsonPath("$.data.role").value("ADMIN"));
+    }
+
+    @Test
+    void auth_login_allSeedUsers_pass() throws Exception {
+        // V1__init_schema.sql 注入 admin / user1 (id=1, 2)
+        // V3__seed_five_role_users.sql 注入 leader / drafter / reviewer / evaluator / admin(role 不冲突)
+        // DataInitializer 会把所有 password_hash = 'INIT' 的用户回填为 BCrypt(123456)
+        String[][] users = {
+            {"admin",     "ROLE_ADMIN"},
+            {"user1",     "USER"},
+            {"leader",    "ROLE_LEADER"},
+            {"drafter",   "ROLE_USER"},
+            {"reviewer",  "ROLE_REVIEWER"},
+            {"evaluator", "ROLE_EVALUATOR"}
+        };
+        for (String[] u : users) {
+            mvc.perform(post("/auth/login")
+                    .contentType("application/json")
+                    .content("{\"username\":\"" + u[0] + "\",\"password\":\"123456\"}"))
+               .andExpect(jsonPath("$.code").value(200))
+               .andExpect(jsonPath("$.data.token").isNotEmpty())
+               .andExpect(jsonPath("$.data.username").value(u[0]));
+        }
+    }
+
+    @Test
     void auth_login_missingUsername_returnsBadRequest() throws Exception {
         // BizException.badRequest 使用默认业务错误码 40001
         mvc.perform(post("/auth/login")
