@@ -66,12 +66,19 @@ public class SecurityConfig {
                 // === 鉴权相关(放行) ===
                 .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh").permitAll()
                 .requestMatchers(HttpMethod.GET,  "/auth/health").permitAll()
-                // === 健康检查 / Prometheus 指标(放行,容器探活 + Prometheus scrape) ===
+                // === 健康检查 / Prometheus 指标(放行,k8s 探活 + Prometheus scrape) ===
                 .requestMatchers(
                     "/actuator/health", "/actuator/health/**",
                     "/actuator/info",
                     "/actuator/prometheus"
                 ).permitAll()
+                // threaddump / heapdump 限管理员(不要对外暴露进程内存快照)
+                .requestMatchers(
+                    "/actuator/threaddump",
+                    "/actuator/heapdump"
+                ).hasRole("ADMIN")
+                // 其余 actuator 端点也限管理员
+                .requestMatchers("/actuator/**").hasRole("ADMIN")
                 // === 爬虫 / 审计(限管理员) ===
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 // === 业务接口(需登录) ===

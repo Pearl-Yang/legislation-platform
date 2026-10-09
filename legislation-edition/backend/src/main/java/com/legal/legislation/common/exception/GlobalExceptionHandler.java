@@ -2,6 +2,9 @@ package com.legal.legislation.common.exception;
 
 import com.legal.legislation.common.Result;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -54,6 +57,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.ok(Result.error(40001, "缺少必填参数: " + ex.getParameterName()));
     }
 
+    /** 路径变量 / 查询参数违反约束（如 @Min、@Max、@NotBlank） */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Result<Void>> handleConstraintViolation(ConstraintViolationException ex) {
+        String msg = ex.getConstraintViolations().stream()
+            .map(v -> v.getPropertyPath() + " " + v.getMessage())
+            .collect(Collectors.joining("; "));
+        return ResponseEntity.ok(Result.error(40001, msg));
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Result<Void>> handleAccessDenied(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Result.error(40300, "无权限访问"));
@@ -67,15 +79,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(JsonProcessingException.class)
     public ResponseEntity<Result<Void>> handleJson(JsonProcessingException ex, HttpServletRequest req) {
         // 典型场景:把 SSE 流当成 JSON 解析 — 给前端一个明确提示,而不是裸 500
-        log.warn("[JsonParse] {} {} -> {}", req.getMethod(), req.getRequestURI(), ex.getOriginalMessage());
-        return ResponseEntity.ok(Result.error(50001,
-            "上游返回非 JSON 内容,已切换为本地兜底: " + ex.getOriginalMessage()));
+        log.warn("[JsonParse] {} {} -> {}", req.getMethod(), req.getRequestURI(), ex.getClass().getSimpleName());
+        return ResponseEntity.ok(Result.error(50001, "响应格式解析失败，请稍后重试"));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Result<Void>> handleUnknown(Exception ex, HttpServletRequest req) {
-        log.error("[UnhandledException] {} {}", req.getMethod(), req.getRequestURI(), ex);
-        return ResponseEntity.ok(Result.error(50000, "系统异常: " + ex.getMessage()));
+        // 仅打印异常类名+消息+请求路径，不打印堆栈，防止 SQL/路径/密钥泄露到日志
+        log.error("[UnhandledException] {} {} | {}: {}",
+            req.getMethod(), req.getRequestURI(), ex.getClass().getSimpleName(), ex.getMessage());
+        return ResponseEntity.ok(Result.error(50000, "系统异常，请稍后重试或联系管理员"));
     }
 
     private String formatFieldError(FieldError fe) {

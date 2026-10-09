@@ -10,9 +10,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.constraints.*;
+import org.springframework.validation.annotation.Validated;
+
 /**
  * 法规 Controller - 模块四 / 模块七 共用
  */
+@Validated
 @RestController
 @RequestMapping("/regulation")
 @RequiredArgsConstructor

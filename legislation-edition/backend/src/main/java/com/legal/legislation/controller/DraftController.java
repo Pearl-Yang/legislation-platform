@@ -18,17 +18,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.constraints.*;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * 草案生成 Controller - 模块二
  * TODO: 对接 LLM（RAG + 异地规章检索）
  */
+@Validated
 @RestController
 @RequestMapping("/draft")
 @RequiredArgsConstructor

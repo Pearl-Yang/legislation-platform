@@ -21,10 +21,11 @@ spring:
       username: ${NEO4J_USER:neo4j}
       password: ${NEO4J_PASSWORD:neo4j}
 
-mybatis-plus:
-  configuration:
-    map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mybatis-plus:
+    configuration:
+      map-underscore-to-camel-case: true
+      # dev 环境用 SLF4J（写到日志文件）;生产改为 log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+      log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
   mapper-locations: classpath*:/mapper/**/*.xml
   type-aliases-package: com.legal.legislation.entity
   global-config:

@@ -10,12 +10,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.constraints.*;
+
 import java.util.List;
 import java.util.Map;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * 立法资料库 Controller - 模块七
  */
+@Validated
 @RestController
 @RequestMapping("/library")
 @RequiredArgsConstructor

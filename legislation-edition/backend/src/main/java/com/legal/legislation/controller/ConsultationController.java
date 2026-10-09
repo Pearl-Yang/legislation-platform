@@ -20,12 +20,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.constraints.*;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * 意见征集 Controller - 模块六
  */
+@Validated
 @RestController
 @RequestMapping("/consultation")
 @RequiredArgsConstructor

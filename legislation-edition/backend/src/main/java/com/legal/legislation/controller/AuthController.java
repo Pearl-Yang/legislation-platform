@@ -9,8 +9,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.constraints.*;
+
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * 认证 Controller。
@@ -23,6 +26,7 @@ import java.util.Map;
  *   GET  /auth/health                                  健康检查
  */
 @Tag(name = "公共-认证", description = "登录 / 刷新 / 当前用户")
+@Validated
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor

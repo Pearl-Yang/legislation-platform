@@ -9,12 +9,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.constraints.*;
+
 import java.util.List;
 import java.util.Map;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * 信息展示 Controller - 模块八
  */
+@Validated
 @RestController
 @RequestMapping("/info")
 @RequiredArgsConstructor

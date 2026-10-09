@@ -10,15 +10,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.constraints.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * 法规爬虫管理 Controller。
  *
  * 仅管理员可调用(权限注解后续在 SecurityConfig 收紧)。
  */
+@Validated
 @RestController
 @RequestMapping("/admin/crawler")
 @RequiredArgsConstructor

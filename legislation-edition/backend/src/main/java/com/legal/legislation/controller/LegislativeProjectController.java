@@ -13,15 +13,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.constraints.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * 立法项目 Controller
  *
  * 模块一：行政立法项目全流程管理
  */
+@Validated
 @RestController
 @RequestMapping("/legislative-project")
 @RequiredArgsConstructor

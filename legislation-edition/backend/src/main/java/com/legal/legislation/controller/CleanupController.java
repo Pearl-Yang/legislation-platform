@@ -14,13 +14,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.constraints.*;
+
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * 清理任务 Controller - 模块四
  */
+@Validated
 @RestController
 @RequestMapping("/cleanup")
 @RequiredArgsConstructor
