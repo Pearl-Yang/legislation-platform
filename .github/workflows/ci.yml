@@ -29,7 +29,7 @@ jobs:
       - name: Compile & Unit Test (offline)
         working-directory: legislation-edition/backend
         run: |
-          mvn -B -Dtest="SuperiorLawParserTest,ReviewRuleTest,DocxExporterTest" test
+          mvn -B -Dtest="SuperiorLawParserTest,ReviewRuleTest,DocxExporterTest,ResultAndBizExceptionTest,ConsultationServiceWordCloudTest" test
 
       - name: Integration Test (H2 + openapi profile, no DB)
         working-directory: legislation-edition/backend
